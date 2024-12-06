@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PetKeeperMobileApp.Utils;
 using PetKeeperMobileApp.View;
-using System.Text.RegularExpressions;
 
 namespace PetKeeperMobileApp.ViewModel;
 
@@ -28,9 +28,9 @@ public partial class MainViewModel : ObservableObject
     private bool isloginErrorVisible;
 
     [RelayCommand]
-    void OnClickLoginBtn()
+    void GoToDashboardPage()
     {
-        if (IsValidEmail(Email))
+        if (Validate.IsValidEmail(Email))
             IsEmailErrorVisible = false;
         else IsEmailErrorVisible = true;
         if (string.IsNullOrEmpty(Password))
@@ -48,7 +48,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    void OnClickRegisterBtn() 
+    void GoToRegisterPage() 
     {
         //TO DO:
         IsloginErrorVisible = false;
@@ -59,14 +59,5 @@ public partial class MainViewModel : ObservableObject
     async Task GoToForgotPasswordPage()
     {
         await Shell.Current.GoToAsync(nameof(ForgotPasswordPage));
-    }
-
-    private bool IsValidEmail(string email)
-    {
-        if (string.IsNullOrWhiteSpace(email))
-            return false;
-
-        var regex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-        return regex.IsMatch(email);
     }
 }

@@ -5,25 +5,23 @@
              xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
              x:DataType="viewmodel:MainViewModel">
 
-    <ScrollView>
+    <VerticalStackLayout>
+        
         <Grid 
             RowDefinitions="100, Auto, Auto, 20, Auto, *"
-            ColumnDefinitions="Auto, *"
+            ColumnDefinitions="*"
             Padding="20"
             RowSpacing="20">
 
             <Image
                 Margin="0, 30, 0, 0"
-                Grid.ColumnSpan="2"
                 Source="logo.png"
                 HeightRequest="120"
                 WidthRequest="120"/>
 
-        
             <Grid
                 Margin="0, 50, 0, 0"
                 Grid.Row="1"
-                Grid.ColumnSpan="2"
                 RowDefinitions="Auto, 10, Auto, 10"
                 RowSpacing="10">
             
@@ -58,7 +56,6 @@
             <Label
                 Margin="0, 0, 4, 30"
                 Grid.Row="2"
-                Grid.ColumnSpan="2"
                 Text="Zresetuj hasło"
                 Style="{StaticResource Hyperlink}"
                 HorizontalOptions="End"
@@ -71,27 +68,24 @@
 
             <Label
                 Grid.Row="3"
-                Grid.ColumnSpan="2"
                 Style="{StaticResource TextError}"
                 Text="{Binding LoginErrorMessage}"
                 IsVisible="{Binding IsloginErrorVisible}"/>       
 
             <Button
                 Grid.Row="4"
-                Grid.ColumnSpan="2"
                 HeightRequest="55"
                 Style="{StaticResource PrimaryButton}"
                 Text="Zaloguj się"
-                Command="{Binding ClickLoginBtnCommand}" />
+                Command="{Binding GoToDashboardPageCommand}" />
 
             <Button
                 VerticalOptions="Start"
                 Grid.Row="5"
-                Grid.ColumnSpan="2"
                 HeightRequest="55"
                 Style="{StaticResource SecondaryButton}"
                 Text="Zarejestruj się" 
-                Command="{Binding ClickRegisterBtnCommand}" />
+                Command="{Binding GoToRegisterPageCommand}" />
         </Grid>
-    </ScrollView>
+    </VerticalStackLayout>
 </ContentPage>

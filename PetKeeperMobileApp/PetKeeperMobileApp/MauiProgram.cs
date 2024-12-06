@@ -15,6 +15,9 @@ namespace PetKeeperMobileApp
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+
+                    fonts.AddFont("regular.otf", "FAR");
+                    fonts.AddFont("solid.otf", "FAS");
                 });
 
             builder.Services.AddSingleton<MainPage>();
@@ -22,6 +25,9 @@ namespace PetKeeperMobileApp
 
             builder.Services.AddTransient<ForgotPasswordPage>();
             builder.Services.AddTransient<ForgotPasswordViewModel>();
+
+            //builder.Services.AddTransient<ConfirmationView>();
+            //builder.Services.AddTransient<ConfirmationViewModel>();
 
 #if DEBUG
     		builder.Logging.AddDebug();
