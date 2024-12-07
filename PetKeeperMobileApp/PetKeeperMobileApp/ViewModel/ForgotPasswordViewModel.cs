@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PetKeeperMobileApp.Utils;
+using PetKeeperMobileApp.View;
 
 namespace PetKeeperMobileApp.ViewModel;
 
@@ -30,8 +31,20 @@ public partial class ForgotPasswordViewModel : ObservableObject
         }
 
         IsEmailErrorVisible = false;
+
         //TO DO:
         //komunikacja z backendem
         //generyczny komponent
+        var confirmationViewModel = new ConfirmationViewModel()
+        {
+            Title = "CZE",
+            Description = "",
+            Status = Enums.StatusIcon.Success,
+            Retry = new RelayCommand(async () => {
+            //TO DO:
+            })
+        };
+
+        await Application.Current!.MainPage!.Navigation.PushModalAsync(new ConfirmationPage(confirmationViewModel));
     }
 }

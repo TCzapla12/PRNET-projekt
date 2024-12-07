@@ -5,87 +5,83 @@
              xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
              x:DataType="viewmodel:MainViewModel">
 
-    <VerticalStackLayout>
-        
-        <Grid 
-            RowDefinitions="100, Auto, Auto, 20, Auto, *"
-            ColumnDefinitions="*"
-            Padding="20"
-            RowSpacing="20">
+    <Grid 
+        RowDefinitions="100, Auto, Auto, 20, Auto, *"
+        Padding="20"
+        RowSpacing="20">
 
-            <Image
-                Margin="0, 30, 0, 0"
-                Source="logo.png"
-                HeightRequest="120"
-                WidthRequest="120"/>
+        <Image
+            Margin="0, 30, 0, 0"
+            Source="logo.png"
+            HeightRequest="120"
+            WidthRequest="120"/>
 
-            <Grid
-                Margin="0, 50, 0, 0"
+        <Grid
+            Margin="0, 50, 0, 0"
+            Grid.Row="1"
+            RowDefinitions="Auto, 10, Auto, 10"
+            RowSpacing="10">
+
+            <Entry
+                Placeholder="E-mail"
+                Text="{Binding Email}"
+                IsSpellCheckEnabled="False" />
+
+            <Label
+                Margin="4, -10, 0, 0"
+                TextColor="Red"
                 Grid.Row="1"
-                RowDefinitions="Auto, 10, Auto, 10"
-                RowSpacing="10">
-            
-                <Entry
-                    Placeholder="E-mail"
-                    Text="{Binding Email}"
-                    IsSpellCheckEnabled="False" />
+                FontSize="12"
+                IsVisible="{Binding IsEmailErrorVisible}"
+                Text="Niepoprawny adres e-mail!" />
 
-                <Label
-                    Margin="4, -10, 0, 0"
-                    TextColor="Red"
-                    Grid.Row="1"
-                    FontSize="12"
-                    IsVisible="{Binding IsEmailErrorVisible}"
-                    Text="Niepoprawny adres e-mail!" />          
-
-                <Entry 
-                    Placeholder="Password"
-                    Grid.Row="2"
-                    Text="{Binding Password}"
-                    IsPassword="True"/>
-
-                <Label
-                    Margin="4, -10, 0, 0"
-                    Grid.Row="3"
-                    TextColor="Red"
-                    FontSize="12"
-                    IsVisible="{Binding IsPasswordErrorVisible}"
-                    Text="Brak hasła!" />
-            </Grid>
-
-            <Label
-                Margin="0, 0, 4, 30"
+            <Entry 
+                Placeholder="Password"
                 Grid.Row="2"
-                Text="Zresetuj hasło"
-                Style="{StaticResource Hyperlink}"
-                HorizontalOptions="End"
-                TextDecorations="Underline">
-                
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding GoToForgotPasswordPageCommand}" />
-                </Label.GestureRecognizers>
-            </Label>
+                Text="{Binding Password}"
+                IsPassword="True"/>
 
             <Label
+                Margin="4, -10, 0, 0"
                 Grid.Row="3"
-                Style="{StaticResource TextError}"
-                Text="{Binding LoginErrorMessage}"
-                IsVisible="{Binding IsloginErrorVisible}"/>       
-
-            <Button
-                Grid.Row="4"
-                HeightRequest="55"
-                Style="{StaticResource PrimaryButton}"
-                Text="Zaloguj się"
-                Command="{Binding GoToDashboardPageCommand}" />
-
-            <Button
-                VerticalOptions="Start"
-                Grid.Row="5"
-                HeightRequest="55"
-                Style="{StaticResource SecondaryButton}"
-                Text="Zarejestruj się" 
-                Command="{Binding GoToRegisterPageCommand}" />
+                TextColor="Red"
+                FontSize="12"
+                IsVisible="{Binding IsPasswordErrorVisible}"
+                Text="Brak hasła!" />
         </Grid>
-    </VerticalStackLayout>
+
+        <Label
+            Margin="0, 0, 4, 30"
+            Grid.Row="2"
+            Text="Zresetuj hasło"
+            Style="{StaticResource Hyperlink}"
+            HorizontalOptions="End"
+            TextDecorations="Underline">
+
+            <Label.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding GoToForgotPasswordPageCommand}" />
+            </Label.GestureRecognizers>
+        </Label>
+
+        <Label
+            Grid.Row="3"
+            Style="{StaticResource TextError}"
+            Text="{Binding LoginErrorMessage}"
+            IsVisible="{Binding IsloginErrorVisible}"/>
+
+        <Button
+            Grid.Row="4"
+            HeightRequest="55"
+            Style="{StaticResource PrimaryButton}"
+            Text="Zaloguj się"
+            Command="{Binding GoToDashboardPageCommand}" />
+
+        <Button
+            VerticalOptions="Start"
+            Grid.Row="5"
+            HeightRequest="55"
+            Style="{StaticResource SecondaryButton}"
+            Text="Zarejestruj się" 
+            Command="{Binding GoToRegisterPageCommand}" />
+    </Grid>
 </ContentPage>

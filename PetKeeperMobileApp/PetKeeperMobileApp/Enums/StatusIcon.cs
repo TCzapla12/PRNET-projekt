@@ -1,6 +1,6 @@
 ﻿namespace PetKeeperMobileApp.Enums;
 
-enum StatusIcon
+public enum StatusIcon
 {
     Success,
     Error
