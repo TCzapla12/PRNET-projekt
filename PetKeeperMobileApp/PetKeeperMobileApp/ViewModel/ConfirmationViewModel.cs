@@ -6,7 +6,16 @@ namespace PetKeeperMobileApp.ViewModel;
 
 public partial class ConfirmationViewModel : ObservableObject
 {
-    public ConfirmationViewModel() { }
+    public ConfirmationViewModel(StatusIcon statusIcon) 
+    {
+        status = statusIcon;
+        if (statusIcon == StatusIcon.Success)
+        {
+            buttonText = "OK";
+            modalCommand = new RelayCommand(() => { });
+        }
+        else buttonText = "Spróbuj ponownie";
+    }
 
     [ObservableProperty]
     private string title;
@@ -15,10 +24,20 @@ public partial class ConfirmationViewModel : ObservableObject
     private string description;
 
     [ObservableProperty]
+    private string buttonText;
+
+    [ObservableProperty]
     private StatusIcon status;
 
     [ObservableProperty]
-    private RelayCommand retry;
+    private RelayCommand modalCommand;
+
+    [RelayCommand]
+    async Task ButtonAction()
+    {
+        await CloseModal();
+        ModalCommand.Execute(null);
+    }
 
     [RelayCommand]
     async Task CloseModal()

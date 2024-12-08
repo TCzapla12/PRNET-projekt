@@ -8,12 +8,13 @@
 
     <ContentPage.Resources>
         <x:String x:Key="xmark">&#xf00d;</x:String>
-        <x:String x:Key="success">&#xf058;</x:String>
-        <x:String x:Key="error">&#xf06a;</x:String>
+
+        <converters:EnumToIconConverter x:Key="EnumToIconConverter"
+                                         xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />
     </ContentPage.Resources>
 
     <Grid
-        RowDefinitions="Auto, *"
+        RowDefinitions="40, .50*, Auto, *"
         ColumnDefinitions="Auto, *"
         Padding="20"
         RowSpacing="20">
@@ -36,13 +37,22 @@
 
         <Image
             Grid.Row="1"
-            HeightRequest="50">
-            <Image.Source>
-                <FontImageSource
-                    FontFamily="FAS"
-                    Glyph="{StaticResource success}"
-                    Color="{StaticResource PrimaryDark}" />
-            </Image.Source>
-        </Image>
+            Grid.ColumnSpan="2"
+            HeightRequest="100"
+            Source="{Binding Status, Converter={StaticResource EnumToIconConverter}}" />    
+
+        <Label
+            Margin="4, 0, 4, 0"
+            Grid.ColumnSpan="2"
+            Grid.Row="2"
+            Text="{Binding Description}" />
+
+        <Button
+            Grid.ColumnSpan="2"
+            Grid.Row="3"
+            VerticalOptions="End"
+            Style="{StaticResource PrimaryButton}"
+            Text="{Binding ButtonText}"
+            Command="{Binding ButtonActionCommand}" /> 
     </Grid>
 </ContentPage>

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PetKeeperMobileApp.Enums;
 using PetKeeperMobileApp.Utils;
 using PetKeeperMobileApp.View;
 
@@ -16,19 +17,13 @@ public partial class MainViewModel : ObservableObject
     private string password;
 
     [ObservableProperty]
-    private string loginErrorMessage;
-
-    [ObservableProperty]
     private bool isEmailErrorVisible;
 
     [ObservableProperty]
     private bool isPasswordErrorVisible;
 
-    [ObservableProperty]
-    private bool isloginErrorVisible;
-
     [RelayCommand]
-    void GoToDashboardPage()
+    async Task GoToDashboardPage()
     {
         if (Validate.IsValidEmail(Email))
             IsEmailErrorVisible = false;
@@ -41,18 +36,24 @@ public partial class MainViewModel : ObservableObject
         {
             //TO DO:
             //komunikacja z backendem
-            LoginErrorMessage = "TO DO";
-            IsloginErrorVisible = true;
 
+            var confirmationViewModel = new ConfirmationViewModel(StatusIcon.Error)
+            {
+                Title = string.Empty,
+                Description = "Wystąpił problem.",
+                ModalCommand = new RelayCommand(async () => {
+                    await GoToDashboardPage();
+                })
+            };
+
+            await Application.Current!.MainPage!.Navigation.PushModalAsync(new ConfirmationPage(confirmationViewModel));
         }
     }
 
     [RelayCommand]
-    void GoToRegisterPage() 
+    async Task GoToRegisterPage() 
     {
         //TO DO:
-        IsloginErrorVisible = false;
-        LoginErrorMessage = string.Empty;
     }
 
     [RelayCommand]

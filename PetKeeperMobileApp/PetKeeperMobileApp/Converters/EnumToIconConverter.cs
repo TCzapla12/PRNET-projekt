@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace PetKeeperMobileApp.Converters;
 
-class EnumToStringConverter : IValueConverter
+class EnumToIconConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
@@ -11,13 +11,13 @@ class EnumToStringConverter : IValueConverter
         {
             return status switch
             {
-                StatusIcon.Success => "success",
-                StatusIcon.Error => "error",
-                _ => "error",
+                StatusIcon.Success => "circle_check.png",
+                StatusIcon.Error => "circle_exclamation.png",
+                _ => "circle_exclamation.png",
             };
         }
 
-        return "error";
+        return "circle_exclamation.png";
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

@@ -6,7 +6,7 @@
              x:DataType="viewmodel:MainViewModel">
 
     <Grid 
-        RowDefinitions="100, Auto, Auto, 20, Auto, *"
+        RowDefinitions="100, Auto, Auto, Auto, *"
         Padding="20"
         RowSpacing="20">
 
@@ -63,23 +63,15 @@
             </Label.GestureRecognizers>
         </Label>
 
-        <Label
-            Grid.Row="3"
-            Style="{StaticResource TextError}"
-            Text="{Binding LoginErrorMessage}"
-            IsVisible="{Binding IsloginErrorVisible}"/>
-
         <Button
-            Grid.Row="4"
-            HeightRequest="55"
+            Grid.Row="3"
             Style="{StaticResource PrimaryButton}"
             Text="Zaloguj się"
             Command="{Binding GoToDashboardPageCommand}" />
 
         <Button
             VerticalOptions="Start"
-            Grid.Row="5"
-            HeightRequest="55"
+            Grid.Row="4"
             Style="{StaticResource SecondaryButton}"
             Text="Zarejestruj się" 
             Command="{Binding GoToRegisterPageCommand}" />
