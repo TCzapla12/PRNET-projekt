@@ -25,6 +25,7 @@
             <Entry
                 Placeholder="E-mail"
                 Text="{Binding Email}"
+                Keyboard="Email"
                 IsSpellCheckEnabled="False" />
 
             <Label
@@ -36,7 +37,7 @@
                 Text="Niepoprawny adres e-mail!" />
 
             <Entry 
-                Placeholder="Password"
+                Placeholder="Hasło"
                 Grid.Row="2"
                 Text="{Binding Password}"
                 IsPassword="True"/>

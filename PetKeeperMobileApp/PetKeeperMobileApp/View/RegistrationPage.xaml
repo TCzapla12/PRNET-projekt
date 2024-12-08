@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PetKeeperMobileApp.View.RegistrationPage"
+             xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             x:DataType="viewmodel:RegistrationViewModel"
+             Title="RegistrationPage">
+    
+    <ContentPage.Resources>
+        <x:String x:Key="arrow-left">&#xf060;</x:String>
+    </ContentPage.Resources>
+
+    <Grid
+        RowDefinitions="40, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, *"
+        ColumnDefinitions="Auto, *"
+        Padding="20"
+        RowSpacing="20">
+        
+        <ImageButton
+            HeightRequest="30"
+            Command="{Binding GoBackCommand}">
+            <ImageButton.Source>
+                <FontImageSource 
+                    FontFamily="FAS" 
+                    Glyph="{StaticResource arrow-left}" 
+                    Color="{StaticResource PrimaryDark}"/>
+            </ImageButton.Source>
+        </ImageButton>
+
+        <Label
+            Grid.ColumnSpan="2"
+            Text="REJESTRACJA"
+            Style="{StaticResource Headline}"/>
+
+        <Entry
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
+            Placeholder="E-mail"
+            Keyboard="Email"
+            Text="{Binding Email}"
+            IsSpellCheckEnabled="False" />
+
+        <Entry
+            Grid.Row="2"
+            Grid.ColumnSpan="2"
+            Placeholder="Hasło"
+            Text="{Binding Password}"
+            IsPassword="True" />
+
+        <Entry
+            Grid.Row="3"
+            Grid.ColumnSpan="2"
+            Placeholder="Powtórz hasło"
+            Text="{Binding RepeatPassword}"
+            IsPassword="True" />
+
+        <Entry
+            Grid.Row="4"
+            Grid.ColumnSpan="2"
+            Placeholder="Imię"
+            Text="{Binding FirstName}" />
+
+        <Entry
+            Grid.Row="5"
+            Grid.ColumnSpan="2"
+            Placeholder="Nazwisko"
+            Text="{Binding LastName}" />
+
+        <Label
+            Grid.Row="6"
+            Text="+48"
+            Margin="10, 12, 0, 0" />
+        
+        <Entry
+            Grid.Row="6"
+            Grid.Column="2"
+            Grid.ColumnSpan="2"
+            Keyboard="Numeric"
+            Placeholder="Nr telefonu"
+            Text="{Binding PhoneNumber}" />
+
+        <Grid
+            Grid.Row="7"
+            Grid.ColumnSpan="2"
+            RowDefinitions="Auto, *"
+            ColumnDefinitions=".3*, .4*, .3*"
+            RowSpacing="20">
+
+            <Entry
+                Grid.ColumnSpan="2"
+                Placeholder="Ulica"
+                Text="{Binding Street}" />
+
+            <Entry
+                Grid.Column="2"
+                Placeholder="Nr domu/m."
+                Text="{Binding HouseNumber}" />
+
+            <Entry
+                Grid.Row="1"
+                Placeholder="Kod pocztowy"
+                Keyboard="Numeric"
+                Text="{Binding ZipCode}" />
+
+            <Entry
+                Grid.Row="1"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Placeholder="Miasto"
+                Text="{Binding City}" />
+        </Grid>
+
+        <Button
+            Grid.Row="8"
+            Grid.ColumnSpan="2"
+            Style="{StaticResource SecondaryButton}"
+            Text="Dodaj zdjęcie użytkownika"
+            Command="{Binding CreateAccountCommand}" />
+
+        <Button
+            Grid.Row="9"
+            Grid.ColumnSpan="2"
+            Style="{StaticResource SecondaryButton}"
+            Text="Dodaj dokument tożsamości"
+            Command="{Binding CreateAccountCommand}" />
+
+        <Button
+            VerticalOptions="End"
+            Grid.Row="10"
+            Grid.ColumnSpan="2"
+            Style="{StaticResource PrimaryButton}"
+            Text="Utwórz konto"
+            Command="{Binding CreateAccountCommand}" />
+    </Grid>
+</ContentPage>

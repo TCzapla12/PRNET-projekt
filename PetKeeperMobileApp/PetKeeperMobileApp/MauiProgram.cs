@@ -25,6 +25,8 @@ namespace PetKeeperMobileApp
 
             builder.Services.AddTransient<ForgotPasswordPage>();
             builder.Services.AddTransient<ForgotPasswordViewModel>();
+            builder.Services.AddTransient<RegistrationPage>();
+            builder.Services.AddTransient<RegistrationViewModel>();
 
 #if DEBUG
             builder.Logging.AddDebug();

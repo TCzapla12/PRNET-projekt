@@ -36,8 +36,8 @@
 		<MauiImage Include="Resources\Images\*" />
     <MauiImage Update="Resources\Images\logo.png" Resize="True" BaseSize="513,510" />
     <MauiImage Include="Resources\Icons\*" />
-    <MauiImage Update="Resources\Icons\circle_check.svg" Resize="True" BaseSize="512,512" TintColor="#2AE3C2"/>
-    <MauiImage Update="Resources\Icons\circle_exclamation.svg*" Resize="True" BaseSize="512,512" TintColor="#EF8159"/>
+    <MauiImage Update="Resources\Icons\circle_check.svg" Resize="True" BaseSize="512,512" TintColor="#2AE3C2" />
+    <MauiImage Update="Resources\Icons\circle_exclamation.svg*" Resize="True" BaseSize="512,512" TintColor="#EF8159" />
     
     <!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />    
@@ -58,6 +58,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="View\ForgotPasswordPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\RegistrationPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

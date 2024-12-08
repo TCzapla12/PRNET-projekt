@@ -53,7 +53,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     async Task GoToRegisterPage() 
     {
-        //TO DO:
+        await Shell.Current.GoToAsync(nameof(RegistrationPage));
     }
 
     [RelayCommand]

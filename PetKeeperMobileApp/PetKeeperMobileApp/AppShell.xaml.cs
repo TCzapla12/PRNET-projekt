@@ -10,6 +10,7 @@ namespace PetKeeperMobileApp
 
             Routing.RegisterRoute(nameof(ForgotPasswordPage), typeof(ForgotPasswordPage));
             Routing.RegisterRoute(nameof(ConfirmationPage), typeof(ConfirmationPage));
+            Routing.RegisterRoute(nameof(RegistrationPage), typeof(RegistrationPage));
         }
     }
 }
