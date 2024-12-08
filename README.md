@@ -1,4 +1,5 @@
-# Usage
+# Backend
+## Usage
 Postgresql docker container is required for the API to work.
 Use the following command to run postgresql container:
 
@@ -13,7 +14,7 @@ Change the database IP in `appsettings.json`
 
 Run the solution using the Container (Dockerfile) mode.
 
-# gRPC interaction and tests
+## gRPC interaction and tests
 Create the .venv and install `grpcio` module
 
 Compile stub files by using the command below. This is also required when the .proto file is updated. Change the path to `user.proto` accordingly

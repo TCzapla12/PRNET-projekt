@@ -6,6 +6,9 @@
         {
             InitializeComponent();
 
+            //wymuszenie jasnego motywu
+            Application.Current!.UserAppTheme = AppTheme.Light;
+
             MainPage = new AppShell();
         }
     }
