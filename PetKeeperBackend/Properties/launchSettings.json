@@ -25,7 +25,7 @@
       },
       "publishAllPorts": true,
       "useSSL": true,
-      "DockerfileRunArguments": "-p 8080:8080 -p 8081:8081"
+      "DockerfileRunArguments": "-p 8080:8080 -p 8081:8081 --add-host postgres:172.17.0.2"
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json"

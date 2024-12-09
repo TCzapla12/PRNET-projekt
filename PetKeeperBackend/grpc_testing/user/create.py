@@ -23,4 +23,4 @@ create_request = user_pb2.UserCreate(
     pesel='00112233445'
 )
 create_response = stub.CreateUser(create_request)
-print("CreateUser Response:", create_response.response)
+print("CreateUser Response:", create_response)

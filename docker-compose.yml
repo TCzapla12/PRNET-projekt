@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: testdb
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - "./PetKeeperBackend/init.sql:/docker-entrypoint-initdb.d/init.sql"
+    networks:
+      app_network:
+        ipv4_address: 172.168.100.10
+    ports:
+      - "5432:5432"
+
+  dotnet_app:
+    build:
+      context: ./PetKeeperBackend
+      dockerfile: Dockerfile
+    container_name: dotnet_app
+    depends_on:
+      - postgres
+    networks:
+      app_network:
+        ipv4_address: 172.168.100.20          # Static IP for the .NET app
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+
+networks:
+  app_network:
+    ipam:
+      config:
+        - subnet: 172.168.100.0/24            # Custom subnet for static IPs
+
+volumes:
+  pg_data:                                  # Volume for PostgreSQL persistence
