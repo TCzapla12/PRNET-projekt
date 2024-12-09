@@ -126,39 +126,36 @@ namespace grpc_hello_world.Services
             };
         }
 
+        [Authorize]
         public override async Task<UserUpdate> UpdateUser(UserUpdate request, ServerCallContext context)
         {
-            // Find the user in the database
+            var request_type = typeof(UserUpdate);
+
             var user = await _context.Users.FindAsync(request.Email) 
                        ?? throw new RpcException(new Status(StatusCode.NotFound, "User not found"));
 
-            var requestProperties = typeof(UserFull).GetProperties();
+            var requestProperties = request_type.GetProperties();
             var modifiedProperties = new HashSet<string>();
 
             foreach (var property in requestProperties)
             {
-                // Check if the property has a corresponding "Has<PropertyName>" indicator
-                var hasProperty = typeof(UserFull).GetProperty($"Has{property.Name}")?.GetValue(request, null) as bool?;
-                if (hasProperty != true) // Skip if presence information is false or unavailable (null)
+                var hasProperty = request_type.GetProperty($"Has{property.Name}")?.GetValue(request, null) as bool?;
+                if (hasProperty != true) // Skip if object is not present or avilability information is unavailable (null)
                     continue;
 
-                // Get the new value from the request
-                var newValue = typeof(UserFull).GetProperty(property.Name)?.GetValue(request, null);
-                if (newValue == null) // Skip if the value is null
+                var newValue = request_type.GetProperty(property.Name)?.GetValue(request, null);
+                if (newValue == null)  // Skip if value is not available in the request (this guard might be optional, since this should not occur)
                     continue;
 
-                // Get the current value from the database object
                 var currentValue = typeof(User).GetProperty(property.Name)?.GetValue(user, null);
 
-                // Only update if the new value is different from the current value
                 if (!Equals(currentValue, newValue))
                 {
                     typeof(User).GetProperty(property.Name)?.SetValue(user, newValue);
-                    modifiedProperties.Add(property.Name); // Track the property name
+                    modifiedProperties.Add(property.Name);
                 }
             }
 
-            // Save changes to the database
             try
             {
                 await _context.SaveChangesAsync();
@@ -173,7 +170,7 @@ namespace grpc_hello_world.Services
 
             foreach (var propertyName in modifiedProperties)
             {
-                var property = typeof(UserFull).GetProperty(propertyName);
+                var property = request_type.GetProperty(propertyName);
                 if (property != null)
                 {
                     var value = typeof(User).GetProperty(propertyName)?.GetValue(user, null);
@@ -185,7 +182,7 @@ namespace grpc_hello_world.Services
 
         }
 
-
+        [Authorize]
         public override async Task<UserMinimal> DeleteUser(UserMinimal request, ServerCallContext context)
         {
             var user = await _context.Users.FindAsync(request.Email);
