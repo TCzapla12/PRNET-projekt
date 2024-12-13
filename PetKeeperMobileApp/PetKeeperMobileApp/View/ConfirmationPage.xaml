@@ -9,8 +9,9 @@
     <ContentPage.Resources>
         <x:String x:Key="xmark">&#xf00d;</x:String>
 
-        <converters:EnumToIconConverter x:Key="EnumToIconConverter"
-                                         xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />
+        <converters:EnumToIconConverter 
+            x:Key="EnumToIconConverter"
+            xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />
     </ContentPage.Resources>
 
     <Grid
@@ -21,7 +22,7 @@
 
         <ImageButton
             HeightRequest="30"
-            Command="{Binding CloseModalCommand}">
+            Command="{Binding CloseButtonActionCommand}">
             <ImageButton.Source>
                 <FontImageSource 
                     FontFamily="FAS" 
@@ -45,7 +46,9 @@
             Margin="4, 0, 4, 0"
             Grid.ColumnSpan="2"
             Grid.Row="2"
-            Text="{Binding Description}" />
+            Text="{Binding Description}"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
 
         <Button
             Grid.ColumnSpan="2"

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PetKeeperMobileApp.View.MorePage"
+             xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             x:DataType="viewmodel:MoreViewModel"
+             Title="MorePage">
+    <VerticalStackLayout>
+        <Label 
+            Text="More"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+    </VerticalStackLayout>
+</ContentPage>

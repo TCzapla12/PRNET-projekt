@@ -3,16 +3,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PetKeeperMobileApp.View.RegistrationPage"
              xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             xmlns:templates="clr-namespace:PetKeeperMobileApp.Templates"
              x:DataType="viewmodel:RegistrationViewModel"
              Title="RegistrationPage">
-    
+
     <ContentPage.Resources>
         <x:String x:Key="arrow-left">&#xf060;</x:String>
     </ContentPage.Resources>
 
     <ScrollView>
         <Grid
-             RowDefinitions="40, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, *"
+             RowDefinitions="40, Auto, Auto, 10, Auto, Auto, Auto, 10, Auto, Auto, 10, *"
              ColumnDefinitions="Auto, *"
              Padding="20"
              RowSpacing="20">
@@ -46,113 +47,174 @@
                      Source="{Binding UserPhoto}" />
             </Frame>
 
-            <Entry
-                 Grid.Row="2"
-                 Grid.ColumnSpan="2"
-                 Placeholder="E-mail"
-                 Keyboard="Email"
-                 Text="{Binding Email}"
-                 IsSpellCheckEnabled="False" />
-
-            <Entry
-                 Grid.Row="3"
-                 Grid.ColumnSpan="2"
-                 Placeholder="Hasło"
-                 Text="{Binding Password}"
-                 IsPassword="True" />
-
-            <Entry
-                 Grid.Row="4"
-                 Grid.ColumnSpan="2"
-                 Placeholder="Powtórz hasło"
-                 Text="{Binding RepeatPassword}"
-                 IsPassword="True" />
-
-            <Entry
-                 Grid.Row="5"
-                 Grid.ColumnSpan="2"
-                 Placeholder="Imię"
-                 Text="{Binding FirstName}" />
-
-            <Entry
-                 Grid.Row="6"
-                 Grid.ColumnSpan="2"
-                 Placeholder="Nazwisko"
-                 Text="{Binding LastName}" />
+            <Label
+                Grid.Row="2"
+                Grid.ColumnSpan="2"
+                Text="Dodaj zdjęcie profilowe"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
 
             <Label
-                 Grid.Row="7"
-                 Text="+48"
-                 Margin="10, 12, 0, 0" />
+                Grid.Row="3"
+                Grid.ColumnSpan="2"
+                Margin="4, -10, 0, 0"
+                Text="Zdjęcie profilowe obowiązkowe!"
+                HorizontalOptions="Center"
+                VerticalOptions="Start"
+                Style="{StaticResource TextError}"
+                IsVisible="{Binding IsUserPhotoErrorVisible}" />
 
-            <Entry
-                 Grid.Row="7"
-                 Grid.Column="2"
-                 Grid.ColumnSpan="2"
-                 Keyboard="Numeric"
-                 Placeholder="Nr telefonu"
-                 Text="{Binding PhoneNumber}" />
+            <StackLayout 
+                x:Name="ValidationEntryStack"
+                Grid.Row="4"
+                Grid.ColumnSpan="2">
 
-            <Grid
-                 Grid.Row="8"
-                 Grid.ColumnSpan="2"
-                 RowDefinitions="Auto, *"
-                 ColumnDefinitions=".3*, .4*, .3*"
-                 RowSpacing="20">
+                <Grid
+                    RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto"
+                    ColumnDefinitions="30, 80, *, 110"
+                    RowSpacing="20">
 
-                <Entry
-                     Grid.ColumnSpan="2"
-                     Placeholder="Ulica"
-                     Text="{Binding Street}" />
+                    <templates:ValidationEntry
+                        Grid.ColumnSpan="4"
+                        Type="Email"
+                        Placeholder="E-mail"
+                        Text="{Binding Email}"
+                        Keyboard="Email"
+                        IsSpellCheck="False" />
+                    <templates:ValidationEntry
+                        Grid.Row="1"
+                        Grid.ColumnSpan="4"
+                        Type="Password"
+                        Placeholder="Hasło"
+                        Text="{Binding Password}"
+                        IsSpellCheck="False"
+                        IsPassword="True" />
+                    <templates:ValidationEntry
+                        Grid.Row="2"
+                        Grid.ColumnSpan="4"
+                        Type="RepeatPassword"
+                        Placeholder="Powtórz hasło"
+                        Text="{Binding RepeatPassword}"
+                        IsSpellCheck="False"
+                        IsPassword="True" />
+                    <templates:ValidationEntry
+                        Grid.Row="3"
+                        Grid.ColumnSpan="4"
+                        Type="Text"
+                        Placeholder="Imię"
+                        Text="{Binding FirstName}" />
+                    <templates:ValidationEntry
+                        Grid.Row="4"
+                        Grid.ColumnSpan="4"
+                        Type="Text"
+                        Placeholder="Nazwisko"
+                        Text="{Binding LastName}" />
+                    <Label
+                        Grid.Row="5"
+                        Text="+48"
+                        Margin="4, 12, 0, 0" />
+                    <templates:ValidationEntry
+                        Grid.Row="5"
+                        Grid.Column="1"
+                        Grid.ColumnSpan="3"
+                        Type="Telephone" 
+                        Placeholder="Nr telefonu"
+                        Text="{Binding PhoneNumber}"
+                        Keyboard="Numeric"
+                        IsSpellCheck="False" />
+                    <templates:ValidationEntry
+                        Grid.Row="6"
+                        Grid.ColumnSpan="3"
+                        Type="Text"
+                        Placeholder="Ulica"
+                        Text="{Binding Street}" />
+                    <templates:ValidationEntry
+                        Grid.Row="6"
+                        Grid.Column="3"
+                        Grid.ColumnSpan="1"
+                        Type="BuildingApartment"
+                        Placeholder="Nr domu/m."
+                        Text="{Binding HouseNumber}"
+                        IsSpellCheck="False" />
+                    <templates:ValidationEntry
+                        Grid.Row="7"
+                        Grid.ColumnSpan="2"
+                        Type="ZipCode"
+                        Placeholder="Kod pocztowy"
+                        Text="{Binding ZipCode}"
+                        Keyboard="Telephone"
+                        IsSpellCheck="False" />
+                    <templates:ValidationEntry
+                        Grid.Row="7"
+                        Grid.Column="2"
+                        Grid.ColumnSpan="2"
+                        Type="Text"
+                        Placeholder="Miejscowość"
+                        Text="{Binding City}" />
+                </Grid>
+            </StackLayout>
 
-                <Entry
-                     Grid.Column="2"
-                     Placeholder="Nr domu/m."
-                     Text="{Binding HouseNumber}" />
-
-                <Entry
-                     Grid.Row="1"
-                     Placeholder="Kod pocztowy"
-                     Keyboard="Numeric"
-                     Text="{Binding ZipCode}" />
-
-                <Entry
-                     Grid.Row="1"
-                     Grid.Column="1"
-                     Grid.ColumnSpan="2"
-                     Placeholder="Miasto"
-                     Text="{Binding City}" />
-            </Grid>
+            <Label
+                Margin="4, 20, 0, 0"
+                Grid.Row="5"
+                Grid.ColumnSpan="2"
+                Text="Dodaj zdjęcie przedniej strony dokumentu tożsamości"
+                VerticalOptions="Center"/>
 
             <Frame
-                 Grid.Row="9"
-                 Grid.ColumnSpan="2"
-                 CornerRadius="10"
-                 HeightRequest="200">
+                Grid.Row="6"
+                Grid.ColumnSpan="2"
+                CornerRadius="10"
+                HeightRequest="200">
                 <ImageButton
-                     Command="{Binding AddDocumentPhotoCommand}"
-                     CommandParameter="0"
-                     Source="{Binding DocumentPhoto[0]}" />
+                    Command="{Binding AddDocumentFrontPhotoCommand}"
+                    Source="{Binding DocumentPhoto[0]}" />
             </Frame>
 
+            <Label
+                Grid.Row="7"
+                Grid.ColumnSpan="2"
+                Margin="4, -10, 0, 0"
+                Text="Zdjęcie dokumentu tożsamości obowiązkowe!"
+                VerticalOptions="Start"
+                Style="{StaticResource TextError}"
+                IsVisible="{Binding IsDocumentPhotoErrorVisible[0]}" />
+
+            <Label
+                Margin="4, 0, 0, 0"
+                Grid.Row="8"
+                Grid.ColumnSpan="2"
+                Text="Dodaj zdjęcie tylnej strony dokumentu tożsamości"
+                VerticalOptions="Center" />
+            
             <Frame
-                 Grid.Row="10"
-                 Grid.ColumnSpan="2"
-                 CornerRadius="10"
-                 HeightRequest="200">
+                Grid.Row="9"
+                Grid.ColumnSpan="2"
+                CornerRadius="10"
+                HeightRequest="200">
                 <ImageButton
-                     Command="{Binding AddDocumentPhotoCommand}"
-                     CommandParameter="1"
-                     Source="{Binding DocumentPhoto[1]}" />
+                    x:Name="Document2"
+                    Command="{Binding AddDocumentBackPhotoCommand}"
+                    Source="{Binding DocumentPhoto[1]}" />
             </Frame>
+
+            <Label
+                Grid.Row="10"
+                Grid.ColumnSpan="2"
+                Margin="4, -10, 0, 0"
+                Text="Zdjęcie dokumentu tożsamości obowiązkowe!"
+                VerticalOptions="Start"
+                Style="{StaticResource TextError}"
+                IsVisible="{Binding IsDocumentPhotoErrorVisible[1]}" />
 
             <Button
-                 VerticalOptions="End"
-                 Grid.Row="11"
-                 Grid.ColumnSpan="2"
-                 Style="{StaticResource PrimaryButton}"
-                 Text="Utwórz konto"
-                 Command="{Binding CreateAccountCommand}" />
+                VerticalOptions="End"
+                Grid.Row="11"
+                Grid.ColumnSpan="2"
+                Style="{StaticResource PrimaryButton}"
+                Text="Utwórz konto"
+                Command="{Binding CreateAccountCommand}"
+                CommandParameter="{x:Reference ValidationEntryStack}" />
         </Grid>
     </ScrollView>
 </ContentPage>

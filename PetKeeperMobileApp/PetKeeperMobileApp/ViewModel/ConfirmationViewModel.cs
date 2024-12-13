@@ -10,10 +10,7 @@ public partial class ConfirmationViewModel : ObservableObject
     {
         status = statusIcon;
         if (statusIcon == StatusIcon.Success)
-        {
             buttonText = "OK";
-            modalCommand = new RelayCommand(() => { });
-        }
         else buttonText = "Spróbuj ponownie";
     }
 
@@ -40,7 +37,14 @@ public partial class ConfirmationViewModel : ObservableObject
     }
 
     [RelayCommand]
-    async Task CloseModal()
+    async Task CloseButtonAction()
+    {
+        if (Status == StatusIcon.Success)
+            await ButtonAction();
+        else await CloseModal();
+    }
+
+    public async Task CloseModal()
     {
         await Application.Current!.MainPage!.Navigation.PopModalAsync();
     }

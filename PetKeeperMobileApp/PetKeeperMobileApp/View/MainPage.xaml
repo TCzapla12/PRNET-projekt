@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PetKeeperMobileApp.View.MainPage"
              xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             xmlns:templates="clr-namespace:PetKeeperMobileApp.Templates"
              x:DataType="viewmodel:MainViewModel">
 
     <Grid 
@@ -16,40 +17,29 @@
             HeightRequest="120"
             WidthRequest="120"/>
 
-        <Grid
-            Margin="0, 50, 0, 0"
+        <StackLayout 
+            x:Name="ValidationEntryStack"
             Grid.Row="1"
-            RowDefinitions="Auto, 10, Auto, 10"
-            RowSpacing="10">
+            Margin="0, 50, 0, 10">
 
-            <Entry
-                Placeholder="E-mail"
-                Text="{Binding Email}"
-                Keyboard="Email"
-                IsSpellCheckEnabled="False" />
-
-            <Label
-                Margin="4, -10, 0, 0"
-                TextColor="Red"
-                Grid.Row="1"
-                FontSize="12"
-                IsVisible="{Binding IsEmailErrorVisible}"
-                Text="Niepoprawny adres e-mail!" />
-
-            <Entry 
-                Placeholder="Hasło"
-                Grid.Row="2"
-                Text="{Binding Password}"
-                IsPassword="True"/>
-
-            <Label
-                Margin="4, -10, 0, 0"
-                Grid.Row="3"
-                TextColor="Red"
-                FontSize="12"
-                IsVisible="{Binding IsPasswordErrorVisible}"
-                Text="Brak hasła!" />
-        </Grid>
+            <Grid 
+                RowDefinitions="Auto, Auto"
+                RowSpacing="20">
+                <templates:ValidationEntry
+                    Type="Email"
+                    Placeholder="E-mail"
+                    Text="{Binding Email}"
+                    Keyboard="Email"
+                    IsSpellCheck="False" />
+                <templates:ValidationEntry
+                    Grid.Row="1"
+                    Type="Password"
+                    Placeholder="Hasło"
+                    Text="{Binding Password}"
+                    IsSpellCheck="False"
+                    IsPassword="True" />
+            </Grid>
+        </StackLayout>
 
         <Label
             Margin="0, 0, 4, 30"
@@ -68,7 +58,8 @@
             Grid.Row="3"
             Style="{StaticResource PrimaryButton}"
             Text="Zaloguj się"
-            Command="{Binding GoToDashboardPageCommand}" />
+            Command="{Binding GoToDashboardPageCommand}"
+            CommandParameter="{x:Reference ValidationEntryStack}" />
 
         <Button
             VerticalOptions="Start"

@@ -22,6 +22,17 @@ namespace PetKeeperMobileApp
 
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<MainViewModel>();
+            builder.Services.AddSingleton<DashboardPage>();
+            builder.Services.AddSingleton<DashboardViewModel>();
+
+            builder.Services.AddTransient<OwnerPage>();
+            builder.Services.AddTransient<OwnerViewModel>();
+            builder.Services.AddTransient<KeeperPage>();
+            builder.Services.AddTransient<KeeperViewModel>();
+            builder.Services.AddTransient<ProfilePage>();
+            builder.Services.AddTransient<ProfileViewModel>();
+            builder.Services.AddTransient<MorePage>();
+            builder.Services.AddTransient<MoreViewModel>();
 
             builder.Services.AddTransient<ForgotPasswordPage>();
             builder.Services.AddTransient<ForgotPasswordViewModel>();

@@ -38,8 +38,13 @@
     <MauiImage Include="Resources\Icons\*" />
     <MauiImage Update="Resources\Icons\circle_check.svg" Resize="True" BaseSize="512,512" TintColor="#2AE3C2" />
     <MauiImage Update="Resources\Icons\circle_exclamation.svg" Resize="True" BaseSize="512,512" TintColor="#EF8159" />
-    <MauiImage Update="Resources\Icons\user_plus.svg" Resize="True" BaseSize="512,512" TintColor="#064849" />
     <MauiImage Update="Resources\Icons\id_card.svg" Resize="True" BaseSize="576,512" TintColor="#064849" />
+    <MauiImage Update="Resources\Icons\camera.svg" Resize="True" BaseSize="512,512" TintColor="#064849" />
+    <MauiImage Update="Resources\Icons\bars.svg" Resize="True" BaseSize="448,512" TintColor="#064849" />
+    <MauiImage Update="Resources\Icons\briefcase.svg" Resize="True" BaseSize="512,512" TintColor="#064849" />
+    <MauiImage Update="Resources\Icons\house.svg" Resize="True" BaseSize="576,512" TintColor="#064849" />
+    <MauiImage Update="Resources\Icons\paw.svg" Resize="True" BaseSize="512,512" TintColor="#064849" />
+    <MauiImage Update="Resources\Icons\user.svg" Resize="True" BaseSize="448,512" TintColor="#064849" />
 
     <!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />    
@@ -57,10 +62,28 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Templates\ValidationEntry.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="View\ConfirmationPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="View\DashboardPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="View\ForgotPasswordPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\KeeperPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\MorePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\OwnerPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\ProfilePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="View\RegistrationPage.xaml">

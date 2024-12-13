@@ -10,6 +10,33 @@
 
     <ShellContent
         ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        Route="Login" />
 
+    <TabBar Route="Main">
+        <ShellContent 
+            Title="Start" 
+            Icon="house.png"
+            ContentTemplate="{DataTemplate local:DashboardPage}" 
+            Route="DashboardPage" />
+        <ShellContent 
+            Title="Właściciel" 
+            Icon="paw.png"
+            ContentTemplate="{DataTemplate local:OwnerPage}" 
+            Route="OwnerPage" />
+        <ShellContent 
+            Title="Opiekun" 
+            Icon="briefcase.png"
+            ContentTemplate="{DataTemplate local:KeeperPage}" 
+            Route="KeeperPage" />
+        <ShellContent 
+            Title="Profil" 
+            Icon="user.png"
+            ContentTemplate="{DataTemplate local:ProfilePage}" 
+            Route="ProfilePage" />
+        <ShellContent
+            Title="Więcej"
+            Icon="bars.png"
+            ContentTemplate="{DataTemplate local:MorePage}" 
+            Route="MorePage" />
+    </TabBar>
 </Shell>
