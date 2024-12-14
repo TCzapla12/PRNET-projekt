@@ -1,0 +1,18 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "PetKeeperMobileApp";
+
+package auth;
+
+service Auth {
+	rpc Login(LoginRequest) returns (LoginReply);
+}
+
+message LoginRequest {
+	string email = 1;
+	string passwordHash = 2;
+}
+
+message LoginReply {
+	string token = 1;
+}
