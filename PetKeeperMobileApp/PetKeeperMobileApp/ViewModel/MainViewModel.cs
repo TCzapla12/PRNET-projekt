@@ -1,7 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Grpc.Core;
 using PetKeeperMobileApp.Enums;
+using PetKeeperMobileApp.Models;
+using PetKeeperMobileApp.Services;
 using PetKeeperMobileApp.Templates;
+using PetKeeperMobileApp.Utils;
 using PetKeeperMobileApp.View;
 
 namespace PetKeeperMobileApp.ViewModel;
@@ -29,19 +33,32 @@ public partial class MainViewModel : ObservableObject
         if (!areAllFieldsValid)
             return;
 
-        //TO DO:
-        //komunikacja z backendem
-        //var confirmationViewModel = new ConfirmationViewModel(StatusIcon.Error)
-        //{
-        //    Title = string.Empty,
-        //    Description = "Wystąpił problem.",
-        //    ModalCommand = new RelayCommand(async () => {
-        //        await GoToDashboardPage(container);
-        //    })
-        //};
+        try
+        {
+            LoginDto dto = new()
+            {
+                Email = this.Email,
+                HashPassword = Security.HashMD5(this.Password)
+            };
 
-        //await Application.Current!.MainPage!.Navigation.PushModalAsync(new ConfirmationPage(confirmationViewModel));
-        await Shell.Current.GoToAsync($"//{RouteType.Main}/{nameof(DashboardPage)}");
+            var token = await GrpcClient.Login(dto);
+
+            await Storage.SaveToken(token);
+
+            await Shell.Current.GoToAsync($"//{RouteType.Main}/{nameof(DashboardPage)}");
+        }
+        catch (RpcException ex) {
+            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Status.Detail, new RelayCommand(async () =>
+            {
+                await GoToDashboardPage(container);
+            }));
+        }
+        catch (Exception ex) {
+            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Message, new RelayCommand(async () =>
+            {
+                await GoToDashboardPage(container);
+            }));
+        }
     }
 
     [RelayCommand]
