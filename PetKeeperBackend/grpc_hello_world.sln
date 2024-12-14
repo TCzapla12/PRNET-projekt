@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grpc_hello_world", "grpc_hello_world.csproj", "{E4236193-6536-46FC-BD7A-EC960AE78680}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "grpc_hello_world", "grpc_hello_world.csproj", "{E4236193-6536-46FC-BD7A-EC960AE78680}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "postgres", "postgres", "{78F37DC0-F3BC-4242-BD08-03DE937560DA}"
+	ProjectSection(SolutionItems) = preProject
+		init.sql = init.sql
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

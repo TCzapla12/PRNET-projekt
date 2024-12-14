@@ -6,11 +6,11 @@ channel = grpc.insecure_channel('localhost:8080')  # Update with your server's a
 stub = user_pb2_grpc.UserServiceStub(channel)  # Replace Greeter with your service name
 
 # 1. get a new user
-update_request = user_pb2.UserFull(
+update_request = user_pb2.UserUpdate(
     email="new_user22222@example.com",
     is_admin=True,
     username="BOASTY_ADMIN",
-    avatar_url="example.co"
+    avatar_url="example.com"
 )
 update_response = stub.UpdateUser(update_request)
 print("UpdateUser Response:\n", update_response)

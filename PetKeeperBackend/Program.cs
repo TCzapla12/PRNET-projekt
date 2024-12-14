@@ -14,7 +14,7 @@ var jwtAudience = builder.Configuration["Jwt:Audience"];
 // Add services to the container.
 builder.Services.AddGrpc();
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql("Host=172.17.0.2;Port=5432;Database=testdb;Username=user;Password=pass;"));
+    options.UseNpgsql("Host=postgres;Port=5432;Database=testdb;Username=user;Password=pass;"));
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
