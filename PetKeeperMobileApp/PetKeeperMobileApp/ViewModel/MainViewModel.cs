@@ -10,10 +10,8 @@ using PetKeeperMobileApp.View;
 
 namespace PetKeeperMobileApp.ViewModel;
 
-public partial class MainViewModel : ObservableObject
+public partial class MainViewModel(IGrpcClient grpcClient) : ObservableObject
 {
-    public MainViewModel() { }
-
     [ObservableProperty]
     private string email;
 
@@ -35,13 +33,13 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
-            LoginDto dto = new()
+            AuthDto dto = new()
             {
                 Email = this.Email,
                 HashPassword = Security.HashMD5(this.Password)
             };
 
-            var token = await GrpcClient.Login(dto);
+            var token = await grpcClient.Login(dto);
 
             await Storage.SaveToken(token);
 
