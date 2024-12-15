@@ -82,6 +82,7 @@ public partial class ValidationEntry : ContentView
     {
         ErrorText = Type switch
         {
+            EntryType.Username => Validate.IsValidUsername(Text),
             EntryType.Text => Validate.IsObligatoryText(Text),
             EntryType.Email => Validate.IsValidEmail(Text),
             EntryType.Password => Validate.IsValidPassword(Text),

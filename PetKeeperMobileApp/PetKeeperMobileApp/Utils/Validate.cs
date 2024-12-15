@@ -5,12 +5,23 @@ namespace PetKeeperMobileApp.Utils;
 class Validate
 {
     private const string OBLIGATORY = "Pole obowiązkowe!";
+    private const string BAD_USERNAME = "Nazwa użytkownika powinna składać się od 3 do 20 znaków!";
     private const string BAD_EMAIL = "Niepoprawny adres e-mail!";
     private const string BAD_PASSWORD = "Hasło powinno składać się od 8 do 20 znaków!";
     private const string DIFFERENT_PASSWORDS = "Hasła nie są indentyczne!";
     private const string BAD_PHONE = "Niepoprawny numer telefonu!";
     private const string BAD_BUILDING = "Niepoprawny nr domu/m!";
     private const string BAD_ZIPCODE = "Niepoprawny kod pocztowy!";
+
+    public static string IsValidUsername(string field)
+    {
+        if (string.IsNullOrWhiteSpace(field))
+            return OBLIGATORY;
+
+        var regex = new Regex(@"^.{3,20}$");
+        if (!regex.IsMatch(field)) return BAD_USERNAME;
+        return string.Empty;
+    }
 
     public static string IsValidEmail(string field)
     {

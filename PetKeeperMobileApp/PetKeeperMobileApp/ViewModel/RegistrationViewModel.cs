@@ -64,10 +64,6 @@ public partial class RegistrationViewModel : ObservableObject
 
     private List<bool> isDocumentPhotoAdded = [false, false];
 
-    //TO DO:
-    //obsługa inputów (generyczne?), zdjęcia, nextPage
-    //problem z bindowaniem dwóch obrazków, tekst
-
     [RelayCommand]
     async Task AddUserPhoto()
     {

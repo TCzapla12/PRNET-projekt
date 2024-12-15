@@ -1,6 +1,6 @@
 ﻿namespace PetKeeperMobileApp.Models;
 
-public class LoginDto
+public class AuthDto
 {
     public required string Email { get; set; }
 

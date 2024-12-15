@@ -70,11 +70,18 @@
                 Grid.ColumnSpan="2">
 
                 <Grid
-                    RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto"
+                    RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto"
                     ColumnDefinitions="30, 80, *, 110"
                     RowSpacing="20">
 
                     <templates:ValidationEntry
+                        Grid.ColumnSpan="4"
+                        Type="Username"
+                        Placeholder="Nazwa użytkownika"
+                        Text="{Binding Username}"
+                        IsSpellCheck="False" />
+                    <templates:ValidationEntry
+                        Grid.Row="1"
                         Grid.ColumnSpan="4"
                         Type="Email"
                         Placeholder="E-mail"
@@ -82,7 +89,7 @@
                         Keyboard="Email"
                         IsSpellCheck="False" />
                     <templates:ValidationEntry
-                        Grid.Row="1"
+                        Grid.Row="2"
                         Grid.ColumnSpan="4"
                         Type="Password"
                         Placeholder="Hasło"
@@ -90,7 +97,7 @@
                         IsSpellCheck="False"
                         IsPassword="True" />
                     <templates:ValidationEntry
-                        Grid.Row="2"
+                        Grid.Row="3"
                         Grid.ColumnSpan="4"
                         Type="RepeatPassword"
                         Placeholder="Powtórz hasło"
@@ -98,23 +105,23 @@
                         IsSpellCheck="False"
                         IsPassword="True" />
                     <templates:ValidationEntry
-                        Grid.Row="3"
+                        Grid.Row="4"
                         Grid.ColumnSpan="4"
                         Type="Text"
                         Placeholder="Imię"
                         Text="{Binding FirstName}" />
                     <templates:ValidationEntry
-                        Grid.Row="4"
+                        Grid.Row="5"
                         Grid.ColumnSpan="4"
                         Type="Text"
                         Placeholder="Nazwisko"
                         Text="{Binding LastName}" />
                     <Label
-                        Grid.Row="5"
+                        Grid.Row="6"
                         Text="+48"
                         Margin="4, 12, 0, 0" />
                     <templates:ValidationEntry
-                        Grid.Row="5"
+                        Grid.Row="6"
                         Grid.Column="1"
                         Grid.ColumnSpan="3"
                         Type="Telephone" 
@@ -123,13 +130,13 @@
                         Keyboard="Numeric"
                         IsSpellCheck="False" />
                     <templates:ValidationEntry
-                        Grid.Row="6"
+                        Grid.Row="7"
                         Grid.ColumnSpan="3"
                         Type="Text"
                         Placeholder="Ulica"
                         Text="{Binding Street}" />
                     <templates:ValidationEntry
-                        Grid.Row="6"
+                        Grid.Row="7"
                         Grid.Column="3"
                         Grid.ColumnSpan="1"
                         Type="BuildingApartment"
@@ -137,7 +144,7 @@
                         Text="{Binding HouseNumber}"
                         IsSpellCheck="False" />
                     <templates:ValidationEntry
-                        Grid.Row="7"
+                        Grid.Row="8"
                         Grid.ColumnSpan="2"
                         Type="ZipCode"
                         Placeholder="Kod pocztowy"
@@ -145,7 +152,7 @@
                         Keyboard="Telephone"
                         IsSpellCheck="False" />
                     <templates:ValidationEntry
-                        Grid.Row="7"
+                        Grid.Row="8"
                         Grid.Column="2"
                         Grid.ColumnSpan="2"
                         Type="Text"

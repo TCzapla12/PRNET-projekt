@@ -4,15 +4,20 @@ option csharp_namespace = "PetKeeperMobileApp";
 
 package auth;
 
-service Auth {
-	rpc Login(LoginRequest) returns (LoginReply);
+service AuthService {
+	rpc Authenticate (AuthRequest) returns (AuthResponse);
 }
 
-message LoginRequest {
+message AuthRequest {
 	string email = 1;
-	string passwordHash = 2;
+	string password = 2;
 }
 
-message LoginReply {
+message AuthResponse {
 	string token = 1;
 }
+
+//Zwraca token
+
+//Komunikaty błędów
+//Błędny adres e-mail i/lub hasło

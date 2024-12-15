@@ -2,6 +2,7 @@
 
 public enum EntryType
 {
+    Username,
     Text,
     Email,
     Password,
