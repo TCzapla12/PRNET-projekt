@@ -6,10 +6,11 @@ channel = grpc.insecure_channel('localhost:8080')  # Update with your server's a
 stub = user_pb2_grpc.UserServiceStub(channel)  # Replace Greeter with your service name
 
 address = user_pb2.AddressCreate(
-    street='Przykladowa 3',
+    street='Przykladowa',
+    house_number='2',
     city='Warszawa',
     post_code='02-285',
-    owner_email='new_user22222@example.com'
+    owner_id='0'
 )
 # 1. Create a new user
 create_request = user_pb2.UserCreate(
@@ -20,7 +21,8 @@ create_request = user_pb2.UserCreate(
     last_name='Kowalski',
     primary_address=address,
     phone='123456789',
-    pesel='00112233445'
+    pesel='00112233445',
+    document_url=['foo', 'baz']
 )
 create_response = stub.CreateUser(create_request)
 print("CreateUser Response:", create_response)

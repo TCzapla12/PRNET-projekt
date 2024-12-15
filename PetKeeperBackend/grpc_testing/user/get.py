@@ -8,9 +8,11 @@ stub = user_pb2_grpc.UserServiceStub(channel)  # Replace Greeter with your servi
 
 email = "new_user22222@example.com"
 password = "securepassword123"
+
+id = user_pb2.UserIdentifier(email=email)
 # 1. get a new user
 get_request = user_pb2.UserGet(
-    email=email
+    user_id=id
 )
 
 token = get_token(email, password, channel=channel)

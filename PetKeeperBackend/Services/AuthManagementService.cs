@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using grpc_hello_world;
 using grpc_hello_world.Services;
+using grpc_hello_world.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -23,32 +24,28 @@ namespace grpc_hello_world.Services
 
         public override async Task<AuthResponse> Authenticate(AuthRequest request, ServerCallContext context)
         {
-            var user = await _context.Users.FindAsync(request.Email);
-            if (user == null)
-            {
-                throw new RpcException(new Status(StatusCode.NotFound, "User not found"));
-            }
-            
+            User? user = await UserManagementService.GetUserAsync(null, request.UserId, _context);
 
             if (UserManagementService.VerifyPassword(request.Password, user.PasswordHash))
             {
                 // Generate JWT token
-                var token = GenerateJwtToken(request.Email);
+                var token = GenerateJwtToken(user.Id.ToString(), user.Email);
                 return new AuthResponse { Token = token };
             }
 
             throw new RpcException(new Status(StatusCode.Unauthenticated, "Invalid credentials"));
         }
 
-        private string GenerateJwtToken(string email)
+        private string GenerateJwtToken(string id, string email)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, email),
+                new Claim(JwtRegisteredClaimNames.Sub, id),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Role, "User"),
                 new Claim(ClaimTypes.Email, email)
             };
 

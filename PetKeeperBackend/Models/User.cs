@@ -7,6 +7,10 @@ namespace grpc_hello_world.Models
     public class User
     {
         [Key]
+        [Column("id")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set;  }
+
         [Column("email")]
         public required string Email { get; set; }
 
@@ -46,7 +50,7 @@ namespace grpc_hello_world.Models
         public string? AvatarUrl { get; set; }
 
         [Column("document_url")]
-        public string? DocumentUrl { get; set; }
+        public required string[] DocumentUrl { get; set; }
 
         [Column("created_date")]
         public long CreatedDate { get; }
