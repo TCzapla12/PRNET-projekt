@@ -109,7 +109,7 @@ class UserServiceStub(object):
         self.CreateUser = channel.unary_unary(
                 '/UserService/CreateUser',
                 request_serializer=user__pb2.UserCreate.SerializeToString,
-                response_deserializer=user__pb2.UserMinimal.FromString,
+                response_deserializer=user__pb2.UserIdentifier.FromString,
                 _registered_method=True)
         self.GetUser = channel.unary_unary(
                 '/UserService/GetUser',
@@ -123,8 +123,8 @@ class UserServiceStub(object):
                 _registered_method=True)
         self.DeleteUser = channel.unary_unary(
                 '/UserService/DeleteUser',
-                request_serializer=user__pb2.UserMinimal.SerializeToString,
-                response_deserializer=user__pb2.UserMinimal.FromString,
+                request_serializer=user__pb2.UserIdentifier.SerializeToString,
+                response_deserializer=user__pb2.UserIdentifier.FromString,
                 _registered_method=True)
 
 
@@ -162,7 +162,7 @@ def add_UserServiceServicer_to_server(servicer, server):
             'CreateUser': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateUser,
                     request_deserializer=user__pb2.UserCreate.FromString,
-                    response_serializer=user__pb2.UserMinimal.SerializeToString,
+                    response_serializer=user__pb2.UserIdentifier.SerializeToString,
             ),
             'GetUser': grpc.unary_unary_rpc_method_handler(
                     servicer.GetUser,
@@ -176,8 +176,8 @@ def add_UserServiceServicer_to_server(servicer, server):
             ),
             'DeleteUser': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteUser,
-                    request_deserializer=user__pb2.UserMinimal.FromString,
-                    response_serializer=user__pb2.UserMinimal.SerializeToString,
+                    request_deserializer=user__pb2.UserIdentifier.FromString,
+                    response_serializer=user__pb2.UserIdentifier.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -206,7 +206,7 @@ class UserService(object):
             target,
             '/UserService/CreateUser',
             user__pb2.UserCreate.SerializeToString,
-            user__pb2.UserMinimal.FromString,
+            user__pb2.UserIdentifier.FromString,
             options,
             channel_credentials,
             insecure,
@@ -286,8 +286,8 @@ class UserService(object):
             request,
             target,
             '/UserService/DeleteUser',
-            user__pb2.UserMinimal.SerializeToString,
-            user__pb2.UserMinimal.FromString,
+            user__pb2.UserIdentifier.SerializeToString,
+            user__pb2.UserIdentifier.FromString,
             options,
             channel_credentials,
             insecure,

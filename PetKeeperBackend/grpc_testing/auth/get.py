@@ -4,9 +4,10 @@ import user_pb2_grpc
 
 def get_token(email, password, *, channel):
     stub = user_pb2_grpc.AuthServiceStub(channel)
-
+    id = user_pb2.UserIdentifier()
+    id.email = email
     get_request = user_pb2.AuthRequest(
-        email=email,
+        user_id=id,
         password=password
     )
     get_response = stub.Authenticate(get_request)
