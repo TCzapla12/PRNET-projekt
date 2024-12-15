@@ -9,6 +9,7 @@ using System.Security.Policy;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Reflection.Metadata.Ecma335;
+using Azure.Core;
 
 namespace grpc_hello_world.Services
 {
@@ -23,8 +24,13 @@ namespace grpc_hello_world.Services
             _logger = logger;
         }
 
-        public override async Task<UserMinimal> CreateUser(UserCreate request, ServerCallContext context)
+        public override async Task<UserIdentifier> CreateUser(UserCreate request, ServerCallContext context)
         {
+            if (request.DocumentUrl.Count != 2)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument,
+                    "Minimum two document pictures required!"));
+            }
             var user = new User
             {
                 Username = request.Username,
@@ -36,7 +42,7 @@ namespace grpc_hello_world.Services
                 Phone = request.Phone,
                 Pesel = request.Pesel,
                 AvatarUrl = request.AvatarUrl,
-                DocumentUrl = request.DocumentUrl,
+                DocumentUrl = request.DocumentUrl.ToArray(),
                 // States
                 IsActivated = false,
                 IsVerified = false,
@@ -55,11 +61,13 @@ namespace grpc_hello_world.Services
 
             var address = new Address
             {
+
                 City = request.PrimaryAddress.City,
-                Street = request.PrimaryAddress.Street,  // Theoretically verification if the number is here is required
-                HouseNumber = request.PrimaryAddress.HouseNumber ?? null,
+                Street = request.PrimaryAddress.Street,  // TODO: verification if the number is here is required
+                HouseNumber = request.PrimaryAddress.HouseNumber,
+                ApartmentNumber = request.PrimaryAddress.ApartmentNumber ?? null,
                 PostCode = request.PrimaryAddress.PostCode,
-                OwnerEmail = request.Email,
+                OwnerId = user.Id,
                 IsPrimary = true
             };
 
@@ -74,9 +82,9 @@ namespace grpc_hello_world.Services
             }
             
 
-            return new UserMinimal
+            return new UserIdentifier
             {
-                Email = user.Email
+                Id = user.Id.ToString()
             };
         }
 
@@ -85,21 +93,30 @@ namespace grpc_hello_world.Services
         {
             var userContext = context.GetHttpContext().User;
             var userEmail = userContext.FindFirst(ClaimTypes.Email)?.Value;
-            var user = await _context.Users.FindAsync(userEmail);
-                //.Include(u => u.Address) // Eager
-                //.FirstOrDefaultAsync(u => u.Email == request.Email);
+            if (!(request.UserId.HasUsername || request.UserId.HasEmail || request.UserId.HasId))
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument,
+                    "User identificaiton not provided. Please provide ID, email or username"));
+            }
+            User? user = await GetUserAsync(userEmail, request.UserId, _context);
+            
             if (user == null)
             {
-                throw new RpcException(new Status(StatusCode.NotFound, "User not found"));
+                throw new RpcException(new Status(StatusCode.NotFound,
+                    "User not found"));
             }
-            var primary_address = await _context.Addresses.
-                FirstOrDefaultAsync(a => a.OwnerEmail == userEmail && a.IsPrimary);
+
+            Address? primary_address = await _context.Addresses.
+                FirstOrDefaultAsync(a => a.OwnerId == user.Id && a.IsPrimary);
             if (primary_address == null)
             {
-                throw new RpcException(new Status(StatusCode.DataLoss, "User has no primary address!"));
+                throw new RpcException(new Status(StatusCode.DataLoss,
+                    "User has no primary address!"));
             }
-            return new UserFull
+
+            var ret = new UserFull
             {
+                Id = user.Id.ToString(),
                 Email = user.Email,
                 Username = user.Username,
                 FirstName = user.FirstName,
@@ -111,28 +128,33 @@ namespace grpc_hello_world.Services
                 {
                     Id = primary_address.Id.ToString(),
                     Street = primary_address.Street,
-                    HouseNumber = primary_address.HouseNumber ?? null,
+                    HouseNumber = primary_address.HouseNumber,
+                    ApartmentNumber = primary_address.ApartmentNumber ?? null,
                     City = primary_address.City,
                     PostCode = primary_address.PostCode,
-                    OwnerEmail = primary_address.OwnerEmail
+                    OwnerId = primary_address.OwnerId.ToString()
                 },
                 AvatarUrl = user.AvatarUrl,
-                DocumentUrl = user.DocumentUrl,
                 // Flags
                 IsActivated = user.IsActivated,
                 IsVerified = user.IsVerified,
                 IsBanned = user.IsBanned,
-                IsAdmin = user.IsAdmin
+                IsAdmin = user.IsAdmin          
             };
+            ret.DocumentUrl.Add(user.DocumentUrl[0]);
+            ret.DocumentUrl.Add(user.DocumentUrl[1]);
+            return ret;
+
         }
 
         [Authorize]
         public override async Task<UserUpdate> UpdateUser(UserUpdate request, ServerCallContext context)
         {
-            var request_type = typeof(UserUpdate);
+            var request_type = request.GetType();
 
-            var user = await _context.Users.FindAsync(request.Email) 
-                       ?? throw new RpcException(new Status(StatusCode.NotFound, "User not found"));
+            var userContext = context.GetHttpContext().User;
+            var userEmail = userContext.FindFirst(ClaimTypes.Email)?.Value;
+            User? user = await GetUserAsync(userEmail, request.UserId, _context);
 
             var requestProperties = request_type.GetProperties();
             var modifiedProperties = new HashSet<string>();
@@ -166,7 +188,10 @@ namespace grpc_hello_world.Services
             }
 
             // Build the UserFull response with modified fields only
-            var UserResponse = new UserUpdate { Email = user.Email};
+            var UserResponse = new UserUpdate
+            {
+                UserId = new UserIdentifier { Email = user.Email }
+            };
 
             foreach (var propertyName in modifiedProperties)
             {
@@ -183,18 +208,15 @@ namespace grpc_hello_world.Services
         }
 
         [Authorize]
-        public override async Task<UserMinimal> DeleteUser(UserMinimal request, ServerCallContext context)
+        public override async Task<UserIdentifier> DeleteUser(UserIdentifier request, ServerCallContext context)
         {
-            var user = await _context.Users.FindAsync(request.Email);
-            if (user == null)
-            {
-                throw new RpcException(new Status(StatusCode.NotFound, "User not found"));
-            }
+            var userContext = context.GetHttpContext().User;
+            var userEmail = userContext.FindFirst(ClaimTypes.Email)?.Value;
+            User user = await GetUserAsync(userEmail, request, _context);
 
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
-
-            return new UserMinimal { Email = request.Email };
+            return new UserIdentifier { Email = user.Email };
         }
 
         public static string HashPassword(string password)
@@ -202,11 +224,47 @@ namespace grpc_hello_world.Services
             var passwordHasher = new PasswordHasher<User>();
             return passwordHasher.HashPassword(null, password); // null is the user object; it's not needed for this case
         }
+
         public static bool VerifyPassword(string password, string hash)
         {
             var passwordHasher = new PasswordHasher<User>();
             var result = passwordHasher.VerifyHashedPassword(null, hash, password);
             return result == PasswordVerificationResult.Success;
+        }
+
+        public static async Task<User> GetUserAsync(string context_email, UserIdentifier user_identifier, AppDbContext context)
+        {
+            User? user = null;
+            switch (user_identifier.KeyCase)
+            {
+                case UserIdentifier.KeyOneofCase.Email:
+                    // TODO: Add actual admin checking, with ClaimTypes.Role
+                    if (context_email != null && user_identifier.Email != context_email && context_email != "admin@admin.com" )
+                    {
+                        throw new RpcException(new Status(StatusCode.Unauthenticated,
+                            "You need to be an admin to read other users data!"));
+                    }
+                    user = await context.Users.FirstOrDefaultAsync(u => u.Email == user_identifier.Email);
+                    break;
+
+                case UserIdentifier.KeyOneofCase.Id:
+                    user = await context.Users.FindAsync(user_identifier.Id);
+                    break;
+
+                case UserIdentifier.KeyOneofCase.Username:
+                    user = await context.Users.FirstOrDefaultAsync(u => u.Username == user_identifier.Username);
+                    break;
+
+                case UserIdentifier.KeyOneofCase.None:
+                    user = await context.Users.FirstOrDefaultAsync(u => u.Email == context_email);
+                    break;
+            }
+            if (user == null)
+            {
+                throw new RpcException(new Status(StatusCode.NotFound,
+                    "User not found"));
+            }
+            return user;
         }
     }
 }
