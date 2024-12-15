@@ -8,27 +8,35 @@ namespace grpc_hello_world.Models
     {
         [Key]
         [Column("id")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
-        [Column("address_street")]
+        [Column("street")]
         public required string Street { get; set; }
 
-        [Column("address_house_number")]
-        public string? HouseNumber { get; set; }
+        [Column("house_number")]
+        public required string HouseNumber { get; set; }
 
-        [Column("address_city")]
+        [Column("apartment_number")]
+        public string? ApartmentNumber { get; set; }
+
+        [Column("city")]
         public required string City { get; set; }
 
-        [Column("address_post_code")]
+        [Column("post_code")]
         public required string PostCode { get; set; }
 
-        [Column("owner_email")]
-        public required string OwnerEmail { get; set; } // This references `users(email)`
-
-        [ForeignKey("OwnerEmail")]
-        public User? Owner { get; set; } // Navigation property to `User`
+        [Column("description")]
+        public string? Description { get; set; }
 
         [Column("is_primary")]
         public required bool IsPrimary { get; set; }
+
+        [Column("owner_id")]
+        public required Guid OwnerId { get; set; } // This references `users(email)`
+
+        [ForeignKey("OwnerId")]
+        public User? Owner { get; set; } // Navigation property to `User`
+
     }
 }
