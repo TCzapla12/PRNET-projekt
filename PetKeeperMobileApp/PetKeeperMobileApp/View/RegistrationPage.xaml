@@ -70,7 +70,7 @@
                 Grid.ColumnSpan="2">
 
                 <Grid
-                    RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto"
+                    RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto"
                     ColumnDefinitions="30, 80, *, 110"
                     RowSpacing="20">
 
@@ -116,12 +116,20 @@
                         Type="Text"
                         Placeholder="Nazwisko"
                         Text="{Binding LastName}" />
-                    <Label
+                    <templates:ValidationEntry
                         Grid.Row="6"
+                        Grid.ColumnSpan="4"
+                        Type="Pesel"
+                        Placeholder="PESEL"
+                        Text="{Binding Pesel}"
+                        Keyboard="Numeric" 
+                        IsSpellCheck="False" />
+                    <Label
+                        Grid.Row="7"
                         Text="+48"
                         Margin="4, 12, 0, 0" />
                     <templates:ValidationEntry
-                        Grid.Row="6"
+                        Grid.Row="7"
                         Grid.Column="1"
                         Grid.ColumnSpan="3"
                         Type="Telephone" 
@@ -130,13 +138,13 @@
                         Keyboard="Numeric"
                         IsSpellCheck="False" />
                     <templates:ValidationEntry
-                        Grid.Row="7"
+                        Grid.Row="8"
                         Grid.ColumnSpan="3"
                         Type="Text"
                         Placeholder="Ulica"
                         Text="{Binding Street}" />
                     <templates:ValidationEntry
-                        Grid.Row="7"
+                        Grid.Row="8"
                         Grid.Column="3"
                         Grid.ColumnSpan="1"
                         Type="BuildingApartment"
@@ -144,7 +152,7 @@
                         Text="{Binding HouseNumber}"
                         IsSpellCheck="False" />
                     <templates:ValidationEntry
-                        Grid.Row="8"
+                        Grid.Row="9"
                         Grid.ColumnSpan="2"
                         Type="ZipCode"
                         Placeholder="Kod pocztowy"
@@ -152,7 +160,7 @@
                         Keyboard="Telephone"
                         IsSpellCheck="False" />
                     <templates:ValidationEntry
-                        Grid.Row="8"
+                        Grid.Row="9"
                         Grid.Column="2"
                         Grid.ColumnSpan="2"
                         Type="Text"

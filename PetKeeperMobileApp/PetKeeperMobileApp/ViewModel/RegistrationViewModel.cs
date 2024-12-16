@@ -1,17 +1,19 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Grpc.Core;
 using PetKeeperMobileApp.Enums;
+using PetKeeperMobileApp.Models;
+using PetKeeperMobileApp.Services;
 using PetKeeperMobileApp.Templates;
+using PetKeeperMobileApp.Utils;
 using PetKeeperMobileApp.View;
 using SkiaSharp;
 using System.Collections.ObjectModel;
 
 namespace PetKeeperMobileApp.ViewModel;
 
-public partial class RegistrationViewModel : ObservableObject
+public partial class RegistrationViewModel(IGrpcClient grpcClient) : ObservableObject
 {
-    public RegistrationViewModel() { }
-
     [ObservableProperty]
     private string username;
 
@@ -118,17 +120,51 @@ public partial class RegistrationViewModel : ObservableObject
         if (!areAllFieldsValid || IsUserPhotoErrorVisible || IsDocumentPhotoErrorVisible[0] || IsDocumentPhotoErrorVisible[1])
             return;
 
-        //TO DO:
-        var confirmationViewModel = new ConfirmationViewModel(StatusIcon.Success)
+        try
         {
-            Title = string.Empty,
-            Description = "Konto zostało utworzone. Na twój adres e-mail została wysłana wiadomość zawierająca link do potwierdzenia rejestracji.",
-            ModalCommand = new RelayCommand(async () => {
-                await GoBack();
-            })
-        };
+            AddressDto address = new()
+            {
+                Street = this.Street,
+                HouseNumber = this.HouseNumber.Split('/')[0],
+                ApartmentNumber = this.HouseNumber.Split('/').Length > 1 ? this.HouseNumber.Split('/')[1] : null,
+                City = this.City,
+                ZipCode = this.ZipCode
+            };
+            RegisterDto user = new()
+            {
+                Email = this.Email,
+                Username = this.Username,
+                HashPassword = Security.HashMD5(this.Password),
+                FirstName = this.FirstName,
+                LastName = this.LastName,
+                PrimaryAddress = address,
+                Phone = this.PhoneNumber,
+                Pesel = this.Pesel,
+                //TO DO:
+                AvatarUrl = string.Empty,
+                DocumentUrls = [string.Empty, string.Empty]
+            };
+            var message = await grpcClient.Register(user);
 
-        await Application.Current!.MainPage!.Navigation.PushModalAsync(new ConfirmationPage(confirmationViewModel));
+            await Helpers.ShowConfirmationView(StatusIcon.Success, message, new RelayCommand(async () =>
+            {
+                await GoBack();
+            }));
+        }
+        catch (RpcException ex)
+        {
+            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Status.Detail, new RelayCommand(async () =>
+            {
+                await CreateAccount(container);
+            }));
+        }
+        catch (Exception ex) 
+        {
+            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Message, new RelayCommand(async () =>
+            {
+                await CreateAccount(container);
+            }));
+        }
     }
 
     private async Task AddDocumentPhoto(int index)

@@ -4,29 +4,48 @@ option csharp_namespace = "PetKeeperMobileApp";
 
 package user;
 
+import "Protos/shared.proto";
 
 service UserService {
-	rpc CreateUser (UserCreate) returns (DefaultResponse);
-	rpc ResetPassword (ResetPasswordRequest) returns (DefaultResponse);
+	rpc CreateUser (UserCreate) returns (shared.UserIdentifier);
+	//Komunikaty błędów
+	//Konto o podanym adresie e-mail nie istnieje
+	//Utworzenie konta nie zostało potwierdzone
+	//Konto nie zostało jeszcze zweryfikowane
+	//Konto zostało zablokowane
+	//JAK ROBIMY Z URLAMI DO AVATARA I DOKUMENTÓW - do przemyślenia!
+
+	//MOŻNA NA RAZIE TEGO NIE IMPLEMENTOWAĆ
+	rpc ResetPassword (ResetPasswordRequest) returns (shared.UserIdentifier);
+	//Komunikaty błędów
+	//Konto o podanym adresie e-mail nie istnieje
+}
+
+message AddressCreate {
+    optional string id = 1;
+    string street = 2;
+    string house_number = 3;
+    optional string apartment_number = 4;
+    string city = 5;
+    string post_code = 6;
+    optional string owner_id = 7;
+    optional string description = 8;
 }
 
 message UserCreate {
 	string email = 1;
 	string username = 2;
-	// TO DO: dodać username
+	string password = 3;
+	string first_name = 4;
+	string last_name = 5;
+	AddressCreate primary_address = 6;
+	string phone = 7;
+	string pesel = 8;
+	optional string avatar_url = 9;
+	repeated string document_url = 10;
 }
 
 message ResetPasswordRequest {
 	string email = 1;
 }
 
-message DefaultResponse {
-	string message = 1;
-}
-
-//MOŻNA NA RAZIE TEGO NIE IMPLEMENTOWAĆ
-
-//Zwraca info: "Na twój adres e-mail została wysłana wiadomość umożliwiająca zmianę hasła."
-
-//Komunikaty błędów
-//Konto o podanym adresie e-mail nie istnieje
