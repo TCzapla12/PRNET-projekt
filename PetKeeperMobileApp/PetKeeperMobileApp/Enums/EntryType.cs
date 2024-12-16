@@ -7,6 +7,7 @@ public enum EntryType
     Email,
     Password,
     RepeatPassword,
+    Pesel,
     Telephone,
     BuildingApartment,
     ZipCode

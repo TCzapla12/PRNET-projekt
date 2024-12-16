@@ -87,6 +87,7 @@ public partial class ValidationEntry : ContentView
             EntryType.Email => Validate.IsValidEmail(Text),
             EntryType.Password => Validate.IsValidPassword(Text),
             EntryType.RepeatPassword => string.Empty,
+            EntryType.Pesel => Validate.IsValidPesel(Text),
             EntryType.Telephone => Validate.IsValidPhoneNumber(Text),
             EntryType.BuildingApartment => Validate.IsValidBuildingApartmentNumber(Text),
             EntryType.ZipCode => Validate.IsValidZipCode(Text),
