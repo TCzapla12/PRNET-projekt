@@ -99,8 +99,6 @@
 	</ItemGroup>
   
   <ItemGroup>
-    <Protobuf Include="Protos\shared.proto" GrpcServices="Client" />
-    <Protobuf Include="Protos\auth.proto" GrpcServices="Client" />
     <Protobuf Include="Protos\user.proto" GrpcServices="Client" />
   </ItemGroup>
 </Project>

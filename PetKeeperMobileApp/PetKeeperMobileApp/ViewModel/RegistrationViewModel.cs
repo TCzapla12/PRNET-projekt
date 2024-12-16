@@ -126,7 +126,7 @@ public partial class RegistrationViewModel(IGrpcClient grpcClient) : ObservableO
             {
                 Street = this.Street,
                 HouseNumber = this.HouseNumber.Split('/')[0],
-                ApartmentNumber = this.HouseNumber.Split('/').Length > 1 ? this.HouseNumber.Split('/')[1] : null,
+                ApartmentNumber = this.HouseNumber.Split('/').Length > 1 ? this.HouseNumber.Split('/')[1] : string.Empty,
                 City = this.City,
                 ZipCode = this.ZipCode
             };
