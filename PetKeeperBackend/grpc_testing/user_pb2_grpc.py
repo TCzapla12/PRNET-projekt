@@ -330,7 +330,7 @@ class AddressServiceStub(object):
                 _registered_method=True)
         self.DeleteAddress = channel.unary_unary(
                 '/AddressService/DeleteAddress',
-                request_serializer=user__pb2.AddressUpdate.SerializeToString,
+                request_serializer=user__pb2.AddressMinimal.SerializeToString,
                 response_deserializer=user__pb2.AddressMinimal.FromString,
                 _registered_method=True)
 
@@ -393,7 +393,7 @@ def add_AddressServiceServicer_to_server(servicer, server):
             ),
             'DeleteAddress': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteAddress,
-                    request_deserializer=user__pb2.AddressUpdate.FromString,
+                    request_deserializer=user__pb2.AddressMinimal.FromString,
                     response_serializer=user__pb2.AddressMinimal.SerializeToString,
             ),
     }
@@ -530,7 +530,7 @@ class AddressService(object):
             request,
             target,
             '/AddressService/DeleteAddress',
-            user__pb2.AddressUpdate.SerializeToString,
+            user__pb2.AddressMinimal.SerializeToString,
             user__pb2.AddressMinimal.FromString,
             options,
             channel_credentials,

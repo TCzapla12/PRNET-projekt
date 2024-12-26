@@ -101,7 +101,7 @@ service AddressService {
     rpc GetUserAddresses (AddressGet) returns (AddressList);
     rpc GetAddress (AddressGet) returns (AddressList);
     rpc UpdateAddress (AddressUpdate) returns (AddressUpdate);
-    rpc DeleteAddress (AddressUpdate) returns (AddressMinimal);
+    rpc DeleteAddress (AddressMinimal) returns (AddressMinimal);
 }
 message AddressMinimal {
     string id = 1;
@@ -116,7 +116,8 @@ message AddressCreate {
     string city = 5;
     string post_code = 6;
     optional string owner_id = 7;
-    string description = 8;
+    optional bool is_primary = 8;
+    string description = 9;
 }
 message AddressGet {
     optional string id = 1;
@@ -124,7 +125,8 @@ message AddressGet {
     optional string house_number = 3;
     optional string city = 4;
     optional string post_code = 5;
-    optional string owner_id = 6;
+    optional bool is_primary = 6;
+    optional string owner_id = 7;
 }
 message AddressUpdate {
     string id = 1;
@@ -133,7 +135,8 @@ message AddressUpdate {
     optional string apartment_number = 4;
     optional string city = 5;
     optional string post_code = 6;
-    optional string description = 7;
+    optional bool is_primary = 7;
+    optional string owner_id = 8;
 }
 
 message AddressList {

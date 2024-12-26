@@ -12,7 +12,7 @@ create_request = user_pb2.AddressCreate(
     street="Wyjazdowa",
     house_number='3',
     apartment_number='42',
-    city='Poznań',
+    city='Warszawa',
     post_code='03-123',
     description='Tu za pocztą wyjazd'
 )
