@@ -9,5 +9,6 @@ namespace grpc_hello_world
         public DbSet<User> Users { get; set; } // This property maps to the Users table in the database
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Announcement> Announcements { get; set; }
+        public DbSet<Animal> Animals { get; set; }
     }
 }

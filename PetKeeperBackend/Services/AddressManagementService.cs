@@ -84,6 +84,7 @@ namespace grpc_hello_world.Services
             return ret;
         }
 
+        [Authorize]
         public override async Task<AddressMinimal> DeleteAddress(AddressMinimal request, ServerCallContext context)
         {
             var userContext = context.GetHttpContext().User;
@@ -100,7 +101,7 @@ namespace grpc_hello_world.Services
                 _context.Addresses.Remove(address);
                 await _context.SaveChangesAsync();
 
-                return new AddressMinimal { Id = address.Id.ToString() };
+                return new AddressMinimal { Id = address.Id.ToString(), OwnerId = address.OwnerId.ToString()  };
             }
             catch (DbUpdateException e)
             {
@@ -108,7 +109,8 @@ namespace grpc_hello_world.Services
             }
         }
 
-        public override async Task<AddressList> GetAddress(AddressGet request, ServerCallContext context)
+        [Authorize]
+        public override async Task<AddressList> GetAddresses(AddressGet request, ServerCallContext context)
         {
             var query = _context.Addresses.AsQueryable();
 
@@ -155,7 +157,7 @@ namespace grpc_hello_world.Services
             return addressList;
         }
 
-
+        [Authorize]
         public override async Task<AddressUpdate> UpdateAddress(AddressUpdate request, ServerCallContext context)
         {
             var request_type = request.GetType();

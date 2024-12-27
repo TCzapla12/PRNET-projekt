@@ -99,7 +99,7 @@ message UserFull {
 service AddressService {
     rpc CreateAddress (AddressCreate) returns (AddressMinimal);
     rpc GetUserAddresses (AddressGet) returns (AddressList);
-    rpc GetAddress (AddressGet) returns (AddressList);
+    rpc GetAddresses (AddressGet) returns (AddressList);
     rpc UpdateAddress (AddressUpdate) returns (AddressUpdate);
     rpc DeleteAddress (AddressMinimal) returns (AddressMinimal);
 }
@@ -136,12 +136,53 @@ message AddressUpdate {
     optional string city = 5;
     optional string post_code = 6;
     optional bool is_primary = 7;
-    optional string owner_id = 8;
 }
 
 message AddressList {
     repeated AddressCreate addresses = 1;
 }
+
+service AnimalService {
+    rpc CreateAnimal (AnimalCreate) returns (AnimalMinimal);
+    rpc GetAnimals (AnimalGet) returns (AnimalList);
+    rpc DeleteAnimal (AnimalMinimal) returns (AnimalMinimal);
+    rpc UpdateAnimal (AnimalUpdate) returns (AnimalUpdate);
+}
+
+message AnimalMinimal {
+    string id = 1;
+    string owner_id = 2;
+}
+
+message AnimalCreate {
+    optional string id = 1;
+    optional string owner_id = 2;
+    string name = 3;
+    string type = 4;
+    repeated string photos = 5;
+    optional string description = 6;
+}
+
+message AnimalGet {
+    optional string id = 1;
+    optional string owner_id = 2;
+    optional string name = 3;
+    optional string type = 4;
+    optional string description = 5;
+}
+
+message AnimalUpdate {
+    string id = 1;
+    optional string name = 2;
+    optional string type = 3;
+    repeated string photos = 4;
+    optional string description = 5;
+}
+
+message AnimalList {
+    repeated AnimalCreate animals = 1;
+}
+
 
 service AnnouncementService {
     rpc GetAnnouncement (AnnouncementFull) returns (CreateAnnouncementResponse);
