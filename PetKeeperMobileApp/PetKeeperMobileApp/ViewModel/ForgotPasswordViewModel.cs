@@ -1,15 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Grpc.Core;
 using PetKeeperMobileApp.Enums;
+using PetKeeperMobileApp.Services;
 using PetKeeperMobileApp.Templates;
+using PetKeeperMobileApp.Utils;
 using PetKeeperMobileApp.View;
 
 namespace PetKeeperMobileApp.ViewModel;
 
-public partial class ForgotPasswordViewModel : ObservableObject
+public partial class ForgotPasswordViewModel(IGrpcClient grpcClient) : ObservableObject
 {
-    public ForgotPasswordViewModel() { }
-
     [ObservableProperty]
     private string email;
 
@@ -26,18 +27,28 @@ public partial class ForgotPasswordViewModel : ObservableObject
             && !validationEntry.ValidateField())
             return;
 
-        //TO DO:
-        //komunikacja z backendem
-        //generyczny komponent
-        var confirmationViewModel = new ConfirmationViewModel(StatusIcon.Success)
+        try
         {
-            Title = string.Empty,
-            Description = "Na twój adres e-mail została wysłana wiadomość umożliwiająca zmianę hasła.",
-            ModalCommand = new RelayCommand(async () => { 
-                await GoBack(); 
-            })
-        };
+            var message = await grpcClient.ResetPassword(Email);
 
-        await Application.Current!.MainPage!.Navigation.PushModalAsync(new ConfirmationPage(confirmationViewModel));
+            await Helpers.ShowConfirmationView(StatusIcon.Success, message, new RelayCommand(async () =>
+            {
+                await GoBack();
+            }));
+        }
+        catch (RpcException ex)
+        {
+            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Status.Detail, new RelayCommand(async () =>
+            {
+                await ResetPassword(container);
+            }));
+        }
+        catch (Exception ex)
+        {
+            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Message, new RelayCommand(async () =>
+            {
+                await ResetPassword(container);
+            }));
+        }
     }
 }

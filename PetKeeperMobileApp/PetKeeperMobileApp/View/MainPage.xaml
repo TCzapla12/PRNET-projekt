@@ -46,8 +46,7 @@
             Grid.Row="2"
             Text="Zresetuj hasło"
             Style="{StaticResource Hyperlink}"
-            HorizontalOptions="End"
-            TextDecorations="Underline">
+            HorizontalOptions="End">
 
             <Label.GestureRecognizers>
                 <TapGestureRecognizer Command="{Binding GoToForgotPasswordPageCommand}" />
