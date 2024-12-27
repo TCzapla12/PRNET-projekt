@@ -45,11 +45,10 @@ CREATE TABLE IF NOT EXISTS announcements (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     -- Ogloszenia zachowywane nawet przy usunieciu usera dla archiwizacji
     author_id UUID NOT NULL REFERENCES users(id) ON DELETE NO ACTION,
-    keeper_id UUID NOT NULL REFERENCES users(id) ON DELETE NO ACTION,
+    keeper_id UUID REFERENCES users(id) ON DELETE NO ACTION,
     animal_id UUID NOT NULL REFERENCES animals(id) ON DELETE NO ACTION,
     keeper_profit INT NOT NULL CHECK (keeper_profit > 0), -- Zysk musi byc wiekszy niz 0. Mozna tez to po prostu sprawdzac na front/back
     is_negotiable BOOLEAN NOT NULL DEFAULT FALSE,
-    long_term BOOLEAN NOT NULL DEFAULT FALSE,
     
     description TEXT,
 	-- Wszystkie timestampy jako UNIX 

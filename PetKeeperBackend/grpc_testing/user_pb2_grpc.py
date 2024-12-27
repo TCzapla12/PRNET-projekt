@@ -753,17 +753,50 @@ class AnnouncementServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetAnnouncement = channel.unary_unary(
-                '/AnnouncementService/GetAnnouncement',
-                request_serializer=user__pb2.AnnouncementFull.SerializeToString,
-                response_deserializer=user__pb2.CreateAnnouncementResponse.FromString,
+        self.CreateAnnouncement = channel.unary_unary(
+                '/AnnouncementService/CreateAnnouncement',
+                request_serializer=user__pb2.AnnouncementCreate.SerializeToString,
+                response_deserializer=user__pb2.AnnouncementMinimal.FromString,
+                _registered_method=True)
+        self.GetAnnouncements = channel.unary_unary(
+                '/AnnouncementService/GetAnnouncements',
+                request_serializer=user__pb2.AnnouncementGet.SerializeToString,
+                response_deserializer=user__pb2.AnnouncementList.FromString,
+                _registered_method=True)
+        self.UpdateAnnouncement = channel.unary_unary(
+                '/AnnouncementService/UpdateAnnouncement',
+                request_serializer=user__pb2.AnnouncementUpdate.SerializeToString,
+                response_deserializer=user__pb2.AnnouncementUpdate.FromString,
+                _registered_method=True)
+        self.DeleteAnnouncement = channel.unary_unary(
+                '/AnnouncementService/DeleteAnnouncement',
+                request_serializer=user__pb2.AnnouncementMinimal.SerializeToString,
+                response_deserializer=user__pb2.AnnouncementMinimal.FromString,
                 _registered_method=True)
 
 
 class AnnouncementServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def GetAnnouncement(self, request, context):
+    def CreateAnnouncement(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetAnnouncements(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateAnnouncement(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeleteAnnouncement(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -772,10 +805,25 @@ class AnnouncementServiceServicer(object):
 
 def add_AnnouncementServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GetAnnouncement': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetAnnouncement,
-                    request_deserializer=user__pb2.AnnouncementFull.FromString,
-                    response_serializer=user__pb2.CreateAnnouncementResponse.SerializeToString,
+            'CreateAnnouncement': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateAnnouncement,
+                    request_deserializer=user__pb2.AnnouncementCreate.FromString,
+                    response_serializer=user__pb2.AnnouncementMinimal.SerializeToString,
+            ),
+            'GetAnnouncements': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetAnnouncements,
+                    request_deserializer=user__pb2.AnnouncementGet.FromString,
+                    response_serializer=user__pb2.AnnouncementList.SerializeToString,
+            ),
+            'UpdateAnnouncement': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateAnnouncement,
+                    request_deserializer=user__pb2.AnnouncementUpdate.FromString,
+                    response_serializer=user__pb2.AnnouncementUpdate.SerializeToString,
+            ),
+            'DeleteAnnouncement': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteAnnouncement,
+                    request_deserializer=user__pb2.AnnouncementMinimal.FromString,
+                    response_serializer=user__pb2.AnnouncementMinimal.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -789,7 +837,7 @@ class AnnouncementService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def GetAnnouncement(request,
+    def CreateAnnouncement(request,
             target,
             options=(),
             channel_credentials=None,
@@ -802,9 +850,90 @@ class AnnouncementService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/AnnouncementService/GetAnnouncement',
-            user__pb2.AnnouncementFull.SerializeToString,
-            user__pb2.CreateAnnouncementResponse.FromString,
+            '/AnnouncementService/CreateAnnouncement',
+            user__pb2.AnnouncementCreate.SerializeToString,
+            user__pb2.AnnouncementMinimal.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetAnnouncements(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/AnnouncementService/GetAnnouncements',
+            user__pb2.AnnouncementGet.SerializeToString,
+            user__pb2.AnnouncementList.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UpdateAnnouncement(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/AnnouncementService/UpdateAnnouncement',
+            user__pb2.AnnouncementUpdate.SerializeToString,
+            user__pb2.AnnouncementUpdate.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DeleteAnnouncement(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/AnnouncementService/DeleteAnnouncement',
+            user__pb2.AnnouncementMinimal.SerializeToString,
+            user__pb2.AnnouncementMinimal.FromString,
             options,
             channel_credentials,
             insecure,
