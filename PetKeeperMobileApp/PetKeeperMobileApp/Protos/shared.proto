@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option csharp_namespace = "PetKeeperMobileApp";
+
+package shared;
+
+message UserIdentifier {
+    oneof key {
+        string email = 1;
+        string id = 2;
+        string username = 3;
+    }
+}

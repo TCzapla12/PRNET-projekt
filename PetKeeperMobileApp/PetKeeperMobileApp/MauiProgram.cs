@@ -21,8 +21,8 @@ namespace PetKeeperMobileApp
                     fonts.AddFont("solid.otf", "FAS");
                 });
 
-            builder.Services.AddScoped<IGrpcClient, GrpcClient>();
-            //builder.Services.AddScoped<IGrpcClient, MockGrpcClient>();
+            //builder.Services.AddScoped<IGrpcClient, GrpcClient>();
+            builder.Services.AddScoped<IGrpcClient, MockGrpcClient>();
 
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<MainViewModel>();

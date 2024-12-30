@@ -1,5 +1,4 @@
 ﻿using Grpc.Net.Client;
-using grpc_hello_world;
 using PetKeeperMobileApp.Models;
 using PetKeeperMobileApp.Utils;
 
@@ -20,11 +19,11 @@ public class GrpcClient : IGrpcClient
 
     public async Task<string> ResetPassword(string email)
     {
-        throw new NotImplementedException();
-        //using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
-        //var client = new UserService.UserServiceClient(channel);
-        //var reply = await client.ResetPasswordAsync(new ResetPasswordRequest { Email = email });
-        //return Wordings.RESET_PASSWORD_SUCCESS;
+        //throw new NotImplementedException();
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new UserService.UserServiceClient(channel);
+        var reply = await client.ResetPasswordAsync(new ResetPasswordRequest { Email = email });
+        return Wordings.RESET_PASSWORD_SUCCESS;
     }
 
     public async Task<string> Register(RegisterDto registerDto)
@@ -38,7 +37,7 @@ public class GrpcClient : IGrpcClient
             ApartmentNumber = registerDto.PrimaryAddress.ApartmentNumber,
             City = registerDto.PrimaryAddress.City,
             PostCode = registerDto.PrimaryAddress.ZipCode,
-            Description = string.Empty
+            //Description = string.Empty
         };
         UserCreate user = new()
         {
