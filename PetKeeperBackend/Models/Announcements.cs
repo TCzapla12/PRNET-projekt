@@ -1,68 +1,66 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace grpc_hello_world.Models
 {
     [Table("announcements")]
     public class Announcement
     {
+        [Key]
         [Column("id")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
-        // Foreign Key: Author Email (linked to User)
-        [Column("author_email")]
-        public string AuthorEmail { get; set; }
+        // Foreign Key: Author Id (linked to User)
+        [Column("author_id")]
+        public Guid AuthorId { get; set; }
+        [ForeignKey("AuthorId")]
         public User Author { get; set; }
 
-        // Foreign Key: Keeper Email (linked to User)
-        [Column("keeper_email")]
-        public string KeeperEmail { get; set; }
+        // Foreign Key: Keeper Id (linked to User)
+        [Column("keeper_id")]
+        public Guid? KeeperId { get; set; }
+        [ForeignKey("KeeperId")]
         public User Keeper { get; set; }
 
-        // Other properties
+        // Foreign Key: Animal Id (linked to User)
+        [Column("animal_id")]
+        public Guid AnimalId { get; set; }
+        [ForeignKey("AnimalId")]
+        public Animal Animal { get; set; }
+
         [Column("keeper_profit")]
-        public int KeeperProfit { get; set; }
+        public uint KeeperProfit { get; set; }
 
         [Column("is_negotiable")]
         public bool IsNegotiable { get; set; }
-
-        [Column("long_term")]
-        public bool LongTerm { get; set; }
 
         [Column("description")]
         public string Description { get; set; }
 
         // Timestamp properties (Unix)
         [Column("start_term")]
-        public long StartTerm { get; set; }
+        public ulong StartTerm { get; set; }
 
         [Column("end_term")]
-        public long EndTerm { get; set; }
+        public ulong EndTerm { get; set; }
 
         [Column("created_date")]
-        public long CreatedDate { get; set; }
+        public ulong CreatedDate { get; }
 
         [Column("started_date")]
-        public long? StartedDate { get; set; }
+        public ulong? StartedDate { get; set; }
 
         [Column("finished_date")]
-        public long? FinishedDate { get; set; }
+        public ulong? FinishedDate { get; set; }
 
-        // Status field
         [Column("status")]
         public string Status { get; set; }
 
-        // Address details
-        [Column("address_street")]
-        public string AddressStreet { get; set; }
-
-        [Column("address_house_number")]
-        public string AddressHouseNumber { get; set; }
-
-        [Column("address_city")]
-        public string AddressCity { get; set; }
-
-        [Column("address_post_code")]
-        public string AddressPostCode { get; set; }
+        [Column("address_id")]
+        public Guid AddressId { get; set; }
+        [ForeignKey("AddressId")]  // Navigation property
+        public Address? Address { get; set; }
     }
 }
 

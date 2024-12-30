@@ -187,7 +187,6 @@ namespace grpc_hello_world.Services
                 throw new RpcException(new Status(StatusCode.FailedPrecondition, e.Message));
             }
 
-            // Build the UserFull response with modified fields only
             var UserResponse = new UserUpdate
             {
                 UserId = new UserIdentifier { Email = user.Email }
