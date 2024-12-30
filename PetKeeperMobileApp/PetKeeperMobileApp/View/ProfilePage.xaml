@@ -5,10 +5,26 @@
              xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
              x:DataType="viewmodel:ProfileViewModel"
              Title="ProfilePage">
-    <VerticalStackLayout>
+    <Grid
+        RowDefinitions="Auto, Auto"
+        Padding="20"
+        RowSpacing="20">
         <Label 
-            Text="Profile"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+            Text="Profil"
+            Style="{StaticResource Headline}" />
+        <Grid
+            Grid.Row="1"
+            RowDefinitions="Auto, *"
+            RowSpacing="10">
+            <Button
+                Style="{StaticResource OutlineButton}"
+                Text="Moje adresy" 
+                Command="{Binding ShowMyAddressesCommand}" />   
+            <Button 
+                Grid.Row="1"
+                Style="{StaticResource OutlineButton}"
+                Text="Moje zwierzęta"
+                Command="{Binding ShowMyPetsCommand}" />
+        </Grid>
+    </Grid>
 </ContentPage>

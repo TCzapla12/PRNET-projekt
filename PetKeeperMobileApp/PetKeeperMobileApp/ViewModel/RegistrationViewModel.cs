@@ -6,7 +6,6 @@ using PetKeeperMobileApp.Models;
 using PetKeeperMobileApp.Services;
 using PetKeeperMobileApp.Templates;
 using PetKeeperMobileApp.Utils;
-using PetKeeperMobileApp.View;
 using SkiaSharp;
 using System.Collections.ObjectModel;
 
