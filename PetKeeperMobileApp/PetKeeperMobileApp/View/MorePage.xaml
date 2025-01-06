@@ -9,7 +9,7 @@
         RowDefinitions="Auto, *"
         Padding="20">
         <Label 
-            Text="Więcej"
+            Text="WIĘCEJ"
             Style="{StaticResource Headline}" />
         <Button
             Grid.Row="1"

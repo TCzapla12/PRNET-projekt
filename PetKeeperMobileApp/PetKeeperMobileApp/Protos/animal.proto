@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+option csharp_namespace = "PetKeeperMobileApp";
+
+package animal;
+
+service AnimalService {
+    rpc CreateAnimal (AnimalCreate) returns (AnimalMinimal);
+    rpc GetAnimals (AnimalGet) returns (AnimalList);
+    rpc DeleteAnimal (AnimalMinimal) returns (AnimalMinimal);
+    rpc UpdateAnimal (AnimalUpdate) returns (AnimalUpdate);
+}
+
+message AnimalCreate {
+    optional string id = 1;
+    optional string owner_id = 2;
+    string name = 3;
+    string type = 4;
+    repeated string photos = 5;
+    optional string description = 6;
+}
+
+message AnimalMinimal {
+    string id = 1;
+    string owner_id = 2;
+}
+
+message AnimalGet {
+    optional string id = 1;
+    optional string owner_id = 2;
+    optional string name = 3;
+    optional string type = 4;
+    optional string description = 5;
+}
+
+message AnimalList {
+    repeated AnimalCreate animals = 1;
+}
+
+message AnimalUpdate {
+    string id = 1;
+    optional string name = 2;
+    optional string type = 3;
+    repeated string photos = 4;
+    optional string description = 5;
+}

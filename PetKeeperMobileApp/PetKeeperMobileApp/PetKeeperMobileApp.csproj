@@ -90,6 +90,12 @@
 	  <MauiXaml Update="View\MorePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="View\MyAddressesPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\MyPetsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="View\OwnerPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -105,5 +111,7 @@
     <Protobuf Include="Protos\shared.proto" GrpcServices="Client" />
     <Protobuf Include="Protos\auth.proto" GrpcServices="Client" />
     <Protobuf Include="Protos\user.proto" GrpcServices="Client" />
+    <Protobuf Include="Protos\address.proto" GrpcServices="Client" />
+    <Protobuf Include="Protos\animal.proto" GrpcServices="Client" />
   </ItemGroup>
 </Project>

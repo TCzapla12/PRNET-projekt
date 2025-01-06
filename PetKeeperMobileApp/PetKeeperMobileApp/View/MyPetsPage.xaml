@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PetKeeperMobileApp.View.MyPetsPage"
+             xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             xmlns:templates="clr-namespace:PetKeeperMobileApp.Templates"
+             xmlns:models="clr-namespace:PetKeeperMobileApp.Models"
+             x:DataType="viewmodel:MyPetsViewModel"
+             Title="MyPetsPage">
+
+    <ContentPage.Resources>
+        <x:String x:Key="arrow-left">&#xf060;</x:String>
+        <x:String x:Key="dog">&#xf6d3;</x:String>
+        <x:String x:Key="cat">&#xf6be;</x:String>
+        <x:String x:Key="other">&#x3f;</x:String>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <Grid 
+            RowDefinitions="40, Auto, Auto"
+            ColumnDefinitions="Auto, *"
+            Padding="20"
+            RowSpacing="20">
+
+            <ImageButton
+                HeightRequest="30"
+                Command="{Binding GoBackCommand}">
+                <ImageButton.Source>
+                    <FontImageSource
+                        FontFamily="FAS"
+                        Glyph="{StaticResource arrow-left}"
+                        Color="{StaticResource PrimaryDark}" /> 
+                </ImageButton.Source>
+            </ImageButton>
+
+            <Label 
+                Grid.ColumnSpan="2"
+                Text="MOJE ZWIERZĘTA"
+                Style="{StaticResource Headline}" />
+
+            <CollectionView
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                ItemsSource="{Binding Animals}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="{x:Type models:AnimalInfo}">
+                        <Frame
+                            Padding="10"
+                            Margin="0, 0, 0, 20"
+                            CornerRadius="10">
+                            <Grid
+                                ColumnDefinitions="*, Auto">
+                                <StackLayout>
+                                    <!--<ImageButton
+                                        HeightRequest="30"
+                                        Command="{Binding GoBackCommand}">
+                                        <ImageButton.Source>
+                                            <FontImageSource
+                                                FontFamily="FAS"
+                                                Glyph="{StaticResource dog}"
+                                                Color="{StaticResource PrimaryDark}" />
+                                        </ImageButton.Source>
+                                    </ImageButton>-->
+                                    <Label Text="{Binding Name}" 
+                                           Style="{StaticResource SubHeadline}"
+                                           FontAttributes="Bold"/>
+                                    <Label Text="{Binding Description}" />
+                                </StackLayout>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button
+                Margin="0, -20, 0, 0"
+                Grid.Row="2"
+                Grid.ColumnSpan="2"
+                Style="{StaticResource PrimaryButton}"
+                Text="Dodaj zwierzę"
+                IsVisible="{Binding IsCreateButtonVisible}"
+                Command="{Binding CreateAnimalCommand}" />
+        </Grid>
+    </ScrollView>
+</ContentPage>

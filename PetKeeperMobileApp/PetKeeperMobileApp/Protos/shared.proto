@@ -11,3 +11,15 @@ message UserIdentifier {
         string username = 3;
     }
 }
+
+message AddressCreate {
+	optional string id = 1;
+    string street = 2;
+    string house_number = 3;
+    optional string apartment_number = 4;
+    string city = 5;
+    string post_code = 6;
+    optional string owner_id = 7;
+	optional bool is_primary = 8;
+    optional string description = 9;
+}

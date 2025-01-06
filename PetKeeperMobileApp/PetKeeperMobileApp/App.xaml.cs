@@ -19,7 +19,7 @@ namespace PetKeeperMobileApp
 
         private async void CheckCredentials()
         {
-            var token = await Storage.LoadToken();
+            var token = await Storage.GetToken();
 
             if (!string.IsNullOrEmpty(token))
             {

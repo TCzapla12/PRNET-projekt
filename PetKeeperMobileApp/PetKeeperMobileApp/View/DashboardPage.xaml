@@ -7,7 +7,7 @@
              Title="DashboardPage">
     <VerticalStackLayout>
         <Label 
-            Text="Dashboard"
+            Text="START"
             VerticalOptions="Center" 
             HorizontalOptions="Center" />
     </VerticalStackLayout>

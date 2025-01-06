@@ -12,7 +12,7 @@ public partial class MoreViewModel : ObservableObject
     [RelayCommand]
     async Task Logout()
     {
-        Storage.RemoveToken();
+        Storage.RemoveCredentials();
         await Shell.Current.GoToAsync($"//{RouteType.Login}");
     }
 }

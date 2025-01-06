@@ -10,7 +10,7 @@
         Padding="20"
         RowSpacing="20">
         <Label 
-            Text="Profil"
+            Text="PROFIL"
             Style="{StaticResource Headline}" />
         <Grid
             Grid.Row="1"

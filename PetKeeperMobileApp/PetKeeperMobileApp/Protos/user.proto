@@ -21,16 +21,7 @@ service UserService {
 	//Konto o podanym adresie e-mail nie istnieje
 }
 
-message AddressCreate {
-	optional string id = 1;
-    string street = 2;
-    string house_number = 3;
-    optional string apartment_number = 4;
-    string city = 5;
-    string post_code = 6;
-    optional string owner_id = 7;
-    optional string description = 8;
-}
+
 
 message UserCreate {
 	string email = 1;
@@ -38,7 +29,7 @@ message UserCreate {
 	string password = 3;
 	string first_name = 4;
 	string last_name = 5;
-	AddressCreate primary_address = 6;
+	shared.AddressCreate primary_address = 6;
 	string phone = 7;
 	string pesel = 8;
 	optional string avatar_url = 9;

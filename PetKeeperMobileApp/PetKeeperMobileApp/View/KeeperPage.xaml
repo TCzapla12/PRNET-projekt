@@ -7,7 +7,7 @@
              Title="KeeperPage">
     <VerticalStackLayout>
         <Label 
-            Text="Keeper"
+            Text="OPIEKUN"
             VerticalOptions="Center" 
             HorizontalOptions="Center" />
     </VerticalStackLayout>

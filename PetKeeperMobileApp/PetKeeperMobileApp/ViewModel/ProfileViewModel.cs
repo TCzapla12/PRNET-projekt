@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PetKeeperMobileApp.View;
 
 namespace PetKeeperMobileApp.ViewModel;
 
@@ -10,12 +11,12 @@ public partial class ProfileViewModel : ObservableObject
     [RelayCommand]
     async Task ShowMyAddresses()
     {
-        //TODO:
+        await Shell.Current.GoToAsync(nameof(MyAddressesPage));
     }
 
     [RelayCommand]
     async Task ShowMyPets()
     {
-        //TODO:
+        await Shell.Current.GoToAsync(nameof(MyPetsPage));
     }
 }
