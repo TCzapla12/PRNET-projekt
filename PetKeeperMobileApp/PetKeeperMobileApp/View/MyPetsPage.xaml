@@ -75,7 +75,7 @@
                                 <Frame
                                      Grid.Row="1"
                                      Grid.Column="1"
-                                     CornerRadius="8"
+                                     CornerRadius="10"
                                      WidthRequest="100"
                                      HeightRequest="100">       
                                     <!--<ImageButton
