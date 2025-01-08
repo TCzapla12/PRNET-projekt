@@ -2,6 +2,7 @@ import grpc
 import user_pb2
 import user_pb2_grpc
 
+
 def get_token(email, password, *, channel):
     stub = user_pb2_grpc.AuthServiceStub(channel)
     id = user_pb2.UserIdentifier()

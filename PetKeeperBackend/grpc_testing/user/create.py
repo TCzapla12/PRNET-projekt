@@ -1,6 +1,10 @@
 import grpc
 import user_pb2
 import user_pb2_grpc
+import os
+import psycopg2
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
 addresses = [
     {
@@ -61,14 +65,14 @@ users = [
 ]
 
 
-def get_ids():
-    with open('uids.txt', 'r') as fid:
-        return [line.strip() for line in fid.readlines()]
+def get_user_ids():
+    with open(os.path.join(script_dir, 'uids.txt'), 'r') as f:
+        return [line.strip() for line in f.readlines()]
 
 
 ###
 if __name__ == "__main__":
-    ids = []
+    ids, addr_ids = [], []
     channel = grpc.insecure_channel('localhost:8080')
     stub = user_pb2_grpc.UserServiceStub(channel)
     for usr, addr in zip(users, addresses):
@@ -78,7 +82,29 @@ if __name__ == "__main__":
         create_response = stub.CreateUser(user_proto)
         print("CreateUser Response\n", create_response)
         ids.append(create_response.id)
+        addr_ids.append(create_response.primary_address_id)
 
-    with open('uids.txt', 'w') as fid:
-        fid.writelines(i + '\n' for i in ids)
+    with open('uids.txt', 'w') as f:
+        f.writelines(i + '\n' for i in ids)
 
+    with open('../address/primary_addr_ids.txt', 'w') as f:
+        f.writelines(i + '\n' for i in addr_ids)
+
+    # Set last user as admin using raw db query
+    conn = psycopg2.connect(
+        dbname='testdb',
+        user='user',
+        password='pass',
+        host='localhost'
+    )
+    cursor = conn.cursor()
+    query = "UPDATE users SET is_admin = TRUE WHERE id = %s"
+    try:
+        cursor.execute(query, (ids[-1],))
+        conn.commit()
+        print(f"Success setting user {users[-1]['username']} with id {ids[-1]} as Admin")
+    except Exception as e:
+        print(f"Error when executing UPDATE query: {e}")
+    finally:
+        cursor.close()
+        conn.close()

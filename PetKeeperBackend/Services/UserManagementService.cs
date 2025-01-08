@@ -58,9 +58,14 @@ namespace grpc_hello_world.Services
                 City = request.PrimaryAddress.City,
                 Street = request.PrimaryAddress.Street,  // TODO: verification if the number is here is required
                 HouseNumber = request.PrimaryAddress.HouseNumber,
-                ApartmentNumber = request.PrimaryAddress.ApartmentNumber ?? null,
+                ApartmentNumber = string.IsNullOrEmpty(request.PrimaryAddress.ApartmentNumber)
+                ? null
+                : request.PrimaryAddress.ApartmentNumber,
                 PostCode = request.PrimaryAddress.PostCode,
                 OwnerId = user.Id,
+                Description = string.IsNullOrEmpty(request.PrimaryAddress.Description)
+                ? null
+                : request.PrimaryAddress.Description,
                 IsPrimary = true
             };
 
@@ -73,11 +78,12 @@ namespace grpc_hello_world.Services
                 _context.Users.Remove(user);
                 throw new RpcException(new Status(StatusCode.AlreadyExists, e.Message));
             }
-            
+
 
             return new UserIdentifier
             {
-                Id = user.Id.ToString()
+                Id = user.Id.ToString(),
+                PrimaryAddressId = address.Id.ToString()
             };
         }
 

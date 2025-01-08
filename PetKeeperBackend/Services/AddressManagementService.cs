@@ -1,16 +1,8 @@
 ﻿using Grpc.Core;
-using grpc_hello_world;
 using grpc_hello_world.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using System.Drawing.Printing;
-using System.Reflection;
-using System.Security.Policy;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using System.Reflection.Metadata.Ecma335;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 
 namespace grpc_hello_world.Services
 {
@@ -30,15 +22,24 @@ namespace grpc_hello_world.Services
         {
             var userContext = context.GetHttpContext().User;
             var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (request.HasOwnerId && userRole == "Admin")
+                userId = request.OwnerId;
+
             var address = new Address
             {
-                Street = request.Street,
-                HouseNumber = request.HouseNumber,
-                ApartmentNumber = request.ApartmentNumber ?? null,
                 City = request.City,
+                Street = request.Street,  // TODO: verification if the number is here is required
+                HouseNumber = request.HouseNumber,
+                ApartmentNumber = string.IsNullOrEmpty(request.ApartmentNumber)
+                ? null
+                : request.ApartmentNumber,
                 PostCode = request.PostCode,
-                Description = request.Description,
                 OwnerId = Guid.Parse(userId),
+                Description = string.IsNullOrEmpty(request.Description)
+                ? null
+                : request.Description,
                 IsPrimary = false  // Primary addresses are created during account creation only!
             };
 
@@ -59,6 +60,7 @@ namespace grpc_hello_world.Services
             };
         }
 
+        // Possibly obsolete in favor of GetAddresses
         [Authorize]
         public override async Task<AddressList> GetUserAddresses(AddressGet request, ServerCallContext context)
         {
@@ -75,11 +77,11 @@ namespace grpc_hello_world.Services
                 Id = a.Id.ToString(),
                 Street = a.Street,
                 HouseNumber = a.HouseNumber,
-                ApartmentNumber = a.ApartmentNumber ?? "",
+                ApartmentNumber = a.ApartmentNumber,
                 City = a.City,
                 PostCode = a.PostCode,
                 // OwnerId = a.OwnerId.ToString(),
-                Description = a.Description ?? ""
+                Description = a.Description
             }));
             return ret;
         }
@@ -89,15 +91,31 @@ namespace grpc_hello_world.Services
         {
             var userContext = context.GetHttpContext().User;
             var ownerId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
 
             try
             {
-                Address? address = await _context.Addresses.SingleOrDefaultAsync(a => a.Id.ToString() == request.Id);
+                Address? address;
+                if (userRole == "Admin")
+                {
+                    address = await _context.Addresses.SingleOrDefaultAsync(
+                        a => a.Id.ToString() == request.Id);
+                }
+                else
+                {
+                    address = await _context.Addresses.SingleOrDefaultAsync(
+                        a => a.Id.ToString() == request.Id && a.OwnerId.ToString() == ownerId);
+                }
                 if (address == null)
                 {
-                    throw new RpcException(new Status(StatusCode.NotFound,
-                        "Address does not exist"));
+                    throw new RpcException(new Status(StatusCode.NotFound, "Address does not exist"));
                 }
+                if (address.IsPrimary)
+                {
+                    throw new RpcException(new Status(StatusCode.PermissionDenied,
+                        "Primary address can't be deleted. Update it or delete the user account instead"));
+                }
+
                 _context.Addresses.Remove(address);
                 await _context.SaveChangesAsync();
 
@@ -112,6 +130,11 @@ namespace grpc_hello_world.Services
         [Authorize]
         public override async Task<AddressList> GetAddresses(AddressGet request, ServerCallContext context)
         {
+            /* Address is assumed to be non-sensitive, even primary address. No Admin control is enforced here */
+            var userContext = context.GetHttpContext().User;
+            var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+
             var query = _context.Addresses.AsQueryable();
 
             if (request.HasId)
@@ -133,13 +156,11 @@ namespace grpc_hello_world.Services
                 query = query.Where(a => a.IsPrimary == request.IsPrimary);
 
             if (request.HasOwnerId)
-            {
-                if (Guid.TryParse(request.OwnerId, out var ownerIdGuid))
-                    query = query.Where(a => a.OwnerId == ownerIdGuid);
+                if (string.IsNullOrEmpty(request.OwnerId))
+                    query = query.Where(a => a.OwnerId.ToString() == userId);
                 else
-                    throw new RpcException(new Status(StatusCode.InvalidArgument, "GUID format invalid"));
-            }
-
+                    query = query.Where(a => a.OwnerId.ToString() == request.OwnerId);  
+                
             var addresses = await query.ToListAsync();
 
             var addressList = new AddressList();
@@ -151,7 +172,8 @@ namespace grpc_hello_world.Services
                 City = a.City,
                 IsPrimary = a.IsPrimary,
                 PostCode = a.PostCode,
-                OwnerId = a.OwnerId.ToString()
+                OwnerId = a.OwnerId.ToString(),
+                Description = a.Description ?? ""
             }));
 
             return addressList;
@@ -164,11 +186,26 @@ namespace grpc_hello_world.Services
 
             var userContext = context.GetHttpContext().User;
             var ownerId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            Address? address = await _context.Addresses.FirstOrDefaultAsync(
-                a => a.Id.ToString() == request.Id && a.OwnerId.ToString() == ownerId)
-                ??
-                throw new RpcException(new Status(StatusCode.NotFound, "Address not found!"));
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
 
+            Address? address;
+            if (userRole == "Admin")
+            {
+                address = await _context.Addresses.FirstOrDefaultAsync(
+                    a => a.Id.ToString() == request.Id);
+            }
+            else
+            {
+                address = await _context.Addresses.FirstOrDefaultAsync(
+                    a => a.Id.ToString() == request.Id && a.OwnerId.ToString() == ownerId);
+            }
+       
+               
+            if (address == null)
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "Address not found!"));
+            }
+                
             var requestProperties = request_type.GetProperties();
             var modifiedProperties = new HashSet<string>();
 

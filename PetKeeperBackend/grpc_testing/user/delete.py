@@ -2,8 +2,8 @@ import grpc
 import user_pb2
 import user_pb2_grpc
 from auth.get import get_token
-from create import users, get_ids
-ids = get_ids()
+from create import users, get_user_ids
+ids = get_user_ids()
 
 pass
 channel = grpc.insecure_channel('localhost:8080')
