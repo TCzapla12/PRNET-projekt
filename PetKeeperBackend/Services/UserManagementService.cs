@@ -1,15 +1,9 @@
 using Grpc.Core;
-using grpc_hello_world;
 using grpc_hello_world.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using System.Drawing.Printing;
-using System.Reflection;
-using System.Security.Policy;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using System.Reflection.Metadata.Ecma335;
-using Azure.Core;
 
 namespace grpc_hello_world.Services
 {
@@ -61,7 +55,6 @@ namespace grpc_hello_world.Services
 
             var address = new Address
             {
-
                 City = request.PrimaryAddress.City,
                 Street = request.PrimaryAddress.Street,  // TODO: verification if the number is here is required
                 HouseNumber = request.PrimaryAddress.HouseNumber,
@@ -92,28 +85,25 @@ namespace grpc_hello_world.Services
         public override async Task<UserFull> GetUser(UserGet request, ServerCallContext context)
         {
             var userContext = context.GetHttpContext().User;
-            var userEmail = userContext.FindFirst(ClaimTypes.Email)?.Value;
-            if (!(request.UserId.HasUsername || request.UserId.HasEmail || request.UserId.HasId))
-            {
-                throw new RpcException(new Status(StatusCode.InvalidArgument,
-                    "User identificaiton not provided. Please provide ID, email or username"));
-            }
-            User? user = await GetUserAsync(userEmail, request.UserId, _context);
-            
-            if (user == null)
-            {
-                throw new RpcException(new Status(StatusCode.NotFound,
-                    "User not found"));
-            }
+            var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
 
-            Address? primary_address = await _context.Addresses.
-                FirstOrDefaultAsync(a => a.OwnerId == user.Id && a.IsPrimary);
+            /* admin-like call to allow requesting other user's data. The result is truncated of sensitive data later on */
+            User? user = await GetUserAsync(request.UserId, context, _context, true);
+
+            Address? primary_address = await _context.Addresses.FirstOrDefaultAsync(
+                a => a.OwnerId == user.Id && a.IsPrimary);
             if (primary_address == null)
             {
-                throw new RpcException(new Status(StatusCode.DataLoss,
-                    "User has no primary address!"));
+                throw new RpcException(new Status(StatusCode.DataLoss, "User has no primary address!"));
             }
+            /* Full data can be given only if user is an admin, or if user is requesting it's own data */
+            bool emailNotSetOrEqual = !request.UserId.HasEmail || user.Email == request.UserId.Email;
+            bool idNotSetOrEqual = !request.UserId.HasId || user.Id.ToString() == request.UserId.Id;
+            bool usernameNotSetOrEqual = !request.UserId.HasUsername || user.Username == request.UserId.Username;
+            bool isAdminOrSelf = userRole == "Admin" || (emailNotSetOrEqual && idNotSetOrEqual && usernameNotSetOrEqual);
 
+            /* Protected user data - PESEL, primary Address, document URLs are truncated if requester is not an Admin */
             var ret = new UserFull
             {
                 Id = user.Id.ToString(),
@@ -123,7 +113,7 @@ namespace grpc_hello_world.Services
                 LastName = user.LastName,
                 // Advanced data
                 Phone = user.Phone,
-                Pesel = user.Pesel,
+                Pesel = isAdminOrSelf ? user.Pesel : "", // Truncate: sensitive 
                 PrimaryAddress = new AddressCreate
                 {
                     Id = primary_address.Id.ToString(),
@@ -141,8 +131,12 @@ namespace grpc_hello_world.Services
                 IsBanned = user.IsBanned,
                 IsAdmin = user.IsAdmin          
             };
-            ret.DocumentUrl.Add(user.DocumentUrl[0]);
-            ret.DocumentUrl.Add(user.DocumentUrl[1]);
+            if (isAdminOrSelf) // Truncate: sensitive
+            {
+                ret.DocumentUrl.Add(user.DocumentUrl[0]);
+                ret.DocumentUrl.Add(user.DocumentUrl[1]);
+            }
+
             return ret;
 
         }
@@ -151,16 +145,21 @@ namespace grpc_hello_world.Services
         public override async Task<UserUpdate> UpdateUser(UserUpdate request, ServerCallContext context)
         {
             var request_type = request.GetType();
-
             var userContext = context.GetHttpContext().User;
-            var userEmail = userContext.FindFirst(ClaimTypes.Email)?.Value;
-            User? user = await GetUserAsync(userEmail, request.UserId, _context);
+            var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+
+            User? user = await GetUserAsync(request.UserId, context, _context);
 
             var requestProperties = request_type.GetProperties();
             var modifiedProperties = new HashSet<string>();
 
+            List<String> adminOnlyProperties = ["IsActivated", "IsAdmin", "IsBanned", "IsVerified"];
             foreach (var property in requestProperties)
             {
+                if (adminOnlyProperties.Contains(property.Name) && userRole != "Admin")
+                    continue;
+
                 var hasProperty = request_type.GetProperty($"Has{property.Name}")?.GetValue(request, null) as bool?;
                 if (hasProperty != true) // Skip if object is not present or avilability information is unavailable (null)
                     continue;
@@ -189,7 +188,7 @@ namespace grpc_hello_world.Services
 
             var UserResponse = new UserUpdate
             {
-                UserId = new UserIdentifier { Email = user.Email }
+                UserId = new UserIdentifier { Id = user.Id.ToString() }
             };
 
             foreach (var propertyName in modifiedProperties)
@@ -205,17 +204,84 @@ namespace grpc_hello_world.Services
             return UserResponse;
 
         }
+        [Authorize]
+        public override async Task<UserUpdate> UpdateUserCredentials(UserUpdateCredentials request, ServerCallContext context)
+        {
+            /* request.PasswordHash is a raw password. The naming is like this to make reflection work */
+            var request_type = request.GetType();
 
+            User? user = await GetUserAsync(request.UserId, context, _context);
+
+            var requestProperties = request_type.GetProperties();
+            var modifiedProperties = new HashSet<string>();
+
+            foreach (var property in requestProperties)
+            {
+                var hasProperty = request_type.GetProperty($"Has{property.Name}")?.GetValue(request, null) as bool?;
+                if (hasProperty != true) // Skip if object is not present or avilability information is unavailable (null)
+                    continue;
+
+                var newValue = request_type.GetProperty(property.Name)?.GetValue(request, null);
+                if (newValue == null)  // Skip if value is not available in the request (this guard might be optional, since this should not occur)
+                    continue;
+                if (property.Name == "PasswordHash")
+                    newValue = HashPassword(request.PasswordHash);
+
+                var currentValue = typeof(User).GetProperty(property.Name)?.GetValue(user, null);
+
+                bool condition = !Equals(currentValue, newValue);
+                if (property.Name == "PasswordHash")
+                {
+                    condition = VerifyPassword(request.PasswordHash, user.PasswordHash);
+
+                }
+                if (!Equals(currentValue, newValue))
+                {
+                    typeof(User).GetProperty(property.Name)?.SetValue(user, newValue);
+                    modifiedProperties.Add(property.Name);
+                }
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException e)
+            {
+                throw new RpcException(new Status(StatusCode.FailedPrecondition, e.Message));
+            }
+
+            var response = new UserUpdate
+            {
+                UserId = new UserIdentifier { Id = user.Id.ToString() }
+            };
+
+            // Include only updated fields in the response
+            foreach (var propertyName in modifiedProperties)
+            {
+                var property = typeof(UserUpdate).GetProperty(propertyName);
+                if (property != null)
+                {
+                    var value = typeof(User).GetProperty(propertyName)?.GetValue(user, null);
+                    if (propertyName == "PasswordHash")
+                        value = true;
+
+                    property.SetValue(response, value);
+                }
+            }
+
+            return response;
+
+        }
         [Authorize]
         public override async Task<UserIdentifier> DeleteUser(UserIdentifier request, ServerCallContext context)
         {
-            var userContext = context.GetHttpContext().User;
-            var userEmail = userContext.FindFirst(ClaimTypes.Email)?.Value;
-            User user = await GetUserAsync(userEmail, request, _context);
+
+            User? user = await GetUserAsync(request, context, _context);
 
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
-            return new UserIdentifier { Email = user.Email };
+            return new UserIdentifier { Id = user.Id.ToString() };
         }
 
         public static string HashPassword(string password)
@@ -231,31 +297,35 @@ namespace grpc_hello_world.Services
             return result == PasswordVerificationResult.Success;
         }
 
-        public static async Task<User> GetUserAsync(string context_email, UserIdentifier user_identifier, AppDbContext context)
+        public static async Task<User> GetUserAsync(
+            UserIdentifier user_identifier,
+            ServerCallContext callContext,
+            AppDbContext dbContext,
+            bool overrideFlag = false
+        )
         {
+            var userContext = callContext.GetHttpContext().User;
+            var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (userRole != "Admin" && !overrideFlag)
+            {
+                user_identifier = new UserIdentifier { Id = userId };
+            }
+
             User? user = null;
             switch (user_identifier.KeyCase)
             {
                 case UserIdentifier.KeyOneofCase.Email:
-                    // TODO: Add actual admin checking, with ClaimTypes.Role
-                    if (context_email != null && user_identifier.Email != context_email && context_email != "admin@admin.com" )
-                    {
-                        throw new RpcException(new Status(StatusCode.Unauthenticated,
-                            "You need to be an admin to read other users data!"));
-                    }
-                    user = await context.Users.FirstOrDefaultAsync(u => u.Email == user_identifier.Email);
+                    user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == user_identifier.Email);
                     break;
 
                 case UserIdentifier.KeyOneofCase.Id:
-                    user = await context.Users.FindAsync(user_identifier.Id);
+                    user = await dbContext.Users.FindAsync(Guid.Parse(user_identifier.Id));
                     break;
 
                 case UserIdentifier.KeyOneofCase.Username:
-                    user = await context.Users.FirstOrDefaultAsync(u => u.Username == user_identifier.Username);
-                    break;
-
-                case UserIdentifier.KeyOneofCase.None:
-                    user = await context.Users.FirstOrDefaultAsync(u => u.Email == context_email);
+                    user = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == user_identifier.Username);
                     break;
             }
             if (user == null)

@@ -28,7 +28,15 @@ service UserService {
     rpc CreateUser (UserCreate) returns (UserIdentifier);
     rpc GetUser (UserGet) returns (UserFull);
     rpc UpdateUser (UserUpdate) returns (UserUpdate);  // Only updated fields are returned
+    rpc UpdateUserCredentials (UserUpdateCredentials) returns  (UserUpdate);
     rpc DeleteUser (UserIdentifier) returns (UserIdentifier);
+}
+
+message UserUpdateCredentials {
+    optional UserIdentifier user_id = 1;
+    optional string email = 2;
+    optional string username = 3;
+    optional string password_hash = 4;
 }
 
 message UserUpdate {
@@ -45,6 +53,10 @@ message UserUpdate {
     optional bool is_verified = 9;
     optional bool is_banned = 10;
     optional bool is_admin = 11;
+    // Only for UserUpdateCredentials
+    optional string email = 12;
+    optional string username = 13;
+    optional bool password_hash = 14;
 }
 
 message UserCreate {

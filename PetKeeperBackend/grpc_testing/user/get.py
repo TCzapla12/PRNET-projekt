@@ -2,19 +2,21 @@ import grpc
 import user_pb2
 import user_pb2_grpc
 from auth.get import get_token
-# Create a channel to connect to the .NET server
-channel = grpc.insecure_channel('localhost:8080')  # Update with your server's address if needed
-stub = user_pb2_grpc.UserServiceStub(channel)  # Replace Greeter with your service name
+from create import users, get_ids
+ids = get_ids()
 
-email = "new_user22222@example.com"
-password = "securepassword123"
+pass
+channel = grpc.insecure_channel('localhost:8080')
+stub = user_pb2_grpc.UserServiceStub(channel)
 
-id = user_pb2.UserIdentifier(email=email)
-# 1. get a new user
-get_request = user_pb2.UserGet(
-    user_id=id
-)
 
-token = get_token(email, password, channel=channel)
-get_response = stub.GetUser(get_request, metadata=[("authorization", f"Bearer {token}")])
-print("GetUser Response:\n", get_response)
+get_reqs = [
+    user_pb2.UserGet(user_id=user_pb2.UserIdentifier(email=users[0]['email'])),
+    user_pb2.UserGet(user_id=user_pb2.UserIdentifier(username=users[1]['username'])),
+    user_pb2.UserGet(user_id=user_pb2.UserIdentifier(id=ids[2]))
+]
+
+for usr, get_req in zip(users, get_reqs):
+    token = get_token(usr['email'], usr['password'], channel=channel)
+    get_response = stub.GetUser(get_req, metadata=[("authorization", f"Bearer {token}")])
+    print("GetUser Response:\n", get_response)
