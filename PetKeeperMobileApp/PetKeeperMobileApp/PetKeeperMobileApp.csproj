@@ -45,6 +45,9 @@
     <MauiImage Update="Resources\Icons\house.svg" Resize="True" BaseSize="576,512" TintColor="#064849" />
     <MauiImage Update="Resources\Icons\paw.svg" Resize="True" BaseSize="512,512" TintColor="#064849" />
     <MauiImage Update="Resources\Icons\user.svg" Resize="True" BaseSize="448,512" TintColor="#064849" />
+    <MauiImage Update="Resources\Icons\cat.svg" Resize="True" BaseSize="576,512" TintColor="#064849" />
+    <MauiImage Update="Resources\Icons\dog.svg" Resize="True" BaseSize="576,512" TintColor="#064849" />
+    <MauiImage Update="Resources\Icons\question.svg" Resize="True" BaseSize="320,512" TintColor="#064849" />
 
     <!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />    

@@ -79,6 +79,12 @@ public class MockGrpcClient : IGrpcClient
                 Name = "Kocur",
                 Type = Enums.AnimalType.Cat,
                 PhotoUrl = String.Empty,
+            },
+            new AnimalDto() {
+                Name = "Cosiek",
+                Type = Enums.AnimalType.Other,
+                PhotoUrl = String.Empty,
+                Description = "Legia Warszawa to najlepszy klub - Mistrz Polski!!! Polska GUUUUROM"
             }
             ];
     }

@@ -38,6 +38,18 @@ public partial class MyPetsViewModel : ObservableObject
         //TODO:
     }
 
+    [RelayCommand]
+    async Task EditAnimal(int index)
+    {
+        //TODO:
+    }
+
+    [RelayCommand]
+    async Task DeleteAnimal(int index)
+    {
+        //TODO:
+    }
+
     private async Task LoadDataAsync()
     {
         try
