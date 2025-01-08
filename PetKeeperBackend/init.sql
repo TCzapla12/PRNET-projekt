@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS animals (
     name VARCHAR(255),
     owner_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     type VARCHAR(50) CHECK (type IN ('dog', 'cat', 'other')),
-    photos TEXT[], -- URL do zdjec zwierzaka
+    photo TEXT, -- sciezka do zdjecia zwierzaka
     description TEXT
 );
 

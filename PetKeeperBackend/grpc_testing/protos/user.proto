@@ -169,7 +169,7 @@ service AnimalService {
 
 message AnimalMinimal {
     string id = 1;
-    string owner_id = 2;
+    optional string owner_id = 2;
 }
 
 message AnimalCreate {
@@ -177,8 +177,8 @@ message AnimalCreate {
     optional string owner_id = 2;
     string name = 3;
     string type = 4;
-    repeated string photos = 5;
-    optional string description = 6;
+    string photo = 5;
+    string description = 6;
 }
 
 message AnimalGet {

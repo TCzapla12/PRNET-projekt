@@ -2,31 +2,61 @@ import grpc
 import user_pb2
 import user_pb2_grpc
 from auth.get import get_token
+from user.create import users, get_user_ids
+import os
+script_dir = os.path.dirname(os.path.abspath(__file__))
+user_ids = get_user_ids()
 
-email = "new_user22222@example.com"
-password = "securepassword123"
-channel = grpc.insecure_channel('localhost:8080')  # Update with your server's address if needed
+
+channel = grpc.insecure_channel('localhost:8080')
 stub = user_pb2_grpc.AnimalServiceStub(channel)
 
-create_request = user_pb2.AnimalCreate(
-    owner_id='8600d7f0-b6cb-41e2-a9e4-6607e92d0d6b',
-    name='Fafik',
-    type='dog',
-    photos=['foo', 'baz'],
-    description='Fajny pimpek można pogłaskać i w ogóle'
-)
+animals = [
+    {
+        'name': 'Fafik',
+        'type': 'dog',
+        'description': 'Przyjazny, normalny pies :)',
+        'photo': '/path/to/photo',
+        # 'owner_id': user_ids[0]
+    },
+    {    # Will actually be owned by user[1]. owner_id should be ignored
+        'name': 'Iker',
+        'type': 'other',
+        'description': 'Gekon, lubi przyjaciół w terrarium',
+        'photo': '/path/to/photo2',
+        'owner_id': user_ids[2]    # Try creating for a different user as non-admin. Field should be ignored
+    },
+    {
+        'name': 'Mruczek',
+        'type': 'cat',
+        'description': 'Spokojny, milutki kot',
+        'photo': '/path/to/photo1',
+        # 'owner_id': user_ids[0]
+    },
+    {
+        'name': 'Inżynier',
+        'type': 'cat',
+        'description': 'Gruby kot. Wymagający dużo jedzenia i głaskania. Starszy',
+        'photo': '/path/to/inżynier',
+        'owner_id': user_ids[1]  # Create for user[1] as admin user[2]
+    }
+]
 
-token = get_token(email, password, channel=channel)
-create_response = stub.CreateAnimal(create_request, metadata=[("authorization", f"Bearer {token}")])
-print("AnimalCreate Response:\n", create_response)
 
-create_request = user_pb2.AnimalCreate(
-    owner_id='8600d7f0-b6cb-41e2-a9e4-6607e92d0d6b',
-    name='Mruczek',
-    type='cat',
-    photos=['biz', 'bor'],
-    description='Kochany kotek dachowiec, potrafi dachować'
-)
+def get_animal_ids():
+    with open(os.path.join(script_dir, 'animal_ids.txt'), 'r') as f:
+        return [line.strip() for line in f.readlines()]
 
-create_response = stub.CreateAnimal(create_request, metadata=[("authorization", f"Bearer {token}")])
-print("AnimalCreate Response:\n", create_response)
+
+if __name__ == "__main__":
+    ids = []
+    for usr_id, usr, animal in zip(user_ids + [user_ids[2]], users + [users[2]], animals):
+        create_request = user_pb2.AnimalCreate(**animal)
+
+        token = get_token(usr['email'], usr['password'], channel=channel)
+        create_response = stub.CreateAnimal(create_request, metadata=[("authorization", f"Bearer {token}")])
+        ids.append(create_response.id)
+        print("AnimalCreate Response:\n", create_response)
+
+    with open('animal_ids.txt', 'w') as f:
+        f.writelines(i + '\n' for i in ids)

@@ -1,26 +1,40 @@
 import grpc
 import user_pb2
 import user_pb2_grpc
+import sys
 from auth.get import get_token
-# Create a channel to connect to the .NET server
+from user.create import users, get_user_ids
+from animal.create import get_animal_ids
+animal_ids = get_animal_ids()
+user_ids = get_user_ids()
 
-email = "new_user22222@example.com"
-password = "securepassword123"
-channel = grpc.insecure_channel('localhost:8080')  # Update with your server's address if needed
-stub = user_pb2_grpc.AnnouncementServiceStub(channel)  # Replace Greeter with your service name
 
-request = user_pb2.AnnouncementUpdate(
-    id='ccbc659c-5b62-41c3-997d-7afa0bde4403',
-    # keeper_id='076277c2-aa04-4b62-8da5-f6e2cd78e753',
-    # animal_id='040825f2-9d12-47f1-9c03-6b712c872917',
-    keeper_profit=666,
-    is_negotiable=False,
-    description='Fafik NIEMIŁY fajny przyjemny!',
-    # start_term=1735340464,
-    end_term=1735686666,
-    # address_id='ac51df27-96b1-4284-8039-4849c80cf441'
-)
+channel = grpc.insecure_channel('localhost:8080')
+stub = user_pb2_grpc.AnimalServiceStub(channel)
 
-token = get_token(email, password, channel=channel)
-response = stub.UpdateAnnouncement(request, metadata=[("authorization", f"Bearer {token}")])
-print("UpdateAnnouncement Response:", response)
+update_requests = [
+    user_pb2.AnimalUpdate(  # Update Fafik
+        id=animal_ids[0],
+        description='Starszy, mało energetyczny, ale przyjazny i miły psina'
+    ),
+    user_pb2.AnimalUpdate(  # Try Updating someone else's animal as non-admin (should fail)
+        id=animal_ids[2],
+        name='Demon',
+        description='Uwaga: agresywny do niektórych osób. Zapraszam wpierw na zapoznanie'
+    ),
+    user_pb2.AnimalUpdate(  # Admin-update animal (Iker of user[1])
+        id=animal_ids[1],
+        photo='/path/to/iker/new_photo3',
+        description='Wyjątkowy gekon potrzebujący kolegę w terrarium.'
+                    'Proszę o uzgodnienie odpowiedniego środowiska dla niego w wiad. prywatnej'
+    ),
+]
+
+for user, user_id, update_request in zip(users, user_ids, update_requests):
+    token = get_token(user['email'], user['password'], channel=channel)
+    try:
+        update_response = stub.UpdateAnimal(update_request, metadata=[("authorization", f"Bearer {token}")])
+        print("AnimalUpdate Response:\n", update_response)
+    except grpc.RpcError as e:
+        print(f"Error: {e}", file=sys.stderr)
+

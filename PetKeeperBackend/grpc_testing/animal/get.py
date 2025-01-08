@@ -2,26 +2,24 @@ import grpc
 import user_pb2
 import user_pb2_grpc
 from auth.get import get_token
-# Create a channel to connect to the .NET server
+from user.create import users, get_user_ids
+user_ids = get_user_ids()
 
-email = "new_user22222@example.com"
-password = "securepassword123"
-channel = grpc.insecure_channel('localhost:8080')  # Update with your server's address if needed
-stub = user_pb2_grpc.AnnouncementServiceStub(channel)  # Replace Greeter with your service name
+channel = grpc.insecure_channel('localhost:8080')
+stub = user_pb2_grpc.AnimalServiceStub(channel)
 
-request = user_pb2.AnnouncementGet(
-    id='ccbc659c-5b62-41c3-997d-7afa0bde4403',
-    # keeper_id='076277c2-aa04-4b62-8da5-f6e2cd78e753',
-    # animal_id='040825f2-9d12-47f1-9c03-6b712c872917',
-    keeper_profit_more=600,
-    keeper_profit_less=700,
-    is_negotiable=True,
-    # description='Fafik NIEMIŁY fajny przyjemny!',
-    # start_term=1735340464,
-    end_term_after=1735686000,
-    # address_id='ac51df27-96b1-4284-8039-4849c80cf441'
-)
+get_requests = [
+    user_pb2.AnimalGet(  # Either name or type here
+        #name='Mruczek',
+        type='cat',
+    ),
+    user_pb2.AnimalGet(owner_id=''),  # Should get all animal of user[1] (self)
+    user_pb2.AnimalGet(owner_id=user_ids[0]),  # Check if user[2] can get user[0] animals
+]
 
-token = get_token(email, password, channel=channel)
-response = stub.GetAnnouncements(request, metadata=[("authorization", f"Bearer {token}")])
-print("GetAnnouncements Response:", response)
+# The zip makes the last request be made by the users[0]
+for user, user_id, request in zip(users + [users[0]], user_ids + [user_ids[0]], get_requests):
+    token = get_token(user['email'], user['password'], channel=channel)
+    get_response = stub.GetAnimals(request, metadata=[("authorization", f"Bearer {token}")])
+
+    print("AnimalGet Response:\n", get_response, "\n" + "-"*100, "\n\n")
