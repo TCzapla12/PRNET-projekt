@@ -193,7 +193,7 @@ message AnimalUpdate {
     string id = 1;
     optional string name = 2;
     optional string type = 3;
-    repeated string photos = 4;
+    optional string photo = 4;
     optional string description = 5;
 }
 
@@ -212,15 +212,15 @@ service AnnouncementService {
 message AnnouncementMinimal {
     string id = 1;
     string author_id = 2;
-    string keeper_id = 3;
-    string animal_id = 4;
-    string address_id = 5;
+    optional string keeper_id = 3;
+    optional string animal_id = 4;
+    optional string address_id = 5;
 }
 
 message AnnouncementCreate {
     optional string id = 1;
-    string author_id = 2;
-    string keeper_id = 3;
+    optional string author_id = 2;
+    optional string keeper_id = 3;
     string animal_id = 4;
     uint32 keeper_profit = 5;
     bool is_negotiable = 6;
@@ -271,5 +271,5 @@ message AnnouncementUpdate {
 }
 
 message AnnouncementList {
-    repeated AnnouncementCreate announcements = 1;
+    repeated AnnouncementUpdate announcements = 1;
 }
