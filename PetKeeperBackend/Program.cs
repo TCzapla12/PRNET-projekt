@@ -33,7 +33,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
-
+builder.Services.AddGrpc(options =>
+{
+    options.MaxReceiveMessageSize = 50 * 1024 * 1024;  // 50 MB
+    options.MaxSendMessageSize = 50 * 1024 * 1024;     // 50 MB
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

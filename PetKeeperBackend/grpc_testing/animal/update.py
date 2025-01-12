@@ -5,6 +5,7 @@ import sys
 from auth.get import get_token
 from user.create import users, get_user_ids
 from animal.create import get_animal_ids
+from read_image import read_image
 animal_ids = get_animal_ids()
 user_ids = get_user_ids()
 
@@ -22,11 +23,10 @@ update_requests = [
         name='Demon',
         description='Uwaga: agresywny do niektórych osób. Zapraszam wpierw na zapoznanie'
     ),
-    user_pb2.AnimalUpdate(  # Admin-update animal (Iker of user[1])
-        id=animal_ids[1],
-        photo='/path/to/iker/new_photo3',
-        description='Wyjątkowy gekon potrzebujący kolegę w terrarium.'
-                    'Proszę o uzgodnienie odpowiedniego środowiska dla niego w wiad. prywatnej'
+    user_pb2.AnimalUpdate(  # Admin-update animal (Inżynier of user[1])
+        id=animal_ids[3],
+        photo=read_image('../images/prawdziwy_inzynier.png'),
+        description='Grubiutki kot, starsza przylepa. Wymaga dużo głaskania. Ma małe problemy z zębami :('
     ),
 ]
 

@@ -3,6 +3,7 @@ import user_pb2
 import user_pb2_grpc
 from auth.get import get_token
 from create import users, get_user_ids
+from read_image import read_image
 ids = get_user_ids()
 
 channel = grpc.insecure_channel('localhost:8080')
@@ -12,8 +13,7 @@ stub = user_pb2_grpc.UserServiceStub(channel)
 updates = [
     {
         'user_id': user_pb2.UserIdentifier(id=ids[0]),
-        #'username': 'kocham_koty76',
-        'avatar_url': '/path/to/avatar.png'
+        'username': 'kocham_koty76',
     },
     {
         'user_id': user_pb2.UserIdentifier(id=ids[1]),
@@ -22,6 +22,7 @@ updates = [
     },
     {
         'user_id': user_pb2.UserIdentifier(id=ids[2]),
+        'avatar_png': read_image("../images/kot_avatar.jpg")
         #'password': 'hihi_haha123'
     }
 ]

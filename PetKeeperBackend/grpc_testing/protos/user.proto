@@ -47,8 +47,8 @@ message UserUpdate {
     optional string phone = 4;
     optional string pesel = 5;
     // Updating addresses done in a different endpoint
-    optional string avatar_url = 6;
-    optional string document_url = 7;
+    optional bytes avatar_png = 6;
+    repeated bytes document_pngs = 7;
     // States
     optional bool is_activated = 8;
     optional bool is_verified = 9;
@@ -69,9 +69,8 @@ message UserCreate {
     AddressCreate primary_address = 6;
     string phone = 7;
     string pesel = 8;
-
-    optional string avatar_url = 9;
-    repeated string document_url = 10;
+    optional bytes avatar_png = 9;
+    repeated bytes document_pngs = 10;
 }
 
 message UserGet {
@@ -81,8 +80,8 @@ message UserGet {
     optional string phone = 4;
     optional string pesel = 5;
     // Updating addresses done in a different endpoint
-    optional string avatar_url = 6;
-    optional string document_url = 7;
+    optional bytes avatar_png = 6;
+    repeated bytes document_pngs = 7;
     // States
     optional bool is_activated = 8;
     optional bool is_verified = 9;
@@ -99,8 +98,8 @@ message UserFull {
     string phone = 6;
     string pesel = 7;
     AddressCreate primary_address = 8;
-    string avatar_url = 9;
-    repeated string document_url = 10;
+    bytes avatar_png = 9;
+    repeated bytes document_pngs = 10;
     // States
     bool is_activated = 11;
     bool is_verified = 12;
@@ -177,7 +176,7 @@ message AnimalCreate {
     optional string owner_id = 2;
     string name = 3;
     string type = 4;
-    string photo = 5;
+    bytes photo = 5;
     string description = 6;
 }
 
@@ -193,7 +192,7 @@ message AnimalUpdate {
     string id = 1;
     optional string name = 2;
     optional string type = 3;
-    optional string photo = 4;
+    optional bytes photo = 4;
     optional string description = 5;
 }
 

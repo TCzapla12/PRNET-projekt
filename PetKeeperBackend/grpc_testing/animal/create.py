@@ -3,6 +3,7 @@ import user_pb2
 import user_pb2_grpc
 from auth.get import get_token
 from user.create import users, get_user_ids
+from read_image import read_image
 import os
 script_dir = os.path.dirname(os.path.abspath(__file__))
 user_ids = get_user_ids()
@@ -16,28 +17,28 @@ animals = [
         'name': 'Fafik',
         'type': 'dog',
         'description': 'Przyjazny, normalny pies :)',
-        'photo': '/path/to/photo',
+        'photo': read_image('../images/dziwny_pies.png'),
         # 'owner_id': user_ids[0]
     },
     {    # Will actually be owned by user[1]. owner_id should be ignored
         'name': 'Iker',
         'type': 'other',
         'description': 'Gekon, lubi przyjaciół w terrarium',
-        'photo': '/path/to/photo2',
+        'photo': read_image('../images/gekon.png'),
         'owner_id': user_ids[2]    # Try creating for a different user as non-admin. Field should be ignored
     },
     {
-        'name': 'Mruczek',
+        'name': 'Mruczka',
         'type': 'cat',
         'description': 'Spokojny, milutki kot',
-        'photo': '/path/to/photo1',
+        'photo': read_image('../images/kot1.png'),
         # 'owner_id': user_ids[0]
     },
     {
         'name': 'Inżynier',
         'type': 'cat',
         'description': 'Gruby kot. Wymagający dużo jedzenia i głaskania. Starszy',
-        'photo': '/path/to/inżynier',
+        'photo': read_image('../images/kot2.png'),
         'owner_id': user_ids[1]  # Create for user[1] as admin user[2]
     }
 ]

@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using Google.Protobuf;
 using grpc_hello_world.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
@@ -15,6 +16,7 @@ namespace grpc_hello_world.Services
         {
             _context = context;
             _logger = logger;
+            Directory.CreateDirectory(UserManagementService._fileDir);
         }
 
         [Authorize]
@@ -26,14 +28,20 @@ namespace grpc_hello_world.Services
 
             if (request.HasOwnerId && userRole == "Admin")
                 ownerId = request.OwnerId;
+            var animalId = Guid.NewGuid();
+
+            var userFileDir = Path.Combine(UserManagementService._fileDir, ownerId.ToString());
+            var photoFilePath = Path.Combine(userFileDir, animalId.ToString(), "photo.png");
+            Directory.CreateDirectory(Path.Combine(userFileDir, animalId.ToString()));
 
             var animal = new Animal
             {
+                Id = animalId,
                 Name = request.Name,
                 OwnerId = Guid.Parse(ownerId),
                 Type = request.Type,
                 Description = request.Description,
-                Photo = request.Photo
+                Photo = photoFilePath
             };
 
             try
@@ -45,6 +53,8 @@ namespace grpc_hello_world.Services
             {
                 throw new RpcException(new Status(StatusCode.AlreadyExists, e.Message));
             }
+
+            await File.WriteAllBytesAsync(photoFilePath, request.Photo.ToByteArray());
 
             return new AnimalMinimal { Id = animal.Id.ToString(), OwnerId = ownerId };
         }
@@ -82,14 +92,21 @@ namespace grpc_hello_world.Services
             var animals = await query.ToListAsync();
 
             var animalList = new AnimalList();
-            animalList.Animals.AddRange(animals.Select(a => new AnimalCreate
+            foreach (var a in animals)
             {
-                Id = a.Id.ToString(),
-                OwnerId = a.OwnerId.ToString(),
-                Name = a.Name,
-                Type = a.Type,
-                Description = a.Description ?? ""
-            }));
+                var photoBytes = await File.ReadAllBytesAsync(a.Photo);
+                var photoByteString = ByteString.CopyFrom(photoBytes);
+
+                animalList.Animals.Add(new AnimalCreate
+                {
+                    Id = a.Id.ToString(),
+                    OwnerId = a.OwnerId.ToString(),
+                    Name = a.Name,
+                    Photo = photoByteString,
+                    Type = a.Type,
+                    Description = a.Description ?? ""
+                });
+            }
 
             return animalList;
 
@@ -143,8 +160,7 @@ namespace grpc_hello_world.Services
             if (userRole == "Admin")
             {
                 animal = await _context.Animals.FirstOrDefaultAsync(
-                    a => a.Id.ToString() == request.Id);
-                
+                    a => a.Id.ToString() == request.Id);               
             }
             else
             {
@@ -171,10 +187,34 @@ namespace grpc_hello_world.Services
                     continue;
 
                 var currentValue = typeof(Animal).GetProperty(property.Name)?.GetValue(animal, null);
-
-                if (!Equals(currentValue, newValue))
+                bool condition = !Equals(currentValue, newValue);
+                if (property.Name == "Photo")
                 {
-                    typeof(Animal).GetProperty(property.Name)?.SetValue(animal, newValue);
+                    var userFileDir = Path.Combine(UserManagementService._fileDir, animal.OwnerId.ToString());
+                    var photoFilePath = Path.Combine(userFileDir, animal.Id.ToString(), "photo.png");
+                    byte[] currentValueBytes = UserManagementService.PngSignature;
+                    try
+                    {
+                        currentValueBytes = await File.ReadAllBytesAsync(photoFilePath);
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        throw new RpcException(new Status(StatusCode.DataLoss, "Animals is missing a photo"));
+                    }
+                    byte[] newValueBytes = request.Photo.ToByteArray();
+                    if (!UserManagementService.IsPng(newValueBytes))
+                        throw new RpcException(new Status(StatusCode.InvalidArgument, "Supplied photo is not a PNG"));
+
+                    condition = !currentValueBytes.SequenceEqual(newValueBytes);
+                    if (condition)
+                    {
+                        await File.WriteAllBytesAsync(photoFilePath, newValueBytes);
+                    }
+                }
+                if (condition)
+                {
+                    if (property.Name != "Photo")  // Don't set new value since filepath doesn't change
+                        typeof(Animal).GetProperty(property.Name)?.SetValue(animal, newValue);
                     modifiedProperties.Add(property.Name);
                 }
             }
@@ -200,6 +240,8 @@ namespace grpc_hello_world.Services
                 if (property != null)
                 {
                     var value = typeof(Animal).GetProperty(propertyName)?.GetValue(animal, null);
+                    if (propertyName == "Photo")
+                        value = ByteString.CopyFrom(new byte[] { 0x01 });  // Send just a single byte to indicate change
                     property.SetValue(response, value);
                 }
             }

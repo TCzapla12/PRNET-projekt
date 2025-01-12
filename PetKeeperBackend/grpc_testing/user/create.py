@@ -3,6 +3,7 @@ import user_pb2
 import user_pb2_grpc
 import os
 import psycopg2
+from read_image import read_image
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -38,7 +39,9 @@ users = [
         'primary_address': addresses[0],
         'phone': '123789456',
         'pesel': '00301309034',
-        'document_url': ['local/kocam_psy123/id0.png', 'local/kocam_psy123/id1.png']
+        'avatar_png': read_image('../images/avatar1.jpg'),
+        'document_pngs': [read_image('../images/dowod_front.jpg'),
+                          read_image('../images/dowod_tyl.jpg')]
     },
     {
         'username': 'jurek57621',
@@ -49,7 +52,9 @@ users = [
         'primary_address': addresses[1],
         'phone': '503000001',
         'pesel': '63071609033',
-        'document_url': ['local/jurek57621/id0.png', 'local/jurek57621/id1.png']
+        'avatar_png': read_image('../images/avatar2.webp'),
+        'document_pngs': [read_image("../images/dowod_USA_front.jpg"),
+                          read_image("../images/dowod_USA_tyl.jpg")]
     },
     {
         'username': 'cheepoi',
@@ -60,7 +65,8 @@ users = [
         'primary_address': addresses[2],
         'phone': '976304999',
         'pesel': '78112345678',
-        'document_url': ['local/cheepoi/id0.png', 'local/cheepoi/id1.png']
+        'document_pngs': [read_image("../images/dowod_USA_fake_front.jpg"),
+                          read_image("../images/dowod_USA_fake_tyl.webp")]
     }
 ]
 
