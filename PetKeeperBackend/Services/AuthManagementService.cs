@@ -24,19 +24,19 @@ namespace grpc_hello_world.Services
 
         public override async Task<AuthResponse> Authenticate(AuthRequest request, ServerCallContext context)
         {
-            User? user = await UserManagementService.GetUserAsync(null, request.UserId, _context);
+            /* override flag is needed because we get a user unauthenticated */
+            User? user = await UserManagementService.GetUserAsync(request.UserId, context, _context, true);
 
             if (UserManagementService.VerifyPassword(request.Password, user.PasswordHash))
             {
-                // Generate JWT token
-                var token = GenerateJwtToken(user.Id.ToString(), user.Email);
+                var token = GenerateJwtToken(user.Id.ToString(), user.Email, user.IsAdmin);
                 return new AuthResponse { Token = token };
             }
 
             throw new RpcException(new Status(StatusCode.Unauthenticated, "Invalid credentials"));
         }
 
-        private string GenerateJwtToken(string id, string email)
+        private string GenerateJwtToken(string id, string email, bool isAdmin)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -45,7 +45,7 @@ namespace grpc_hello_world.Services
             {
                 new Claim(JwtRegisteredClaimNames.Sub, id),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role, "User"),
+                new Claim(ClaimTypes.Role, isAdmin ? "Admin" : "User"),
                 new Claim(ClaimTypes.Email, email)
             };
 

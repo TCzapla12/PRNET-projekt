@@ -23,8 +23,8 @@ namespace grpc_hello_world.Models
         [Column("type")]
         public required string Type { get; set; }
 
-        [Column("photos")]
-        public required string[] Photos { get; set; }
+        [Column("photo")]
+        public required string Photo { get; set; }
 
         [Column("description")]
         public required string Description { get; set; }

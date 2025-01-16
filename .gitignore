@@ -364,3 +364,8 @@ FodyWeavers.xsd
 
 # Pycharm project files
 .idea/
+/PetKeeperBackend/grpc_testing/user/uids.txt
+/PetKeeperBackend/grpc_testing/address/primary_addr_ids.txt
+/PetKeeperBackend/grpc_testing/address/secondary_addr_ids.txt
+/PetKeeperBackend/grpc_testing/animal/animal_ids.txt
+/PetKeeperBackend/grpc_testing/announcement/announcement_ids.txt

@@ -9,6 +9,7 @@ using System.Security.Policy;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Net;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace grpc_hello_world.Services
 {
@@ -23,10 +24,35 @@ namespace grpc_hello_world.Services
             _logger = logger;
         }
 
+        [Authorize]
         public override async Task<AnnouncementMinimal> CreateAnnouncement(AnnouncementCreate request, ServerCallContext context)
         {
             var userContext = context.GetHttpContext().User;
             var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (userRole == "Admin")  // If user is Admin
+            {
+                if (request.HasAuthorId)
+                    userId = request.AuthorId;
+            }
+
+            /* Even in case of Admin operation, Animal and Address should belong to the Announcement author */
+            Animal? animal = await _context.Animals.SingleOrDefaultAsync(
+                a => a.Id.ToString() == request.AnimalId && a.OwnerId == Guid.Parse(userId));
+            if (animal == null)
+            {
+                throw new RpcException(new Status(StatusCode.NotFound,
+                    "Animal does not exist for this user"));
+            }
+
+            Address? address = await _context.Addresses.SingleOrDefaultAsync(
+                a => a.Id.ToString() == request.AddressId && a.OwnerId == Guid.Parse(userId));
+            if (address == null)
+            {
+                throw new RpcException(new Status(StatusCode.NotFound,
+                    "Address does not exist for this user."));
+            }
 
             var announcement = new Announcement
             {
@@ -62,8 +88,13 @@ namespace grpc_hello_world.Services
             };
         }
 
+        [Authorize]
         public override async Task<AnnouncementList> GetAnnouncements(AnnouncementGet request, ServerCallContext context)
         {
+            var userContext = context.GetHttpContext().User;
+            var authorId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+
             var query = _context.Announcements.AsQueryable();
 
             if (request.HasId)
@@ -77,10 +108,6 @@ namespace grpc_hello_world.Services
 
             if (request.HasAuthorId)
             {
-                if (Guid.TryParse(request.Id, out var AuthorIdGuid))
-                    query = query.Where(a => a.Id == AuthorIdGuid);
-                else
-                    throw new RpcException(new Status(StatusCode.InvalidArgument, "GUID format invalid for AuthorId"));
                 query = query.Where(a => a.AuthorId.ToString() == request.AuthorId);
             }
                 
@@ -145,14 +172,14 @@ namespace grpc_hello_world.Services
             if (request.HasAddressId)
                 query = query.Where(a => a.AddressId.ToString() == request.AddressId);
 
-            var announcements = query.ToList();
+            var announcements = await query.ToListAsync();
 
             var announcementList = new AnnouncementList();
-            announcementList.Announcements.AddRange(announcements.Select(a => new AnnouncementCreate
+            announcementList.Announcements.AddRange(announcements.Select(a => new AnnouncementUpdate
             {
                 Id = a.Id.ToString(),
                 AuthorId = a.AuthorId.ToString(),
-                KeeperId = a.KeeperId.ToString(),
+                KeeperId = a.KeeperId?.ToString() ?? "",
                 AnimalId = a.AnimalId.ToString(),
                 KeeperProfit = a.KeeperProfit,
                 IsNegotiable = a.IsNegotiable,
@@ -174,10 +201,47 @@ namespace grpc_hello_world.Services
 
             var userContext = context.GetHttpContext().User;
             var authorId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            Announcement? announcement = await _context.Announcements.FirstOrDefaultAsync(
-                a => a.Id.ToString() == request.Id && a.AuthorId.ToString() == authorId)
-                ??
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+
+            Announcement? announcement;
+            if (userRole == "Admin")
+            {
+                announcement = await _context.Announcements.FirstOrDefaultAsync(
+                    a => a.Id.ToString() == request.Id);
+                // To evaluate - is getting authorId from retrieved announcement, or requiring it in the request better??
+                authorId = announcement?.AuthorId.ToString() ?? null;
+            }
+            else
+            {
+                announcement = await _context.Announcements.FirstOrDefaultAsync(
+                    a => a.Id.ToString() == request.Id && a.AuthorId.ToString() == authorId);
+            }
+            if (announcement == null)
+            {
                 throw new RpcException(new Status(StatusCode.NotFound, "Announcement not found!"));
+            }
+
+            /* Even in case of Admin operation, Animal and Address should belong to the Announcement author */
+            if (request.HasAnimalId)
+            {
+                Animal? animal = await _context.Animals.SingleOrDefaultAsync(
+                    a => a.Id.ToString() == request.AnimalId && a.OwnerId == Guid.Parse(authorId));
+                if (animal == null)
+                {
+                    throw new RpcException(new Status(StatusCode.NotFound,
+                        "Animal does not exist for this user"));
+                }
+            }
+            if (request.HasAddressId)
+            {
+                Address? address = await _context.Addresses.SingleOrDefaultAsync(
+                    a => a.Id.ToString() == request.AddressId && a.OwnerId == Guid.Parse(authorId));
+                if (address == null)
+                {
+                    throw new RpcException(new Status(StatusCode.NotFound,
+                        "Address does not exist for this user."));
+                }
+            }
 
             var requestProperties = request_type.GetProperties();
             var modifiedProperties = new HashSet<string>();
@@ -191,7 +255,9 @@ namespace grpc_hello_world.Services
                 var newValue = request_type.GetProperty(property.Name)?.GetValue(request, null);
                 if (newValue == null)  // Skip if value is not available in the request (this guard might be optional, since this should not occur)
                     continue;
-
+                if (property.Name.Contains("Id"))
+                    newValue = Guid.Parse(newValue as string);
+                    
                 var currentValue = typeof(Announcement).GetProperty(property.Name)?.GetValue(announcement, null);
 
                 if (!Equals(currentValue, newValue))
@@ -222,6 +288,8 @@ namespace grpc_hello_world.Services
                 if (property != null)
                 {
                     var value = typeof(Announcement).GetProperty(propertyName)?.GetValue(announcement, null);
+                    if (propertyName.Contains("Id"))
+                        value = value.ToString();
                     property.SetValue(response, value);
                 }
             }
@@ -232,13 +300,27 @@ namespace grpc_hello_world.Services
         public override async Task<AnnouncementMinimal> DeleteAnnouncement(AnnouncementMinimal request, ServerCallContext context)
         {
             var userContext = context.GetHttpContext().User;
-            var ownerId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var authorId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
 
+
+            Announcement? announcement;
+            if (userRole == "Admin")
+            {
+                announcement = await _context.Announcements.SingleOrDefaultAsync(
+                    a => a.Id.ToString() == request.Id);
+            }
+            else
+            {
+                announcement = await _context.Announcements.SingleOrDefaultAsync(
+                    a => a.Id.ToString() == request.Id && a.AuthorId.ToString() == authorId);
+            }
+            if (announcement == null)
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "Announcement does not exist"));
+            }
             try
             {
-                Announcement? announcement = await _context.Announcements.SingleOrDefaultAsync(a => a.Id.ToString() == request.Id)
-                ?? throw new RpcException(new Status(StatusCode.NotFound, "Announcement does not exist"));
-
                 _context.Announcements.Remove(announcement);
                 await _context.SaveChangesAsync();
 

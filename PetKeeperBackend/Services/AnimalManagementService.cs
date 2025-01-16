@@ -1,15 +1,9 @@
 ﻿using Grpc.Core;
-using grpc_hello_world;
+using Google.Protobuf;
 using grpc_hello_world.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using System.Drawing.Printing;
-using System.Reflection;
-using System.Security.Policy;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using System.Reflection.Metadata.Ecma335;
-using Azure.Core;
 
 namespace grpc_hello_world.Services
 {
@@ -22,6 +16,7 @@ namespace grpc_hello_world.Services
         {
             _context = context;
             _logger = logger;
+            Directory.CreateDirectory(UserManagementService._fileDir);
         }
 
         [Authorize]
@@ -29,14 +24,24 @@ namespace grpc_hello_world.Services
         {
             var userContext = context.GetHttpContext().User;
             var ownerId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (request.HasOwnerId && userRole == "Admin")
+                ownerId = request.OwnerId;
+            var animalId = Guid.NewGuid();
+
+            var userFileDir = Path.Combine(UserManagementService._fileDir, ownerId.ToString());
+            var photoFilePath = Path.Combine(userFileDir, animalId.ToString(), "photo.png");
+            Directory.CreateDirectory(Path.Combine(userFileDir, animalId.ToString()));
 
             var animal = new Animal
             {
+                Id = animalId,
                 Name = request.Name,
                 OwnerId = Guid.Parse(ownerId),
                 Type = request.Type,
-                Description = request.Description ?? "",
-                Photos = request.Photos.ToArray()
+                Description = request.Description,
+                Photo = photoFilePath
             };
 
             try
@@ -49,12 +54,17 @@ namespace grpc_hello_world.Services
                 throw new RpcException(new Status(StatusCode.AlreadyExists, e.Message));
             }
 
+            await File.WriteAllBytesAsync(photoFilePath, request.Photo.ToByteArray());
+
             return new AnimalMinimal { Id = animal.Id.ToString(), OwnerId = ownerId };
         }
 
         [Authorize]
         public override async Task<AnimalList> GetAnimals(AnimalGet request, ServerCallContext context)
         {
+            var userContext = context.GetHttpContext().User;
+            var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             var query = _context.Animals.AsQueryable();
 
             if (request.HasId)
@@ -73,19 +83,32 @@ namespace grpc_hello_world.Services
                 query = query.Where(a => words.Any(word => a.Description.Contains(word)));
             }
 
+            if (request.HasOwnerId)
+                if (string.IsNullOrEmpty(request.OwnerId))
+                    query = query.Where(a => a.OwnerId.ToString() == userId);
+                else
+                    query = query.Where(a => a.OwnerId.ToString() == request.OwnerId);
+
             var animals = await query.ToListAsync();
 
-            var addressList = new AnimalList();
-            addressList.Animals.AddRange(animals.Select(a => new AnimalCreate
+            var animalList = new AnimalList();
+            foreach (var a in animals)
             {
-                Id = a.Id.ToString(),
-                OwnerId = a.OwnerId.ToString(),
-                Name = a.Name,
-                Type = a.Type,
-                Description = a.Description ?? ""
-            }));
+                var photoBytes = await File.ReadAllBytesAsync(a.Photo);
+                var photoByteString = ByteString.CopyFrom(photoBytes);
 
-            return addressList;
+                animalList.Animals.Add(new AnimalCreate
+                {
+                    Id = a.Id.ToString(),
+                    OwnerId = a.OwnerId.ToString(),
+                    Name = a.Name,
+                    Photo = photoByteString,
+                    Type = a.Type,
+                    Description = a.Description ?? ""
+                });
+            }
+
+            return animalList;
 
         }
 
@@ -94,17 +117,29 @@ namespace grpc_hello_world.Services
         {
             var userContext = context.GetHttpContext().User;
             var ownerId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
 
             try
             {
-                Animal? animal = await _context.Animals.SingleOrDefaultAsync(
-                    a => a.Id.ToString() == request.Id && a.OwnerId.ToString() == ownerId)
-                    ?? throw new RpcException(new Status(StatusCode.NotFound, "Animal does not exist"));
+                Animal? animal;
+                if (userRole == "Admin")
+                {
+                    animal = await _context.Animals.SingleOrDefaultAsync(
+                    a => a.Id.ToString() == request.Id);
+                }
+                else
+                {
+                    animal = await _context.Animals.SingleOrDefaultAsync(
+                    a => a.Id.ToString() == request.Id && a.OwnerId.ToString() == ownerId);
+                }
+
+                if (animal == null)
+                    throw new RpcException(new Status(StatusCode.NotFound, "Animal does not exist"));
 
                 _context.Animals.Remove(animal);
                 await _context.SaveChangesAsync();
 
-                return new AnimalMinimal { Id = animal.Id.ToString(), OwnerId = animal.OwnerId.ToString()  };
+                return new AnimalMinimal { Id = animal.Id.ToString(), OwnerId = animal.OwnerId.ToString() };
             }
             catch (DbUpdateException e)
             {
@@ -119,10 +154,24 @@ namespace grpc_hello_world.Services
 
             var userContext = context.GetHttpContext().User;
             var ownerId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            Animal? animal = await _context.Animals.FirstOrDefaultAsync(
-                a => a.Id.ToString() == request.Id && a.OwnerId.ToString() == ownerId)
-                ??
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+
+            Animal? animal;
+            if (userRole == "Admin")
+            {
+                animal = await _context.Animals.FirstOrDefaultAsync(
+                    a => a.Id.ToString() == request.Id);               
+            }
+            else
+            {
+                animal = await _context.Animals.FirstOrDefaultAsync(
+                    a => a.Id.ToString() == request.Id && a.OwnerId.ToString() == ownerId);
+            }
+            if (animal == null)
+            {
                 throw new RpcException(new Status(StatusCode.NotFound, "Animal not found!"));
+            }
+            
 
             var requestProperties = request_type.GetProperties();
             var modifiedProperties = new HashSet<string>();
@@ -138,10 +187,34 @@ namespace grpc_hello_world.Services
                     continue;
 
                 var currentValue = typeof(Animal).GetProperty(property.Name)?.GetValue(animal, null);
-
-                if (!Equals(currentValue, newValue))
+                bool condition = !Equals(currentValue, newValue);
+                if (property.Name == "Photo")
                 {
-                    typeof(Animal).GetProperty(property.Name)?.SetValue(animal, newValue);
+                    var userFileDir = Path.Combine(UserManagementService._fileDir, animal.OwnerId.ToString());
+                    var photoFilePath = Path.Combine(userFileDir, animal.Id.ToString(), "photo.png");
+                    byte[] currentValueBytes = UserManagementService.PngSignature;
+                    try
+                    {
+                        currentValueBytes = await File.ReadAllBytesAsync(photoFilePath);
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        throw new RpcException(new Status(StatusCode.DataLoss, "Animals is missing a photo"));
+                    }
+                    byte[] newValueBytes = request.Photo.ToByteArray();
+                    if (!UserManagementService.IsPng(newValueBytes))
+                        throw new RpcException(new Status(StatusCode.InvalidArgument, "Supplied photo is not a PNG"));
+
+                    condition = !currentValueBytes.SequenceEqual(newValueBytes);
+                    if (condition)
+                    {
+                        await File.WriteAllBytesAsync(photoFilePath, newValueBytes);
+                    }
+                }
+                if (condition)
+                {
+                    if (property.Name != "Photo")  // Don't set new value since filepath doesn't change
+                        typeof(Animal).GetProperty(property.Name)?.SetValue(animal, newValue);
                     modifiedProperties.Add(property.Name);
                 }
             }
@@ -167,6 +240,8 @@ namespace grpc_hello_world.Services
                 if (property != null)
                 {
                     var value = typeof(Animal).GetProperty(propertyName)?.GetValue(animal, null);
+                    if (propertyName == "Photo")
+                        value = ByteString.CopyFrom(new byte[] { 0x01 });  // Send just a single byte to indicate change
                     property.SetValue(response, value);
                 }
             }
