@@ -52,7 +52,7 @@
                         <Frame
                             Padding="10"
                             Margin="0, 0, 0, 20"
-                            CornerRadius="10">
+                            CornerRadius="8">
                             <Grid
                                 ColumnDefinitions=".1*, *, .1*"
                                 RowDefinitions="Auto, Auto, *"
@@ -75,7 +75,7 @@
                                 <Frame
                                      Grid.Row="1"
                                      Grid.Column="1"
-                                     CornerRadius="10"
+                                     CornerRadius="8"
                                      WidthRequest="100"
                                      HeightRequest="100">       
                                     <!--<ImageButton
