@@ -62,9 +62,6 @@ public partial class EditAnimalViewModel : ObservableObject
     private bool isPhotoErrorVisible;
 
     [ObservableProperty]
-    private bool isErrorTextVisible;
-
-    [ObservableProperty]
     private ObservableCollection<string> animalTypes =
         new(Enum.GetValues(typeof(AnimalType)).Cast<AnimalType>().Select(a => Helpers.GetDescription(a)));
 
@@ -93,30 +90,25 @@ public partial class EditAnimalViewModel : ObservableObject
     [RelayCommand]
     async Task AddEditAnimal(object container)
     {
-        IsErrorTextVisible = false;
-        AnimalType type;
-        try
-        {
-            type = Helpers.GetEnumFromDescription<AnimalType>(this.AnimalType);
-        }
-        catch (ArgumentException)
-        {
-            IsErrorTextVisible = true;
-        }
         IsPhotoErrorVisible = !_isPhotoAdded;
         bool areAllFieldsValid = true;
 
         if (container is StackLayout stackLayout && stackLayout.Children[0] is Grid grid)
             foreach (var child in grid.Children)
-                if (child is ValidationEntry validationEntry)
-                    if (validationEntry.Type != EntryType.RepeatPassword && !validationEntry.ValidateField())
-                        areAllFieldsValid = false;
-
-        if (!areAllFieldsValid || IsPhotoErrorVisible || IsErrorTextVisible)
+            {
+                if (child is ValidationEntry validationEntry 
+                    && validationEntry.Type != EntryType.RepeatPassword && !validationEntry.ValidateField())
+                    areAllFieldsValid = false;
+                else if (child is ValidationPicker validationPicker && !validationPicker.ValidateField()) 
+                    areAllFieldsValid = false;
+            }
+                
+        if (!areAllFieldsValid || IsPhotoErrorVisible)
             return;
 
         try
         {
+            AnimalType type = Helpers.GetEnumFromDescription<AnimalType>(this.AnimalType);
             var message = String.Empty;
             if (_animalDto == null)
             {

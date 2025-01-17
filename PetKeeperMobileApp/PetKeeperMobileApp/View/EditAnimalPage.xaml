@@ -76,22 +76,11 @@
                     Type="Text"
                     Placeholder="Imię"
                     Text="{Binding Name}" />
-                <VerticalStackLayout
-                    Grid.Row="1"
-                    HeightRequest="44">
-                    <Picker
-                        Title="Typ"
-                        ItemsSource="{Binding AnimalTypes}"
-                        SelectedItem="{Binding AnimalType}"
-                        TextColor="Black"
-                        TitleColor="Black" />
-                    <Label
-                        Grid.Row="2"
-                        Margin="4, 0, 0, -10"
-                        IsVisible="{Binding IsErrorTextVisible}"
-                        Text="Pole obowiązkowe!"
-                        Style="{StaticResource TextError}" />
-                </VerticalStackLayout>
+                <templates:ValidationPicker
+                    Grid.Row="1" 
+                    Title="Typ"
+                    ItemsSource="{Binding AnimalTypes}"
+                    SelectedItem="{Binding AnimalType}" />
                 <Editor
                     Grid.Row="3"
                     MaxLength="300"

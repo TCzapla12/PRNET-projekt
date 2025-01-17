@@ -75,6 +75,9 @@
 	  <MauiXaml Update="Templates\ValidationEntry.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Templates\ValidationPicker.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="View\ConfirmationPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -122,5 +125,6 @@
     <Protobuf Include="Protos\user.proto" GrpcServices="Client" />
     <Protobuf Include="Protos\address.proto" GrpcServices="Client" />
     <Protobuf Include="Protos\animal.proto" GrpcServices="Client" />
+    <Protobuf Include="Protos\announcement.proto" GrpcServices="Client" />
   </ItemGroup>
 </Project>

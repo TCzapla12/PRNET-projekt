@@ -6,11 +6,128 @@
              xmlns:templates="clr-namespace:PetKeeperMobileApp.Templates"
              x:DataType="viewmodel:CreateAnnouncementViewModel"
              Title="CreateAnnouncementPage">
-    
-    <VerticalStackLayout>
-        <Label 
-            Text="Ogłoszenie"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+
+    <ContentPage.Resources>
+        <x:String x:Key="xmark">&#xf00d;</x:String>
+        <converters:StringToVisibilityConverter
+            x:Key="StringToVisibilityConverter"
+            xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <Grid
+             RowDefinitions="40, Auto, *"
+             ColumnDefinitions="Auto, *"
+             Padding="20"
+             RowSpacing="20">
+
+            <ImageButton
+                HeightRequest="30"
+                Command="{Binding ButtonActionCommand}">
+                <ImageButton.Source>
+                    <FontImageSource
+                        FontFamily="FAS"
+                        Glyph="{StaticResource xmark}"
+                        Color="{StaticResource PrimaryDark}" />
+                </ImageButton.Source>
+            </ImageButton>
+
+            <Label
+                Grid.ColumnSpan="2"
+                Text="Nowe ogłoszenie"
+                Style="{StaticResource Headline}" />
+
+            <StackLayout
+                x:Name="ValidationEntryStack"
+                Grid.Row="1"
+                Grid.ColumnSpan="2">
+
+                <Grid
+                    RowDefinitions="Auto, Auto, Auto, Auto, Auto"
+                    ColumnDefinitions=".6*, Auto, *, Auto"
+                    RowSpacing="20">
+
+                    <templates:ValidationEntry
+                        Type="Price"
+                        Placeholder="Cena"
+                        Text="{Binding Profit}"
+                        IsSpellCheck="False"
+                        Keyboard="Numeric" />
+                    <Label
+                        Grid.Column="1"
+                        Text="zł"
+                        Margin="4, 12, 0, 0" />
+                    <Label
+                        Grid.Column="2"
+                        Text="Do negocjacji"
+                        Margin="0, 12, 0, 0" 
+                        HorizontalOptions="End"/>
+                    <CheckBox 
+                        Grid.Column="3"
+                        IsChecked="{Binding IsNegotiable}"
+                        HorizontalOptions="End"
+                        Color="{StaticResource PrimaryDark}"/>
+                    <Editor
+                        Grid.Row="1"
+                        Grid.ColumnSpan="4"
+                        MaxLength="300"
+                        AutoSize="TextChanges"
+                        Placeholder="Opis"
+                        PlaceholderColor="Black"
+                        Text="{Binding Description}" />
+                    <templates:ValidationPicker
+                        Grid.Row="2"
+                        Grid.ColumnSpan="4"
+                        Title="Zwierzę"
+                        ItemsSource="{Binding AnimalList}"
+                        SelectedItem="{Binding Animal}" />
+                    <templates:ValidationPicker
+                        Grid.Row="3"
+                        Grid.ColumnSpan="4"
+                        Title="Adres"
+                        ItemsSource="{Binding AddressList}"
+                        SelectedItem="{Binding Address}" />
+                    <VerticalStackLayout 
+                        HeightRequest="44"
+                        Grid.Row="4"
+                        Grid.ColumnSpan="4">
+                        <Grid ColumnDefinitions="0.25*, 0.2*, 0.1*, 0.25*, 0.2*">
+                            <DatePicker
+                                Date="{Binding StartTerm}"
+                                MinimumDate="{Binding MinimumDate}"/>
+                            <TimePicker
+                                Grid.Column="1"
+                                Time="{Binding StartTermTime}"/>
+                            <Label 
+                                Grid.Column="2"
+                                Text="-"
+                                HorizontalTextAlignment="Center"
+                                Margin="0, 12, 0, 0"/>
+                            <DatePicker
+                                Grid.Column="3"
+                                Date="{Binding EndTerm}"
+                                MinimumDate="{Binding StartTerm}" />
+                            <TimePicker
+                                Grid.Column="4" 
+                                Time="{Binding EndTermTime}"/>
+                        </Grid>
+                        <Label 
+                            Margin="4, 0, 0, -10"
+                            IsVisible="{Binding ErrorText, Converter={StaticResource StringToVisibilityConverter}}"
+                            Text="{Binding ErrorText}"
+                            Style="{StaticResource TextError}" />
+                    </VerticalStackLayout>
+                </Grid>
+            </StackLayout>
+
+            <Button
+                VerticalOptions="End"
+                Grid.Row="2"
+                Grid.ColumnSpan="2"
+                Style="{StaticResource PrimaryButton}"
+                Text="Dodaj"
+                Command="{Binding CreateAnnouncementCommand}"
+                CommandParameter="{x:Reference ValidationEntryStack}" />
+        </Grid>
+    </ScrollView>
 </ContentPage>

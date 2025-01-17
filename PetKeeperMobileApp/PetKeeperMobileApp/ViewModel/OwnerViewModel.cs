@@ -1,16 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PetKeeperMobileApp.Services;
 using PetKeeperMobileApp.View;
 
 namespace PetKeeperMobileApp.ViewModel;
 
-public partial class OwnerViewModel : ObservableObject
+public partial class OwnerViewModel(IGrpcClient grpcClient) : ObservableObject
 {
-    public OwnerViewModel() { }
-
     [RelayCommand]
     async Task CreateAnnouncement()
     {
-        await Shell.Current.GoToAsync(nameof(CreateAnnouncementPage));
+        var createAnnouncementViewModel = new CreateAnnouncementViewModel(grpcClient);
+        await Application.Current!.MainPage!.Navigation.PushModalAsync(new CreateAnnouncementPage(createAnnouncementViewModel));
     }
 }

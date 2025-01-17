@@ -33,4 +33,14 @@ public interface IGrpcClient
 
     Task<string> DeleteAnimal(string id);
     #endregion
+
+    #region Announcement
+    Task<List<AnnouncementDto>> GetAnnouncements();
+
+    Task<string> CreateAnnouncement(AnnouncementDto announcementDto);
+
+    Task<string> UpdateAnnouncement(AnnouncementDto announcementDto);
+
+    Task<string> DeleteAnnouncement(string id);
+    #endregion
 }

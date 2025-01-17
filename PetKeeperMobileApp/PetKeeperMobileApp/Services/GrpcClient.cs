@@ -3,6 +3,7 @@ using Grpc.Net.Client;
 using PetKeeperMobileApp.Enums;
 using PetKeeperMobileApp.Models;
 using PetKeeperMobileApp.Utils;
+using static Android.Util.EventLogTags;
 
 namespace PetKeeperMobileApp.Services;
 
@@ -190,6 +191,79 @@ public class GrpcClient : IGrpcClient
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AnimalService.AnimalServiceClient(channel);
         var reply = await client.DeleteAnimalAsync(new AnimalMinimal { Id = id, OwnerId = await Storage.GetUserId() });
+        return Wordings.SUCCESS;
+    }
+    #endregion
+
+    #region Announcement
+    public async Task<List<AnnouncementDto>> GetAnnouncements()
+    {
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new AnnouncementService.AnnouncementServiceClient(channel);
+        var reply = await client.GetAnnouncementsAsync(new AnnouncementGet { AuthorId = await Storage.GetUserId() });
+        var announcements = new List<AnnouncementDto>();
+        foreach (var announcement in reply.Announcements)
+        {
+            announcements.Add(new AnnouncementDto()
+            {
+                Id = announcement.Id,
+                AnimalId = announcement.AnimalId,
+                Profit = announcement.KeeperProfit,
+                IsNegotiable = announcement.IsNegotiable,
+                Description = announcement.Description,
+                StartTerm = announcement.StartTerm,
+                EndTerm = announcement.EndTerm,
+                Status = Enum.TryParse<StatusType>(announcement.Status, out var parsedStatus) ? parsedStatus : StatusType.Canceled,
+                AddressId = announcement.AddressId
+            });
+        }
+        return announcements;
+    }
+
+    public async Task<string> CreateAnnouncement(AnnouncementDto announcementDto)
+    {
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new AnnouncementService.AnnouncementServiceClient(channel);
+        AnnouncementCreate announcement = new()
+        {
+            AnimalId = announcementDto.AnimalId,
+            KeeperProfit = announcementDto.Profit,
+            IsNegotiable = announcementDto.IsNegotiable,
+            Description = announcementDto.Description,
+            StartTerm = announcementDto.StartTerm,
+            EndTerm = announcementDto.EndTerm,
+            Status = announcementDto.Status.ToString(),
+            AddressId = announcementDto.AddressId
+        };
+        var reply = await client.CreateAnnouncementAsync(announcement);
+        return Wordings.SUCCESS;
+    }
+
+    public async Task<string> UpdateAnnouncement(AnnouncementDto announcementDto)
+    {
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new AnnouncementService.AnnouncementServiceClient(channel);
+        AnnouncementUpdate announcement = new()
+        {
+            Id = announcementDto.Id,
+            AnimalId = announcementDto.AnimalId,
+            KeeperProfit = announcementDto.Profit,
+            IsNegotiable = announcementDto.IsNegotiable,
+            Description = announcementDto.Description,
+            StartTerm = announcementDto.StartTerm,
+            EndTerm = announcementDto.EndTerm,
+            Status = announcementDto.Status.ToString(),
+            AddressId = announcementDto.AddressId
+        };
+        var reply = await client.UpdateAnnouncementAsync(announcement);
+        return Wordings.SUCCESS;
+    }
+
+    public async Task<string> DeleteAnnouncement(string id)
+    {
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new AnnouncementService.AnnouncementServiceClient(channel);
+        var reply = await client.DeleteAnnouncementAsync(new AnnouncementMinimal { Id = id, AuthorId = await Storage.GetUserId() });
         return Wordings.SUCCESS;
     }
     #endregion

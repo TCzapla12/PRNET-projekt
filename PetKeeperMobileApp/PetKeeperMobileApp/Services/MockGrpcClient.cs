@@ -112,4 +112,92 @@ public class MockGrpcClient : IGrpcClient
         return Wordings.SUCCESS;
     }
     #endregion
+
+    #region Announcement
+    public async Task<List<AnnouncementDto>> GetAnnouncements()
+    {
+        return [
+            new AnnouncementDto() {
+                Id = "1",
+                AnimalId = "1",
+                Profit = 100,
+                IsNegotiable = true,
+                Description = "Bardzo dobre ogłoszenie",
+                StartTerm = (ulong)new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(),
+                EndTerm = (ulong)new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                Status = StatusType.Created,
+                AddressId = "1",
+            },
+            new AnnouncementDto() {
+                Id = "2",
+                AnimalId = "2",
+                Profit = 200,
+                IsNegotiable = false,
+                StartTerm = (ulong)new DateTimeOffset(DateTime.Today).ToUnixTimeSeconds(),
+                EndTerm = (ulong)new DateTimeOffset(DateTime.Today).ToUnixTimeSeconds(),
+                Status = StatusType.Ongoing,
+                AddressId = "2",
+            },
+            new AnnouncementDto() {
+                Id = "3",
+                AnimalId = "3",
+                Profit = 300,
+                IsNegotiable = false,
+                Description = "Legia Warszawa to najlepszy klub - Mistrz Polski!!! Polska GUUUUROM",
+                StartTerm = (ulong)new DateTimeOffset(DateTime.MinValue).ToUnixTimeSeconds(),
+                EndTerm = (ulong)new DateTimeOffset(DateTime.MaxValue).ToUnixTimeSeconds(),
+                Status = StatusType.Finished,
+                AddressId = "3",
+            },
+            new AnnouncementDto() {
+                Id = "4",
+                AnimalId = "3",
+                Profit = 300,
+                IsNegotiable = false,
+                Description = "Legia Warszawa to najlepszy klub - Mistrz Polski!!! Polska GUUUUROM",
+                StartTerm = (ulong)new DateTimeOffset(DateTime.MinValue).ToUnixTimeSeconds(),
+                EndTerm = (ulong)new DateTimeOffset(DateTime.MaxValue).ToUnixTimeSeconds(),
+                Status = StatusType.Pending,
+                AddressId = "4",
+            },
+            new AnnouncementDto() {
+                Id = "5",
+                AnimalId = "3",
+                Profit = 300,
+                IsNegotiable = false,
+                Description = "Legia Warszawa to najlepszy klub - Mistrz Polski!!! Polska GUUUUROM",
+                StartTerm = (ulong)new DateTimeOffset(DateTime.MinValue).ToUnixTimeSeconds(),
+                EndTerm = (ulong)new DateTimeOffset(DateTime.MaxValue).ToUnixTimeSeconds(),
+                Status = StatusType.Canceled,
+                AddressId = "4",
+            },
+            new AnnouncementDto() {
+                Id = "6",
+                AnimalId = "3",
+                Profit = 300,
+                IsNegotiable = false,
+                Description = "Legia Warszawa to najlepszy klub - Mistrz Polski!!! Polska GUUUUROM",
+                StartTerm = (ulong)new DateTimeOffset(DateTime.MinValue).ToUnixTimeSeconds(),
+                EndTerm = (ulong)new DateTimeOffset(DateTime.MaxValue).ToUnixTimeSeconds(),
+                Status = StatusType.Accepted,
+                AddressId = "4",
+            }
+            ];
+    }
+
+    public async Task<string> CreateAnnouncement(AnnouncementDto announcementDto)
+    {
+        return Wordings.SUCCESS;
+    }
+
+    public async Task<string> UpdateAnnouncement(AnnouncementDto announcementDto)
+    {
+        return Wordings.SUCCESS;
+    }
+
+    public async Task<string> DeleteAnnouncement(string id)
+    {
+        return Wordings.SUCCESS;
+    }
+    #endregion
 }

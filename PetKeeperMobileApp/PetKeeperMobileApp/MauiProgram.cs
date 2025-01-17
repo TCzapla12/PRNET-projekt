@@ -38,8 +38,6 @@ namespace PetKeeperMobileApp
             builder.Services.AddTransient<MorePage>();
             builder.Services.AddTransient<MoreViewModel>();
 
-            builder.Services.AddTransient<CreateAnnouncementPage>();
-            builder.Services.AddTransient<CreateAnnouncementViewModel>();
             builder.Services.AddTransient<MyPetsPage>();
             builder.Services.AddTransient<MyPetsViewModel>();
             builder.Services.AddTransient<MyAddressesPage>();
