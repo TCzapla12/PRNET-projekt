@@ -34,7 +34,11 @@ public partial class ValidationPicker : ContentView
     public string SelectedItem
     {
         get => (string)GetValue(SelectedItemProperty);
-        set => SetValue(SelectedItemProperty, value);
+        set  
+        {
+            if (!string.IsNullOrEmpty(value))
+                SetValue(SelectedItemProperty, value);
+        }
     }
 
     private string errorText;
