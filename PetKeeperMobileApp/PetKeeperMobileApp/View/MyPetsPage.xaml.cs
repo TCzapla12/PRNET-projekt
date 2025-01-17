@@ -8,5 +8,12 @@ public partial class MyPetsPage : ContentPage
 	{
 		InitializeComponent();
 		BindingContext = vm;
-	}
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        if (BindingContext is MyPetsViewModel vm)
+            _ = vm.LoadDataAsync();
+    }
 }

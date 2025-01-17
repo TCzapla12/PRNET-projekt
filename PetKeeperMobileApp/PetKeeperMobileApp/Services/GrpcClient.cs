@@ -1,4 +1,5 @@
-﻿using Grpc.Net.Client;
+﻿using Google.Protobuf;
+using Grpc.Net.Client;
 using PetKeeperMobileApp.Enums;
 using PetKeeperMobileApp.Models;
 using PetKeeperMobileApp.Utils;
@@ -57,10 +58,11 @@ public class GrpcClient : IGrpcClient
             LastName = registerDto.LastName,
             Phone = registerDto.Phone,
             Pesel = registerDto.Pesel,
-            AvatarUrl = registerDto.AvatarUrl,
+            AvatarPng = ByteString.CopyFrom(registerDto.AvatarPng),
             PrimaryAddress = address
         };
-        user.DocumentUrl.AddRange(registerDto.DocumentUrls);
+        foreach (var documentPng in registerDto.DocumentPngs)
+            user.DocumentPngs.Add(ByteString.CopyFrom(documentPng));
         var reply = await client.CreateUserAsync(user);
         return Wordings.REGISTER_SUCCESS;
     }
@@ -77,6 +79,7 @@ public class GrpcClient : IGrpcClient
         {
             addresses.Add(new AddressDto()
             {
+                Id = address.Id,
                 Street = address.Street,
                 HouseNumber = address.HouseNumber,
                 ApartmentNumber = address.ApartmentNumber,
@@ -88,19 +91,45 @@ public class GrpcClient : IGrpcClient
         return addresses;
     }
 
-    public Task<string> CreateAddress(AddressDto addressDto)
+    public async Task<string> CreateAddress(AddressDto addressDto)
     {
-        throw new NotImplementedException();
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new AddressService.AddressServiceClient(channel);
+        AddressCreate address = new()
+        {
+            Street = addressDto.Street,
+            HouseNumber = addressDto.HouseNumber,
+            ApartmentNumber = addressDto.ApartmentNumber,
+            City = addressDto.City,
+            PostCode = addressDto.ZipCode,
+        };
+        var reply = await client.CreateAddressAsync(address);
+        return Wordings.SUCCESS;
     }
 
-    public Task<string> UpdateAddress(AddressDto addressDto)
+    public async Task<string> UpdateAddress(AddressDto addressDto)
     {
-        throw new NotImplementedException();
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new AddressService.AddressServiceClient(channel);
+        AddressUpdate address = new()
+        {
+            Id = addressDto.Id,
+            Street = addressDto.Street,
+            HouseNumber = addressDto.HouseNumber,
+            ApartmentNumber = addressDto.ApartmentNumber,
+            City = addressDto.City,
+            PostCode = addressDto.ZipCode,
+        };
+        var reply = await client.UpdateAddressAsync(address);
+        return Wordings.SUCCESS;
     }
 
-    public Task<string> DeleteAddress(string id)
+    public async Task<string> DeleteAddress(string id)
     {
-        throw new NotImplementedException();
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new AddressService.AddressServiceClient(channel);
+        var reply = await client.DeleteAddressAsync(new AddressMinimal { Id = id, OwnerId = await Storage.GetUserId() });
+        return Wordings.SUCCESS;
     }
     #endregion
 
@@ -115,28 +144,53 @@ public class GrpcClient : IGrpcClient
         {
             animals.Add(new AnimalDto()
             {
+                Id = animal.Id,
                 Name = animal.Name,
                 Type = Enum.TryParse<AnimalType>(animal.Type, out var parsedType) ? parsedType : AnimalType.Other,
-                PhotoUrl = animal.Photos.FirstOrDefault(String.Empty),
+                Photo = animal.Photo.ToByteArray(),
                 Description = animal.Description
             });
         }
         return animals;
     }
 
-    public Task<string> CreateAnimal(AnimalDto animalDto)
+    public async Task<string> CreateAnimal(AnimalDto animalDto)
     {
-        throw new NotImplementedException();
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new AnimalService.AnimalServiceClient(channel);
+        AnimalCreate animal = new()
+        {
+            Name = animalDto.Name,
+            Type = animalDto.Type.ToString(),
+            Photo = ByteString.CopyFrom(animalDto.Photo),
+            Description = animalDto.Description
+        };
+        var reply = await client.CreateAnimalAsync(animal);
+        return Wordings.SUCCESS;
     }
 
-    public Task<string> UpdateAnimal(AnimalDto animalDto)
+    public async Task<string> UpdateAnimal(AnimalDto animalDto)
     {
-        throw new NotImplementedException();
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new AnimalService.AnimalServiceClient(channel);
+        AnimalUpdate animal = new()
+        {
+            Id = animalDto.Id,
+            Name = animalDto.Name,
+            Type = animalDto.Type.ToString(),
+            Photo = ByteString.CopyFrom(animalDto.Photo),
+            Description = animalDto.Description
+        };
+        var reply = await client.UpdateAnimalAsync(animal);
+        return Wordings.SUCCESS;
     }
 
-    public Task<string> DeleteAnimal(string id)
+    public async Task<string> DeleteAnimal(string id)
     {
-        throw new NotImplementedException();
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new AnimalService.AnimalServiceClient(channel);
+        var reply = await client.DeleteAnimalAsync(new AnimalMinimal { Id = id, OwnerId = await Storage.GetUserId() });
+        return Wordings.SUCCESS;
     }
     #endregion
 }

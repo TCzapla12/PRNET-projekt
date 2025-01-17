@@ -6,7 +6,6 @@ using PetKeeperMobileApp.Models;
 using PetKeeperMobileApp.Services;
 using PetKeeperMobileApp.Templates;
 using PetKeeperMobileApp.Utils;
-using SkiaSharp;
 using System.Collections.ObjectModel;
 
 namespace PetKeeperMobileApp.ViewModel;
@@ -75,7 +74,7 @@ public partial class RegistrationViewModel(IGrpcClient grpcClient) : ObservableO
 
         if (result != null)
         {
-            var croppedImage = await CropImage(result.FullPath, 512, 512);
+            var croppedImage = await Helpers.CropImage(result.FullPath, 512, 512);
             UserPhoto = ImageSource.FromStream(() => new MemoryStream(croppedImage));
             isUserPhotoAdded = true;
         }
@@ -139,9 +138,8 @@ public partial class RegistrationViewModel(IGrpcClient grpcClient) : ObservableO
                 PrimaryAddress = address,
                 Phone = this.PhoneNumber,
                 Pesel = this.Pesel,
-                //TO DO:
-                AvatarUrl = string.Empty,
-                DocumentUrls = [string.Empty, string.Empty]
+                AvatarPng = await Helpers.ImageToBytes(this.UserPhoto),
+                DocumentPngs = [await Helpers.ImageToBytes(this.documentPhoto[0]), await Helpers.ImageToBytes(this.documentPhoto[1])]
             };
             var message = await grpcClient.Register(user);
 
@@ -179,26 +177,5 @@ public partial class RegistrationViewModel(IGrpcClient grpcClient) : ObservableO
             isDocumentPhotoAdded[index] = true;
             OnPropertyChanged(nameof(DocumentPhoto));
         }
-    }
-
-    private async Task<byte[]> CropImage(string imagePath, int width, int height)
-    {
-        using var originalImage = SKBitmap.Decode(imagePath);
-
-        int cropSize = Math.Min(originalImage.Width, originalImage.Height);
-        int x = (originalImage.Width - cropSize) / 2;
-        int y = (originalImage.Height - cropSize) / 2;
-
-        using var croppedBitmap = new SKBitmap(width, height);
-        using var canvas = new SKCanvas(croppedBitmap);
-
-        canvas.DrawBitmap(originalImage,
-            new SKRect(x, y, x + cropSize, y + cropSize),
-            new SKRect(0, 0, width, height));
-
-        using var image = SKImage.FromBitmap(croppedBitmap);
-        using var data = image.Encode(SKEncodedImageFormat.Png, 100);
-
-        return data.ToArray();
     }
 }

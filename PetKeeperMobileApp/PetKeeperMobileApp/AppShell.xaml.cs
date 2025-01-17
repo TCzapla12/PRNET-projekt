@@ -14,6 +14,8 @@ namespace PetKeeperMobileApp
             Routing.RegisterRoute(nameof(CreateAnnouncementPage), typeof(CreateAnnouncementPage));
             Routing.RegisterRoute(nameof(MyAddressesPage), typeof(MyAddressesPage));
             Routing.RegisterRoute(nameof(MyPetsPage), typeof(MyPetsPage));
+            Routing.RegisterRoute(nameof(EditAddressPage), typeof(EditAddressPage));
+            Routing.RegisterRoute(nameof(EditAnimalPage), typeof(EditAnimalPage));
         }
     }
 }

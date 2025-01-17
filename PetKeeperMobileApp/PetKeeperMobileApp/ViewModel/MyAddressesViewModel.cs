@@ -5,6 +5,7 @@ using PetKeeperMobileApp.Enums;
 using PetKeeperMobileApp.Models;
 using PetKeeperMobileApp.Services;
 using PetKeeperMobileApp.Utils;
+using PetKeeperMobileApp.View;
 using System.Collections.ObjectModel;
 
 
@@ -13,11 +14,11 @@ namespace PetKeeperMobileApp.ViewModel;
 public partial class MyAddressesViewModel : ObservableObject
 {
     private IGrpcClient _grpcClient;
+    private List<AddressDto> _addressesDto;
+
     public MyAddressesViewModel(IGrpcClient grpcClient) 
     {
         _grpcClient = grpcClient;
-
-        LoadDataAsync();
     }
 
     [ObservableProperty]
@@ -35,31 +36,51 @@ public partial class MyAddressesViewModel : ObservableObject
     [RelayCommand]
     async Task CreateAddress()
     {
-        //TO DO:
+        var editAddressViewModel = new EditAddressViewModel(_grpcClient);
+        await Application.Current!.MainPage!.Navigation.PushModalAsync(new EditAddressPage(editAddressViewModel));
     }
 
     [RelayCommand]
-    async Task EditAddress(int index)
+    async Task EditAddress(string id)
     {
-        //TO DO:
+        var editAddressViewModel = new EditAddressViewModel(_grpcClient, _addressesDto.Where(a => a.Id == id).First());
+        await Application.Current!.MainPage!.Navigation.PushModalAsync(new EditAddressPage(editAddressViewModel));
     }
 
     [RelayCommand]
-    async Task DeleteAddress(int index)
-    {
-        //TO DO:
-    }
-
-    private async Task LoadDataAsync()
+    async Task DeleteAddress(string id)
     {
         try
         {
-            var addressesDto = await _grpcClient.GetAddresses();
-            addressesDto.OrderBy(a => a.IsPrimary ?? false);
-            var addressesList = new List<AddressInfo>();
-            for (int i = 0; i < addressesDto.Count; i++)
+            await _grpcClient.DeleteAddress(id);
+        }
+        catch (RpcException ex)
+        {
+            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Status.Detail, new RelayCommand(async () =>
             {
-                addressesList.Add(new AddressInfo(i, addressesDto[i]));
+                await LoadDataAsync();
+            }));
+        }
+        catch (Exception ex)
+        {
+            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Message, new RelayCommand(async () =>
+            {
+                await LoadDataAsync();
+            }));
+        }
+        await LoadDataAsync();
+    }
+
+    public async Task LoadDataAsync()
+    {
+        try
+        {
+            _addressesDto = await _grpcClient.GetAddresses();
+            _addressesDto.OrderBy(a => a.IsPrimary ?? false);
+            var addressesList = new List<AddressInfo>();
+            for (int i = 0; i < _addressesDto.Count; i++)
+            {
+                addressesList.Add(new AddressInfo(i, _addressesDto[i]));
             }
             Addresses = new ObservableCollection<AddressInfo>(addressesList);
         }

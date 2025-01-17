@@ -16,7 +16,7 @@ message AnimalCreate {
     optional string owner_id = 2;
     string name = 3;
     string type = 4;
-    repeated string photos = 5;
+    bytes photo = 5;
     optional string description = 6;
 }
 
@@ -41,6 +41,6 @@ message AnimalUpdate {
     string id = 1;
     optional string name = 2;
     optional string type = 3;
-    repeated string photos = 4;
+    optional bytes photo = 4;
     optional string description = 5;
 }

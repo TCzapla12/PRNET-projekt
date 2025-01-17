@@ -21,8 +21,6 @@ service UserService {
 	//Konto o podanym adresie e-mail nie istnieje
 }
 
-
-
 message UserCreate {
 	string email = 1;
 	string username = 2;
@@ -32,8 +30,8 @@ message UserCreate {
 	shared.AddressCreate primary_address = 6;
 	string phone = 7;
 	string pesel = 8;
-	optional string avatar_url = 9;
-	repeated string document_url = 10;
+	optional bytes avatar_png = 9;
+	repeated bytes document_pngs = 10;
 }
 
 message ResetPasswordRequest {

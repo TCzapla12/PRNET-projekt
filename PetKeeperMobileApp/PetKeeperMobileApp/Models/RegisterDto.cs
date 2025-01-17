@@ -18,7 +18,7 @@ public class RegisterDto
 
     public required string Pesel { get; set; }
 
-    public required string AvatarUrl { get; set; }
+    public required byte[] AvatarPng { get; set; }
 
-    public required List<string> DocumentUrls { get; set; }
+    public required List<byte[]> DocumentPngs { get; set; }
 }

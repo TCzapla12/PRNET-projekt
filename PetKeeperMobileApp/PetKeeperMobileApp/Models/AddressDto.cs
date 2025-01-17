@@ -2,6 +2,8 @@
 
 public class AddressDto
 {
+    public string? Id { get; set; }
+
     public required string Street { get; set; }
 
     public required string HouseNumber { get; set; }
