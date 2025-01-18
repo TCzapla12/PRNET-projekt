@@ -2,7 +2,6 @@
 using grpc_hello_world.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using System.Data.Entity;
 using System.Net;
 using System.Security.Claims;
 

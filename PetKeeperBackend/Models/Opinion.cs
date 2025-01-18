@@ -36,6 +36,6 @@ namespace grpc_hello_world.Models
         public string Description { get; set; }
 
         [Column("created_date")]
-        public ulong CreatedDate { get; private set; }
+        public ulong CreatedDate { get; }
     }
 }

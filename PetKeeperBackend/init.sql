@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS opinions (
     rating INT CHECK (rating >= 0 AND rating <= 10),
     description TEXT,
     announcement_id UUID REFERENCES announcements(id) ON DELETE CASCADE UNIQUE,
-    created_date BIGINT DEFAULT EXTRACT(EPOCH FROM NOW())
+    created_date BIGINT NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())
 );
 
 
