@@ -1,0 +1,51 @@
+﻿@page "/dashboard"
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+
+
+<h2>Welcome to PetKeeper admin dashboard!</h2>
+
+<div style="display: flex; gap: 1rem;">
+    <button @onclick="NavigateToUsers">Users</button>
+    <button @onclick="NavigateToOpinions">Opinions</button>
+    <button @onclick="NavigateToAnnouncements">Announcements</button>
+</div>
+
+
+@code {
+    private bool IsAuthorized { get; set; } = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            IsAuthorized = !string.IsNullOrEmpty(token);
+
+            if (!IsAuthorized)
+            {
+                NavigationManager.NavigateTo("/login");
+            }
+
+            // Trigger re-render after state change
+            StateHasChanged();
+        }
+    }
+
+    private void NavigateToUsers()
+    {
+        NavigationManager.NavigateTo("/users");
+    }
+
+    private void NavigateToOpinions()
+    {
+        NavigationManager.NavigateTo("/opinions");
+    }
+
+    private void NavigateToAnnouncements()
+    {
+        NavigationManager.NavigateTo("/announcements");
+    }
+}

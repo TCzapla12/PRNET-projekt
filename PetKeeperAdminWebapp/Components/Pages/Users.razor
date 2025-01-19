@@ -1,0 +1,250 @@
+﻿@page "/users"
+@using grpc_hello_world
+@using Grpc.Core;
+@using System.Threading.Tasks
+@inject grpc_hello_world.UserService.UserServiceClient UserServiceClient
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.WebUtilities
+@using Blazored.LocalStorage;
+@inject ILocalStorageService LocalStorage
+@rendermode InteractiveServer
+
+<h3>Search User</h3>
+
+<div>
+    <label for="id">User ID:</label>
+    <input id="id" @bind="UserId" placeholder="Enter User ID" />
+
+    <label for="email">Email:</label>
+    <input id="email" @bind="Email" placeholder="Enter Email" />
+
+    <label for="username">Username:</label>
+    <input id="username" @bind="Username" placeholder="Enter Username" />
+
+    <button @onclick="GetUser">Get User</button>
+</div>
+
+@if (User != null)
+{
+    <h3>User Details</h3>
+    <p><strong>ID:</strong> @User.Id</p>
+    <p><strong>Email:</strong> @User.Email</p>
+    <p><strong>Username:</strong> @User.Username</p>
+    <p><strong>First Name:</strong> @User.FirstName</p>
+    <p><strong>Last Name:</strong> @User.LastName</p>
+    <p><strong>Phone:</strong> @User.Phone</p>
+    <p><strong>PESEL:</strong> @User.Pesel</p>
+    <p><strong>Activated:</strong> @User.IsActivated</p>
+    <p><strong>Verified:</strong> @User.IsVerified</p>
+    @if (!User.IsVerified)
+    {
+        <button @onclick="VerifyUser">Verify User</button>
+    }
+    <p><strong>Banned:</strong> @User.IsBanned</p>
+    @if (!User.IsBanned)
+    {
+        <button @onclick="BanUser">Ban User</button>
+    }
+    <p><strong>Admin:</strong> @User.IsAdmin</p>
+
+    @if (!User.AvatarPng.IsEmpty)
+    {
+        <h4>Avatar</h4>
+        <img src="@GetBase64Image(User.AvatarPng)" alt="User Avatar" style="max-width: 200px; max-height: 200px;" />
+    }
+    else
+    {
+        <h4>Avatar</h4>
+        <p>User does not have an avatar</p>
+    }
+
+    @if (User.DocumentPngs.Count != 0 && User.DocumentPngs.Any())
+    {
+        <h4>Documents</h4>
+        @foreach (var doc in User.DocumentPngs)
+        {
+            <img src="@GetBase64Image(doc)" alt="Document Image" style="max-width: 200px; max-height: 200px; margin-right: 10px;" />
+        }
+    }
+}
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p style="color:red;">@ErrorMessage</p>
+}
+
+@if (SuccessMessage != null)
+{
+    <p style="color:green;">@SuccessMessage</p>
+}
+
+@code {
+    private string UserId { get; set; }
+    private string Email { get; set; }
+    private string Username { get; set; }
+    private UserFull User { get; set; }
+    private string ErrorMessage { get; set; }
+    private string SuccessMessage { get; set; }
+    private bool IsInitialized { get; set; } = false;
+    private bool IsAuthorized { get; set; } = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            IsAuthorized = !string.IsNullOrEmpty(token);
+
+            if (!IsAuthorized)
+            {
+                NavigationManager.NavigateTo("/login");
+            }
+            // Extract query parameters after the page has fully loaded
+            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+            var queryParams = QueryHelpers.ParseQuery(uri.Query);
+
+            if (queryParams.TryGetValue("userId", out var userIdValue))
+            {
+                UserId = userIdValue;
+                await LoadUserData();
+            }
+
+            IsInitialized = true;
+            StateHasChanged(); // Re-render the component to show the updated state
+        }
+    }
+
+    private async Task LoadUserData()
+    {
+        ErrorMessage = string.Empty;
+        SuccessMessage = string.Empty;
+        User = null;
+
+        var request = new UserGet
+        {
+            UserId = new UserIdentifier { }
+        };
+        if (!string.IsNullOrEmpty(UserId))
+        {
+            request.UserId.Id = UserId;
+        }
+        else if (!string.IsNullOrEmpty(Email))
+        {
+            request.UserId.Email = Email;
+        }
+        else if (!string.IsNullOrEmpty(Username))
+        {
+            request.UserId.Username = Username;
+        }
+        else
+        {
+            ErrorMessage = "Please enter at least one search criteria (ID, Email, or Username)";
+            return;
+        }
+
+        try
+        {
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            var metadata = new Metadata
+            {
+                { "Authorization", $"Bearer {token}" }
+            };
+            var response = await UserServiceClient.GetUserAsync(request, metadata);
+            User = response;
+        }
+        catch (Grpc.Core.RpcException ex)
+        {
+            ErrorMessage = $"Error retrieving user. Please check provided data and try again";
+        }
+    }
+
+    private async Task GetUser()
+    {
+        await LoadUserData();
+    }
+
+    private async Task VerifyUser()
+    {
+        if (User == null)
+        {
+            ErrorMessage = "No user selected.";
+            return;
+        }
+
+        try
+        {
+            var request = new UserUpdate
+                {
+                    UserId = new UserIdentifier { Id = User.Id },
+                    IsVerified = true
+                };
+
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            var metadata = new Metadata
+            {
+                { "Authorization", $"Bearer {token}" }
+            };
+
+            var response = await UserServiceClient.UpdateUserAsync(request, metadata);
+
+            if (response.IsVerified)
+            {
+                SuccessMessage = "User verified successfully!";
+                User.IsVerified = true;
+            }
+            else
+            {
+                ErrorMessage = "Failed to verify the user.";
+            }
+        }
+        catch (Grpc.Core.RpcException ex)
+        {
+            ErrorMessage = $"Error verifying user: {ex.Status.Detail}";
+        }
+    }
+
+    private async Task BanUser()
+    {
+        if (User == null)
+        {
+            ErrorMessage = "No user selected.";
+            return;
+        }
+
+        try
+        {
+            var request = new UserUpdate
+            {
+                UserId = new UserIdentifier { Id = User.Id },
+                IsBanned = true
+            };
+
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            var metadata = new Metadata
+            {
+                { "Authorization", $"Bearer {token}" }
+            };
+
+            var response = await UserServiceClient.UpdateUserAsync(request, metadata);
+
+            if (response.IsBanned)
+            {
+                SuccessMessage = "User banned successfully!";
+                User.IsBanned = true;
+            }
+            else
+            {
+                ErrorMessage = "Failed to ban the user.";
+            }
+        }
+        catch (Grpc.Core.RpcException ex)
+        {
+            ErrorMessage = $"Error banning user: {ex.Status.Detail}";
+        }
+    }
+
+    private string GetBase64Image(Google.Protobuf.ByteString imageBytes)
+    {
+        return $"data:image/png;base64,{Convert.ToBase64String(imageBytes.ToByteArray())}";
+    }
+}

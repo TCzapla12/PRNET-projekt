@@ -1,0 +1,79 @@
+﻿@page "/login"
+@using grpc_hello_world
+@using System;
+@using Blazored.LocalStorage;
+@using Microsoft.IdentityModel.Tokens;
+@inject NavigationManager Navigation
+@using System.IdentityModel.Tokens.Jwt;
+@using System.Security.Claims;
+@using System.Text;
+@inject grpc_hello_world.AuthService.AuthServiceClient AuthClient
+@inject ILocalStorageService LocalStorage
+@rendermode InteractiveServer
+
+<h3>Login</h3>
+
+<div>
+    <label for="username">Username:</label>
+    <input id="username" @bind="Username" />
+
+    <label for="password">Password:</label>
+    <input id="password" type="password" @bind="Password" />
+
+    <button @onclick="HandleLogin">Login</button>
+
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <p style="color: red;">@ErrorMessage</p>
+    }
+</div>
+
+@code {
+    private string Username { get; set; } = string.Empty;
+    private string Password { get; set; } = string.Empty;
+    private string Token { get; set; } = string.Empty;
+    private string ErrorMessage { get; set; } = string.Empty;
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var request = new grpc_hello_world.AuthRequest
+                {
+                    UserId = new grpc_hello_world.UserIdentifier { Username = Username },
+                    Password = Password
+                };
+            var response = await AuthClient.AuthenticateAsync(request);
+            Token = response.Token;
+            ErrorMessage = string.Empty;
+
+            var jwtHandler = new JwtSecurityTokenHandler();
+            if (jwtHandler.CanReadToken(Token))
+            {
+                var jwtToken = jwtHandler.ReadToken(Token) as JwtSecurityToken;
+                if (jwtToken != null)
+                {
+                    var claims = jwtToken.Claims;
+                    var role = claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+                    var id = claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
+                    if (role != "Admin")
+                    {
+                        Token = string.Empty;
+                        ErrorMessage = "Login failed: User is not an Admin";
+                        return;
+                    }
+                    await LocalStorage.SetItemAsync("auth_token", Token);
+                    Navigation.NavigateTo("/dashboard");
+                }
+            }
+        }
+        catch (Grpc.Core.RpcException ex)
+        {
+            ErrorMessage = $"Login failed: {ex.Status.Detail}";
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Unexpected error occurred";
+        }
+    }
+}

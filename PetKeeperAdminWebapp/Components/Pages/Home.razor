@@ -1,0 +1,30 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<PageTitle>Home</PageTitle>
+
+@code {
+    private bool IsAuthorized { get; set; } = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            IsAuthorized = !string.IsNullOrEmpty(token);
+
+            if (!IsAuthorized)
+            {
+                NavigationManager.NavigateTo("/login");
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/dashboard");
+            }
+
+            StateHasChanged();
+        }
+    }
+}

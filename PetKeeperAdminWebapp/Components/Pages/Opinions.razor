@@ -1,0 +1,122 @@
+﻿@page "/opinions"
+@using grpc_hello_world
+@using Grpc.Core
+@using System.Threading.Tasks
+@inject grpc_hello_world.OpinionService.OpinionServiceClient OpinionServiceClient
+@inject NavigationManager NavigationManager
+@using Blazored.LocalStorage
+@inject ILocalStorageService LocalStorage
+@rendermode InteractiveServer
+
+<h3>Opinions</h3>
+
+@if (OpinionList != null && OpinionList.Any())
+{
+    <ul>
+        @foreach (var opinion in OpinionList)
+        {
+            <li>
+                <strong>Keeper:</strong>
+                <a href="#" @onclick="() => RedirectToUserView(opinion.KeeperId)">
+                    User Info
+                </a>
+                <br />
+
+                <strong>Owner:</strong>
+                <a href="#" @onclick="() => RedirectToUserView(opinion.AuthorId)">
+                    User Info
+                </a>
+                <br />
+                <strong>Related Announcement:</strong>
+                <a href="#" @onclick="() => RedirectToAnnouncementView(opinion.AnnouncementId)">
+                    Announcement Info
+                </a>
+                <br />
+                <strong>Description:</strong>
+                <p>@opinion.Description</p>
+                <br />
+
+                <strong>Rating:</strong>
+                <span>@opinion.Rating</span>
+                <br />
+                <hr />
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No opinions found.</p>
+}
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p style="color:red;">@ErrorMessage</p>
+}
+
+@code {
+    private List<OpinionUpdate> OpinionList { get; set; }
+    private string ErrorMessage { get; set; }
+
+    // Flag to check if the component has been fully rendered on the client-side
+    private bool IsFirstRender { get; set; } = true;
+    private bool IsAuthorized { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // We will handle fetching opinions in OnAfterRenderAsync to ensure it's done after page load
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // After the first render, access the LocalStorage
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            IsAuthorized = !string.IsNullOrEmpty(token);
+
+            if (!IsAuthorized)
+            {
+                NavigationManager.NavigateTo("/login");
+            }
+            var metadata = new Metadata
+            {
+                { "Authorization", $"Bearer {token}" }
+            };
+
+            // Now fetch the opinions
+            await GetOpinions(metadata);
+
+            // Set the first render flag to false
+            IsFirstRender = false;
+
+            // Trigger a re-render
+            StateHasChanged();
+        }
+    }
+
+    private async Task GetOpinions(Metadata metadata)
+    {
+        try
+        {
+            var request = new OpinionGet();  // Empty request to get all opinions
+            var response = await OpinionServiceClient.GetOpinionsAsync(request, metadata);
+            OpinionList = response.Opinions.ToList();
+        }
+        catch (Grpc.Core.RpcException ex)
+        {
+            ErrorMessage = $"Error retrieving opinions: {ex.Status.Detail}";
+        }
+    }
+
+    private void RedirectToUserView(string userId)
+    {
+        // Redirect to the Users page with the provided user ID in the search field
+        NavigationManager.NavigateTo($"/users?userId={userId}");
+    }
+
+    private void RedirectToAnnouncementView(string announcementId)
+    {
+        NavigationManager.NavigateTo($"/announcements?announcementId={announcementId}");
+    }
+}
