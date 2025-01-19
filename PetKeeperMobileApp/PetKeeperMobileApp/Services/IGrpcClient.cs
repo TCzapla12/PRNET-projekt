@@ -17,6 +17,8 @@ public interface IGrpcClient
     #region Address
     Task<List<AddressDto>> GetAddresses();
 
+    Task<AddressDto> GetAddress(string id);
+
     Task<string> CreateAddress(AddressDto addressDto);
 
     Task<string> UpdateAddress(AddressDto addressDto);
@@ -26,6 +28,8 @@ public interface IGrpcClient
 
     #region Animal
     Task<List<AnimalDto>> GetAnimals();
+
+    Task<AnimalDto> GetAnimal(string id);
 
     Task<string> CreateAnimal(AnimalDto animalDto);
 

@@ -11,8 +11,7 @@ public class MockGrpcClient : IGrpcClient
     {
         return new CredentialsDto 
         {
-            Token = "1234",
-            Id = "12AA"
+            Token = "1234"
         };
     }
     #endregion
@@ -50,6 +49,20 @@ public class MockGrpcClient : IGrpcClient
                 ZipCode = "05-200"
             }
             ];
+    }
+
+    public async Task<AddressDto> GetAddress(string id)
+    {
+        return new AddressDto()
+        {
+            Id = "1",
+            Street = "Abackiego",
+            HouseNumber = "1",
+            ApartmentNumber = "12",
+            City = "Warszawa",
+            ZipCode = "03-318",
+            IsPrimary = true,
+        };
     }
 
     public async Task<string> CreateAddress(AddressDto addressDto)
@@ -95,6 +108,18 @@ public class MockGrpcClient : IGrpcClient
                 Description = "Legia Warszawa to najlepszy klub - Mistrz Polski!!! Polska GUUUUROM"
             }
             ];
+    }
+
+    public async Task<AnimalDto> GetAnimal(string id)
+    {
+        return new AnimalDto()
+        {
+            Id = "1",
+            Name = "Ugryź",
+            Type = AnimalType.Dog,
+            Photo = [],
+            Description = "Bardzo fajny piesek :)"
+        };
     }
 
     public async Task<string> CreateAnimal(AnimalDto animalDto)

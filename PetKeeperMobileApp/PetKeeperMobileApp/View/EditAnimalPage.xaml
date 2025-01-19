@@ -81,14 +81,10 @@
                     Title="Typ"
                     ItemsSource="{Binding AnimalTypes}"
                     SelectedItem="{Binding AnimalType}" />
-                <Editor
+                <templates:ValidationEditor
                     Grid.Row="3"
-                    MaxLength="300"
-                    AutoSize="TextChanges"
                     Placeholder="Opis"
-                    PlaceholderColor="Black"
                     Text="{Binding Description}" />
-
             </Grid>
         </StackLayout>
 

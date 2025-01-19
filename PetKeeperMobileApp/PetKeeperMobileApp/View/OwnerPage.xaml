@@ -3,19 +3,40 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PetKeeperMobileApp.View.OwnerPage"
              xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             xmlns:models="clr-namespace:PetKeeperMobileApp.Models"
              x:DataType="viewmodel:OwnerViewModel"
+             xmlns:templates="clr-namespace:PetKeeperMobileApp.Templates"
              Title="OwnerPage">
-    <Grid
-        RowDefinitions="Auto, Auto"
-        Padding="20"
-        RowSpacing="20">
-        <Label 
-            Text="WŁAŚCICIEL"
-            Style="{StaticResource Headline}" />
-        <Button 
-            Grid.Row="1"
-            Style="{StaticResource OutlineButton}"
-            Text="Dodaj ogłoszenie"
-            Command="{Binding CreateAnnouncementCommand}" />
-    </Grid>
+    <ScrollView>
+        <Grid
+            RowDefinitions="Auto, Auto, Auto, Auto"
+            Padding="20"
+            RowSpacing="20">
+            <Label 
+                Text="WŁAŚCICIEL"
+                Style="{StaticResource Headline}" />
+            <Label
+                Grid.Row="1"
+                Text="Moje ogłoszenia"
+                Style="{StaticResource SubHeadline}"
+                HorizontalOptions="Start"/>
+            <CollectionView
+                Grid.Row="2"
+                Grid.ColumnSpan="2"
+                ItemsSource="{Binding AnnouncementList}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="{x:Type models:AnnouncementInfo}">
+                        <templates:AnnouncementItem 
+                            Announcement="{Binding .}"/>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <Button
+                Margin="0, 0, 0, 0"
+                Grid.Row="3"
+                Style="{StaticResource OutlineButton}"
+                Text="Dodaj ogłoszenie"
+                Command="{Binding CreateAnnouncementCommand}" />
+        </Grid>
+    </ScrollView>
 </ContentPage>

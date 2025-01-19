@@ -44,12 +44,12 @@
 
                 <Grid
                     RowDefinitions="Auto, Auto, Auto, Auto, Auto"
-                    ColumnDefinitions=".6*, Auto, *, Auto"
+                    ColumnDefinitions=".7*, Auto, *, Auto"
                     RowSpacing="20">
 
                     <templates:ValidationEntry
                         Type="Price"
-                        Placeholder="Cena"
+                        Placeholder="Wynagrodzenie"
                         Text="{Binding Profit}"
                         IsSpellCheck="False"
                         Keyboard="Numeric" />
@@ -67,29 +67,21 @@
                         IsChecked="{Binding IsNegotiable}"
                         HorizontalOptions="End"
                         Color="{StaticResource PrimaryDark}"/>
-                    <Editor
-                        Grid.Row="1"
-                        Grid.ColumnSpan="4"
-                        MaxLength="300"
-                        AutoSize="TextChanges"
-                        Placeholder="Opis"
-                        PlaceholderColor="Black"
-                        Text="{Binding Description}" />
                     <templates:ValidationPicker
-                        Grid.Row="2"
+                        Grid.Row="1"
                         Grid.ColumnSpan="4"
                         Title="Zwierzę"
                         ItemsSource="{Binding AnimalList}"
                         SelectedItem="{Binding Animal}" />
                     <templates:ValidationPicker
-                        Grid.Row="3"
+                        Grid.Row="2"
                         Grid.ColumnSpan="4"
                         Title="Adres"
                         ItemsSource="{Binding AddressList}"
                         SelectedItem="{Binding Address}" />
                     <VerticalStackLayout 
                         HeightRequest="44"
-                        Grid.Row="4"
+                        Grid.Row="3"
                         Grid.ColumnSpan="4">
                         <Grid ColumnDefinitions="0.25*, 0.2*, 0.1*, 0.25*, 0.2*">
                             <DatePicker
@@ -117,6 +109,11 @@
                             Text="{Binding ErrorText}"
                             Style="{StaticResource TextError}" />
                     </VerticalStackLayout>
+                    <templates:ValidationEditor
+                        Grid.Row="4"
+                        Grid.ColumnSpan="4"
+                        Placeholder="Opis"
+                        Text="{Binding Description}" />
                 </Grid>
             </StackLayout>
 

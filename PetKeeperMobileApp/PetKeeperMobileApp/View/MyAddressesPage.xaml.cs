@@ -1,4 +1,3 @@
-using PetKeeperMobileApp.Utils;
 using PetKeeperMobileApp.ViewModel;
 
 namespace PetKeeperMobileApp.View;

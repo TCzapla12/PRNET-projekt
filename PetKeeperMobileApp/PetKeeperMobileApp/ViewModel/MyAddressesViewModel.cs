@@ -86,17 +86,11 @@ public partial class MyAddressesViewModel : ObservableObject
         }
         catch (RpcException ex)
         {
-            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Status.Detail, new RelayCommand(async () =>
-            {
-                await LoadDataAsync();
-            }));
+            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Status.Detail, new RelayCommand(async () => {}));
         }
         catch (Exception ex)
         {
-            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Message, new RelayCommand(async () =>
-            {
-                await LoadDataAsync();
-            }));
+            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Message, new RelayCommand(async () => {}));
         }
         IsCreateButtonVisible = Addresses.Count < 3;
     }

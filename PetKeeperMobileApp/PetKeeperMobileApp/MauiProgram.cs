@@ -21,8 +21,8 @@ namespace PetKeeperMobileApp
                     fonts.AddFont("solid.otf", "FAS");
                 });
 
-            //builder.Services.AddScoped<IGrpcClient, GrpcClient>();
-            builder.Services.AddScoped<IGrpcClient, MockGrpcClient>();
+            builder.Services.AddScoped<IGrpcClient, GrpcClient>();
+            //builder.Services.AddScoped<IGrpcClient, MockGrpcClient>();
 
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<MainViewModel>();
@@ -42,6 +42,8 @@ namespace PetKeeperMobileApp
             builder.Services.AddTransient<MyPetsViewModel>();
             builder.Services.AddTransient<MyAddressesPage>();
             builder.Services.AddTransient<MyAddressesViewModel>();
+            builder.Services.AddTransient<SearchPage>();
+            builder.Services.AddTransient<SearchViewModel>();
 
             builder.Services.AddTransient<ForgotPasswordPage>();
             builder.Services.AddTransient<ForgotPasswordViewModel>();

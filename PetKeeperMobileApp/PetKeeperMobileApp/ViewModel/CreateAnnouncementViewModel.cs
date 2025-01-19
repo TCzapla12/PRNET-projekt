@@ -83,6 +83,8 @@ public partial class CreateAnnouncementViewModel : ObservableObject
                     areAllFieldsValid = false;
                 else if (child is ValidationPicker validationPicker && !validationPicker.ValidateField())
                     areAllFieldsValid = false;
+                else if (child is ValidationEditor validationEditor && !validationEditor.ValidateField())
+                    areAllFieldsValid = false;
             }
 
         if (!areAllFieldsValid || ErrorText != String.Empty)
@@ -133,9 +135,9 @@ public partial class CreateAnnouncementViewModel : ObservableObject
             var addresses = new List<string>();
             var animals = new List<string>();
             foreach (var addressDto in _addressesDto)
-                addresses.Add(AddressToString(addressDto));
+                addresses.Add(AddressDto.AddressToString(addressDto));
             foreach (var animalDto in _animalsDto)
-                animals.Add(AnimalToString(animalDto));
+                animals.Add(AnimalDto.AnimalToString(animalDto));
             AddressList = new ObservableCollection<string>(addresses);
             AnimalList = new ObservableCollection<string>(animals);
         }
@@ -153,22 +155,5 @@ public partial class CreateAnnouncementViewModel : ObservableObject
                 await LoadDataAsync();
             }));
         }
-    }
-
-    private string AddressToString(AddressDto addressDto)
-    {
-        var text = addressDto.Street + " " + addressDto.HouseNumber;
-        if (!string.IsNullOrWhiteSpace(addressDto.ApartmentNumber))
-            text += "/" + addressDto.ApartmentNumber;
-        text += "\n" + addressDto.ZipCode + ", " + addressDto.City;
-        return text;
-    }
-
-    private string AnimalToString(AnimalDto animalDto)
-    {
-        var text = animalDto.Name + " (" + Helpers.GetDescription(animalDto.Type) + ")";
-        if (!string.IsNullOrWhiteSpace(animalDto.Description))
-            text += "\n" + animalDto.Description;
-        return text;
     }
 }

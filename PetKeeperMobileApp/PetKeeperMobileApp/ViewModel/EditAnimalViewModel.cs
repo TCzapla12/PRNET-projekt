@@ -101,6 +101,8 @@ public partial class EditAnimalViewModel : ObservableObject
                     areAllFieldsValid = false;
                 else if (child is ValidationPicker validationPicker && !validationPicker.ValidateField()) 
                     areAllFieldsValid = false;
+                else if (child is ValidationEditor validationEditor && !validationEditor.ValidateField())
+                    areAllFieldsValid = false;
             }
                 
         if (!areAllFieldsValid || IsPhotoErrorVisible)

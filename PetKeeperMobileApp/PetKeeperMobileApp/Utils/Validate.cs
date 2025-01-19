@@ -12,7 +12,7 @@ class Validate
     private const string BAD_PHONE = "Niepoprawny numer telefonu!";
     private const string BAD_BUILDING = "Niepoprawny nr domu/m!";
     private const string BAD_ZIPCODE = "Niepoprawny kod pocztowy!";
-    private const string BAD_PRICE = "Niepoprawna cena!";
+    private const string BAD_PRICE = "Niepoprawna wartość!";
     private const string BAD_DATE = "Niepoprawny przedział czasowy!";
 
     public static string IsValidUsername(string field)

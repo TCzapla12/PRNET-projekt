@@ -1,9 +1,10 @@
 ﻿using Google.Protobuf;
+using Grpc.Core;
 using Grpc.Net.Client;
+using grpc_hello_world;
 using PetKeeperMobileApp.Enums;
 using PetKeeperMobileApp.Models;
 using PetKeeperMobileApp.Utils;
-using static Android.Util.EventLogTags;
 
 namespace PetKeeperMobileApp.Services;
 
@@ -21,7 +22,7 @@ public class GrpcClient : IGrpcClient
         return new CredentialsDto 
         { 
             Token = reply.Token,
-            Id = reply.Id,
+            //Id = reply.Id,
         };
     }
     #endregion
@@ -29,11 +30,11 @@ public class GrpcClient : IGrpcClient
     #region User
     public async Task<string> ResetPassword(string email)
     {
-        //throw new NotImplementedException();
-        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
-        var client = new UserService.UserServiceClient(channel);
-        var reply = await client.ResetPasswordAsync(new ResetPasswordRequest { Email = email });
-        return Wordings.RESET_PASSWORD_SUCCESS;
+        throw new NotImplementedException();
+        //using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        //var client = new UserService.UserServiceClient(channel);
+        //var reply = await client.ResetPasswordAsync(new ResetPasswordRequest { Email = email });
+        //return Wordings.RESET_PASSWORD_SUCCESS;
     }
 
     public async Task<string> Register(RegisterDto registerDto)
@@ -74,7 +75,7 @@ public class GrpcClient : IGrpcClient
     {
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AddressService.AddressServiceClient(channel);
-        var reply = await client.GetUserAddressesAsync(new AddressGet { OwnerId = await Storage.GetUserId()});
+        var reply = await client.GetAddressesAsync(new AddressGet { OwnerId = String.Empty }, await Storage.GetMetadata());
         var addresses = new List<AddressDto>();
         foreach (var address in reply.Addresses) 
         {
@@ -92,6 +93,28 @@ public class GrpcClient : IGrpcClient
         return addresses;
     }
 
+    public async Task<AddressDto> GetAddress(string id)
+    {
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new AddressService.AddressServiceClient(channel);
+        var reply = await client.GetAddressesAsync(new AddressGet { Id = id }, await Storage.GetMetadata());
+        var addresses = new List<AddressDto>();
+        foreach (var address in reply.Addresses)
+        {
+            addresses.Add(new AddressDto()
+            {
+                Id = address.Id,
+                Street = address.Street,
+                HouseNumber = address.HouseNumber,
+                ApartmentNumber = address.ApartmentNumber,
+                City = address.City,
+                ZipCode = address.PostCode,
+                IsPrimary = address.IsPrimary,
+            });
+        }
+        return addresses[0];
+    }
+
     public async Task<string> CreateAddress(AddressDto addressDto)
     {
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
@@ -104,7 +127,7 @@ public class GrpcClient : IGrpcClient
             City = addressDto.City,
             PostCode = addressDto.ZipCode,
         };
-        var reply = await client.CreateAddressAsync(address);
+        var reply = await client.CreateAddressAsync(address, await Storage.GetMetadata());
         return Wordings.SUCCESS;
     }
 
@@ -121,7 +144,7 @@ public class GrpcClient : IGrpcClient
             City = addressDto.City,
             PostCode = addressDto.ZipCode,
         };
-        var reply = await client.UpdateAddressAsync(address);
+        var reply = await client.UpdateAddressAsync(address, await Storage.GetMetadata());
         return Wordings.SUCCESS;
     }
 
@@ -129,7 +152,7 @@ public class GrpcClient : IGrpcClient
     {
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AddressService.AddressServiceClient(channel);
-        var reply = await client.DeleteAddressAsync(new AddressMinimal { Id = id, OwnerId = await Storage.GetUserId() });
+        var reply = await client.DeleteAddressAsync(new AddressMinimal { Id = id }, await Storage.GetMetadata());
         return Wordings.SUCCESS;
     }
     #endregion
@@ -139,7 +162,7 @@ public class GrpcClient : IGrpcClient
     {
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AnimalService.AnimalServiceClient(channel);
-        var reply = await client.GetAnimalsAsync(new AnimalGet { OwnerId = await Storage.GetUserId() });
+        var reply = await client.GetAnimalsAsync(new AnimalGet { }, await Storage.GetMetadata());
         var animals = new List<AnimalDto>();
         foreach (var animal in reply.Animals)
         {
@@ -147,12 +170,32 @@ public class GrpcClient : IGrpcClient
             {
                 Id = animal.Id,
                 Name = animal.Name,
-                Type = Enum.TryParse<AnimalType>(animal.Type, out var parsedType) ? parsedType : AnimalType.Other,
+                Type = Enum.TryParse<AnimalType>(animal.Type, true, out var parsedType) ? parsedType : AnimalType.Other,
                 Photo = animal.Photo.ToByteArray(),
                 Description = animal.Description
             });
         }
         return animals;
+    }
+
+    public async Task<AnimalDto> GetAnimal(string id)
+    {
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new AnimalService.AnimalServiceClient(channel);
+        var reply = await client.GetAnimalsAsync(new AnimalGet { Id = id }, await Storage.GetMetadata());
+        var animals = new List<AnimalDto>();
+        foreach (var animal in reply.Animals)
+        {
+            animals.Add(new AnimalDto()
+            {
+                Id = animal.Id,
+                Name = animal.Name,
+                Type = Enum.TryParse<AnimalType>(animal.Type, true, out var parsedType) ? parsedType : AnimalType.Other,
+                Photo = animal.Photo.ToByteArray(),
+                Description = animal.Description
+            });
+        }
+        return animals[0];
     }
 
     public async Task<string> CreateAnimal(AnimalDto animalDto)
@@ -162,11 +205,11 @@ public class GrpcClient : IGrpcClient
         AnimalCreate animal = new()
         {
             Name = animalDto.Name,
-            Type = animalDto.Type.ToString(),
+            Type = animalDto.Type.ToString().ToLower(),
             Photo = ByteString.CopyFrom(animalDto.Photo),
             Description = animalDto.Description
         };
-        var reply = await client.CreateAnimalAsync(animal);
+        var reply = await client.CreateAnimalAsync(animal, await Storage.GetMetadata());
         return Wordings.SUCCESS;
     }
 
@@ -178,11 +221,11 @@ public class GrpcClient : IGrpcClient
         {
             Id = animalDto.Id,
             Name = animalDto.Name,
-            Type = animalDto.Type.ToString(),
+            Type = animalDto.Type.ToString().ToLower(),
             Photo = ByteString.CopyFrom(animalDto.Photo),
             Description = animalDto.Description
         };
-        var reply = await client.UpdateAnimalAsync(animal);
+        var reply = await client.UpdateAnimalAsync(animal, await Storage.GetMetadata());
         return Wordings.SUCCESS;
     }
 
@@ -190,7 +233,7 @@ public class GrpcClient : IGrpcClient
     {
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AnimalService.AnimalServiceClient(channel);
-        var reply = await client.DeleteAnimalAsync(new AnimalMinimal { Id = id, OwnerId = await Storage.GetUserId() });
+        var reply = await client.DeleteAnimalAsync(new AnimalMinimal { Id = id }, await Storage.GetMetadata());
         return Wordings.SUCCESS;
     }
     #endregion
@@ -200,7 +243,7 @@ public class GrpcClient : IGrpcClient
     {
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AnnouncementService.AnnouncementServiceClient(channel);
-        var reply = await client.GetAnnouncementsAsync(new AnnouncementGet { AuthorId = await Storage.GetUserId() });
+        var reply = await client.GetAnnouncementsAsync(new AnnouncementGet { }, await Storage.GetMetadata());
         var announcements = new List<AnnouncementDto>();
         foreach (var announcement in reply.Announcements)
         {
@@ -213,7 +256,7 @@ public class GrpcClient : IGrpcClient
                 Description = announcement.Description,
                 StartTerm = announcement.StartTerm,
                 EndTerm = announcement.EndTerm,
-                Status = Enum.TryParse<StatusType>(announcement.Status, out var parsedStatus) ? parsedStatus : StatusType.Canceled,
+                Status = Enum.TryParse<StatusType>(announcement.Status, true, out var parsedStatus) ? parsedStatus : StatusType.Canceled,
                 AddressId = announcement.AddressId
             });
         }
@@ -232,10 +275,10 @@ public class GrpcClient : IGrpcClient
             Description = announcementDto.Description,
             StartTerm = announcementDto.StartTerm,
             EndTerm = announcementDto.EndTerm,
-            Status = announcementDto.Status.ToString(),
+            Status = announcementDto.Status.ToString().ToLower(),
             AddressId = announcementDto.AddressId
         };
-        var reply = await client.CreateAnnouncementAsync(announcement);
+        var reply = await client.CreateAnnouncementAsync(announcement, await Storage.GetMetadata());
         return Wordings.SUCCESS;
     }
 
@@ -252,10 +295,10 @@ public class GrpcClient : IGrpcClient
             Description = announcementDto.Description,
             StartTerm = announcementDto.StartTerm,
             EndTerm = announcementDto.EndTerm,
-            Status = announcementDto.Status.ToString(),
+            Status = announcementDto.Status.ToString().ToLower(),
             AddressId = announcementDto.AddressId
         };
-        var reply = await client.UpdateAnnouncementAsync(announcement);
+        var reply = await client.UpdateAnnouncementAsync(announcement, await Storage.GetMetadata());
         return Wordings.SUCCESS;
     }
 
@@ -263,7 +306,7 @@ public class GrpcClient : IGrpcClient
     {
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AnnouncementService.AnnouncementServiceClient(channel);
-        var reply = await client.DeleteAnnouncementAsync(new AnnouncementMinimal { Id = id, AuthorId = await Storage.GetUserId() });
+        var reply = await client.DeleteAnnouncementAsync(new AnnouncementMinimal { Id = id }, await Storage.GetMetadata());
         return Wordings.SUCCESS;
     }
     #endregion
