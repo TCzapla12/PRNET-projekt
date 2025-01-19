@@ -9,17 +9,125 @@
 @inject ILocalStorageService LocalStorage
 @rendermode InteractiveServer
 
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #e0f7fa;
+        color: #00796b;
+        margin: 0;
+        padding: 20px;
+    }
+
+    h3 {
+        color: #00796b;
+        font-size: 1.3em;
+        margin-bottom: 1em;
+        text-align: left;
+    }
+
+    .search-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        max-width: 600px;
+        margin: 0;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        margin-bottom: 0.5rem;
+        color: #00796b;
+    }
+
+    input {
+        padding: 10px;
+        font-size: 1em;
+        border: 1px solid #00796b;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+    }
+
+    button {
+        padding: 10px 20px;
+        background-color: #00796b;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1.1em;
+        transition: background-color 0.3s ease;
+        margin-bottom: 1rem;
+    }
+
+    button:hover {
+        background-color: #004d40;
+    }
+
+    .user-details p {
+        font-size: 1.1em;
+        margin-bottom: 1rem;
+    }
+
+    .user-details h4 {
+        color: #00796b;
+        margin-bottom: 1rem;
+    }
+
+    img {
+        max-width: 200px;
+        max-height: 200px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+
+    .error-message {
+        color: red;
+        font-weight: bold;
+    }
+
+    .success-message {
+        color: green;
+        font-weight: bold;
+    }
+
+    .user-actions button {
+        margin-top: 1rem;
+        padding: 10px 20px;
+        background-color: #00796b;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1.1em;
+        transition: background-color 0.3s ease;
+    }
+
+    .user-actions button:hover {
+        background-color: #004d40;
+    }
+</style>
+
 <h3>Search User</h3>
 
-<div>
-    <label for="id">User ID:</label>
-    <input id="id" @bind="UserId" placeholder="Enter User ID" />
+<div class="search-container">
+    <div class="form-group">
+        <label for="id">User ID:</label>
+        <input id="id" @bind="UserId" placeholder="Enter User ID" />
+    </div>
 
-    <label for="email">Email:</label>
-    <input id="email" @bind="Email" placeholder="Enter Email" />
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input id="email" @bind="Email" placeholder="Enter Email" />
+    </div>
 
-    <label for="username">Username:</label>
-    <input id="username" @bind="Username" placeholder="Enter Username" />
+    <div class="form-group">
+        <label for="username">Username:</label>
+        <input id="username" @bind="Username" placeholder="Enter Username" />
+    </div>
 
     <button @onclick="GetUser">Get User</button>
 </div>
@@ -27,56 +135,66 @@
 @if (User != null)
 {
     <h3>User Details</h3>
-    <p><strong>ID:</strong> @User.Id</p>
-    <p><strong>Email:</strong> @User.Email</p>
-    <p><strong>Username:</strong> @User.Username</p>
-    <p><strong>First Name:</strong> @User.FirstName</p>
-    <p><strong>Last Name:</strong> @User.LastName</p>
-    <p><strong>Phone:</strong> @User.Phone</p>
-    <p><strong>PESEL:</strong> @User.Pesel</p>
-    <p><strong>Activated:</strong> @User.IsActivated</p>
-    <p><strong>Verified:</strong> @User.IsVerified</p>
-    @if (!User.IsVerified)
-    {
-        <button @onclick="VerifyUser">Verify User</button>
-    }
-    <p><strong>Banned:</strong> @User.IsBanned</p>
-    @if (!User.IsBanned)
-    {
-        <button @onclick="BanUser">Ban User</button>
-    }
-    <p><strong>Admin:</strong> @User.IsAdmin</p>
+    <div class="user-details">
+        <p><strong>ID:</strong> @User.Id</p>
+        <p><strong>Email:</strong> @User.Email</p>
+        <p><strong>Username:</strong> @User.Username</p>
+        <p><strong>First Name:</strong> @User.FirstName</p>
+        <p><strong>Last Name:</strong> @User.LastName</p>
+        <p><strong>Phone:</strong> @User.Phone</p>
+        <p><strong>PESEL:</strong> @User.Pesel</p>
+        <p><strong>Activated:</strong> @User.IsActivated</p>
+        <p><strong>Verified:</strong> @User.IsVerified</p>
 
-    @if (!User.AvatarPng.IsEmpty)
-    {
-        <h4>Avatar</h4>
-        <img src="@GetBase64Image(User.AvatarPng)" alt="User Avatar" style="max-width: 200px; max-height: 200px;" />
-    }
-    else
-    {
-        <h4>Avatar</h4>
-        <p>User does not have an avatar</p>
-    }
-
-    @if (User.DocumentPngs.Count != 0 && User.DocumentPngs.Any())
-    {
-        <h4>Documents</h4>
-        @foreach (var doc in User.DocumentPngs)
+        @if (!User.IsVerified)
         {
-            <img src="@GetBase64Image(doc)" alt="Document Image" style="max-width: 200px; max-height: 200px; margin-right: 10px;" />
+            <div class="user-actions">
+                <button @onclick="VerifyUser">Verify User</button>
+            </div>
         }
-    }
+
+        <p><strong>Banned:</strong> @User.IsBanned</p>
+        @if (!User.IsBanned)
+        {
+            <div class="user-actions">
+                <button @onclick="BanUser">Ban User</button>
+            </div>
+        }
+
+        <p><strong>Admin:</strong> @User.IsAdmin</p>
+
+        @if (!User.AvatarPng.IsEmpty)
+        {
+            <h4>Avatar</h4>
+            <img src="@GetBase64Image(User.AvatarPng)" alt="User Avatar" />
+        }
+        else
+        {
+            <h4>Avatar</h4>
+            <p>User does not have an avatar</p>
+        }
+
+        @if (User.DocumentPngs.Count != 0 && User.DocumentPngs.Any())
+        {
+            <h4>Documents</h4>
+            @foreach (var doc in User.DocumentPngs)
+            {
+                <img src="@GetBase64Image(doc)" alt="Document Image" />
+            }
+        }
+    </div>
 }
 
 @if (!string.IsNullOrEmpty(ErrorMessage))
 {
-    <p style="color:red;">@ErrorMessage</p>
+    <p class="error-message">@ErrorMessage</p>
 }
 
 @if (SuccessMessage != null)
 {
-    <p style="color:green;">@SuccessMessage</p>
+    <p class="success-message">@SuccessMessage</p>
 }
+
 
 @code {
     private string UserId { get; set; }
