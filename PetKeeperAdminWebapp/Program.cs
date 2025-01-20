@@ -10,12 +10,12 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddGrpcClient<AuthService.AuthServiceClient>(o =>
 {
-    o.Address = new Uri("http://localhost:8080");
+    o.Address = new Uri("http://172.168.100.20:8080");
 });
 
 builder.Services.AddGrpcClient<UserService.UserServiceClient>(o =>
 {
-    o.Address = new Uri("http://localhost:8080");
+    o.Address = new Uri("http://172.168.100.20:8080");
 }).ConfigureChannel(options =>
 {
     options.MaxReceiveMessageSize = 50 * 1024 * 1024; // 50 MB
@@ -24,12 +24,12 @@ builder.Services.AddGrpcClient<UserService.UserServiceClient>(o =>
 
 builder.Services.AddGrpcClient<OpinionService.OpinionServiceClient>(o =>
 {
-    o.Address = new Uri("http://localhost:8080");
+    o.Address = new Uri("http://172.168.100.20:8080");
 });
 
 builder.Services.AddGrpcClient<AnnouncementService.AnnouncementServiceClient>(o =>
 {
-    o.Address = new Uri("http://localhost:8080");
+    o.Address = new Uri("http://172.168.100.20:8080");
 });
 
 builder.Services.AddBlazoredLocalStorage();
