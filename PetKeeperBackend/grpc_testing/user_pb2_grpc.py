@@ -986,3 +986,204 @@ class AnnouncementService(object):
             timeout,
             metadata,
             _registered_method=True)
+
+
+class OpinionServiceStub(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.CreateOpinion = channel.unary_unary(
+                '/OpinionService/CreateOpinion',
+                request_serializer=user__pb2.OpinionCreate.SerializeToString,
+                response_deserializer=user__pb2.OpinionMinimal.FromString,
+                _registered_method=True)
+        self.GetOpinions = channel.unary_unary(
+                '/OpinionService/GetOpinions',
+                request_serializer=user__pb2.OpinionGet.SerializeToString,
+                response_deserializer=user__pb2.OpinionList.FromString,
+                _registered_method=True)
+        self.UpdateOpinion = channel.unary_unary(
+                '/OpinionService/UpdateOpinion',
+                request_serializer=user__pb2.OpinionUpdate.SerializeToString,
+                response_deserializer=user__pb2.OpinionUpdate.FromString,
+                _registered_method=True)
+        self.DeleteOpinion = channel.unary_unary(
+                '/OpinionService/DeleteOpinion',
+                request_serializer=user__pb2.OpinionMinimal.SerializeToString,
+                response_deserializer=user__pb2.OpinionMinimal.FromString,
+                _registered_method=True)
+
+
+class OpinionServiceServicer(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def CreateOpinion(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetOpinions(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateOpinion(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeleteOpinion(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_OpinionServiceServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'CreateOpinion': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateOpinion,
+                    request_deserializer=user__pb2.OpinionCreate.FromString,
+                    response_serializer=user__pb2.OpinionMinimal.SerializeToString,
+            ),
+            'GetOpinions': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetOpinions,
+                    request_deserializer=user__pb2.OpinionGet.FromString,
+                    response_serializer=user__pb2.OpinionList.SerializeToString,
+            ),
+            'UpdateOpinion': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateOpinion,
+                    request_deserializer=user__pb2.OpinionUpdate.FromString,
+                    response_serializer=user__pb2.OpinionUpdate.SerializeToString,
+            ),
+            'DeleteOpinion': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteOpinion,
+                    request_deserializer=user__pb2.OpinionMinimal.FromString,
+                    response_serializer=user__pb2.OpinionMinimal.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'OpinionService', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+    server.add_registered_method_handlers('OpinionService', rpc_method_handlers)
+
+
+ # This class is part of an EXPERIMENTAL API.
+class OpinionService(object):
+    """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def CreateOpinion(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/OpinionService/CreateOpinion',
+            user__pb2.OpinionCreate.SerializeToString,
+            user__pb2.OpinionMinimal.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetOpinions(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/OpinionService/GetOpinions',
+            user__pb2.OpinionGet.SerializeToString,
+            user__pb2.OpinionList.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UpdateOpinion(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/OpinionService/UpdateOpinion',
+            user__pb2.OpinionUpdate.SerializeToString,
+            user__pb2.OpinionUpdate.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DeleteOpinion(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/OpinionService/DeleteOpinion',
+            user__pb2.OpinionMinimal.SerializeToString,
+            user__pb2.OpinionMinimal.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)

@@ -272,3 +272,52 @@ message AnnouncementUpdate {
 message AnnouncementList {
     repeated AnnouncementUpdate announcements = 1;
 }
+
+service OpinionService {
+    rpc CreateOpinion (OpinionCreate) returns (OpinionMinimal);
+    rpc GetOpinions (OpinionGet) returns (OpinionList);
+    rpc UpdateOpinion (OpinionUpdate) returns (OpinionUpdate);
+    rpc DeleteOpinion (OpinionMinimal) returns (OpinionMinimal);
+}
+
+message OpinionMinimal {
+    string id = 1;
+    optional string announcement_id = 2;
+    optional string author_id = 3;
+    optional string keeper_id = 4;
+}
+
+message OpinionCreate {
+    optional string id = 1;
+    optional string author_id = 2;
+    optional string keeper_id = 3;
+    optional string description = 4;
+    optional uint64 created_date = 5;
+    uint32 rating = 6;
+    string announcement_id = 7;
+}
+
+message OpinionGet {
+    optional string id = 1;
+    optional string author_id = 2;
+    optional string keeper_id = 3;
+    optional string description_contains = 4;
+    optional uint64 created_date_before = 5;
+    optional uint64 created_date_after = 6;
+    optional uint32 rating_less = 7;
+    optional uint32 rating_more = 8;
+    optional string announcement_id = 9;
+}
+
+message OpinionUpdate {
+    string id = 1;
+    optional string author_id = 2;
+    optional string keeper_id = 3;
+    optional string description = 4;
+    optional uint64 created_date = 5;
+    optional uint32 rating = 6;
+    string announcement_id = 7;
+}
+message OpinionList {
+    repeated OpinionUpdate opinions = 1;
+}
