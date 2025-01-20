@@ -162,7 +162,7 @@ public class GrpcClient : IGrpcClient
     {
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AnimalService.AnimalServiceClient(channel);
-        var reply = await client.GetAnimalsAsync(new AnimalGet { }, await Storage.GetMetadata());
+        var reply = await client.GetAnimalsAsync(new AnimalGet { OwnerId = String.Empty }, await Storage.GetMetadata());
         var animals = new List<AnimalDto>();
         foreach (var animal in reply.Animals)
         {
