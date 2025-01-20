@@ -4,31 +4,27 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 5000
 
 
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["grpc_hello_world.csproj", "."]
-RUN dotnet restore "./grpc_hello_world.csproj"
+COPY ["PetKeeperAdminWebapp.csproj", "."]
+RUN dotnet restore "./PetKeeperAdminWebapp.csproj"
 COPY . .
+COPY Protos_/user.proto /PetKeeperBackend/Protos/user.proto
 WORKDIR "/src/."
-RUN dotnet build "./grpc_hello_world.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./PetKeeperAdminWebapp.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./grpc_hello_world.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./PetKeeperAdminWebapp.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-USER root
-RUN mkdir /home/app/uploads
-RUN chown -R app:app /home/app/uploads
-USER app
-ENTRYPOINT ["dotnet", "grpc_hello_world.dll"]
+ENTRYPOINT ["dotnet", "PetKeeperAdminWebapp.dll"]
