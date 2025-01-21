@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PetKeeperMobileApp.View.EditAddressPage"
+             xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             xmlns:templates="clr-namespace:PetKeeperMobileApp.Templates"
+             x:DataType="viewmodel:EditAddressViewModel"
+             Title="EditAddressPage">
+    
+    <ContentPage.Resources>
+        <x:String x:Key="xmark">&#xf00d;</x:String>
+    </ContentPage.Resources>
+
+    <Grid
+        RowDefinitions="40, Auto, *"
+        ColumnDefinitions="Auto, *"
+        Padding="20"
+        RowSpacing="20">
+
+        <ImageButton
+            HeightRequest="30"
+            Command="{Binding ButtonActionCommand}">
+            <ImageButton.Source>
+                <FontImageSource
+                    FontFamily="FAS"
+                    Glyph="{StaticResource xmark}"
+                    Color="{StaticResource PrimaryDark}" />
+            </ImageButton.Source>
+        </ImageButton>
+
+        <Label
+            Grid.ColumnSpan="2"
+            Text="{Binding Title}"
+            Style="{StaticResource Headline}" />
+
+        <StackLayout
+            x:Name="ValidationEntryStack"
+            Grid.Row="1"
+            Grid.ColumnSpan="2">
+
+            <Grid
+                RowDefinitions="Auto, *"
+                ColumnDefinitions="30, 80, *, 110"
+                RowSpacing="20">
+                <templates:ValidationEntry
+                    Grid.ColumnSpan="3"
+                    Type="Text"
+                    Placeholder="Ulica"
+                    Text="{Binding Street}" />
+                <templates:ValidationEntry
+                    Grid.Column="3"
+                    Grid.ColumnSpan="1"
+                    Type="BuildingApartment"
+                    Placeholder="Nr domu/m."
+                    Text="{Binding HouseNumber}"
+                    IsSpellCheck="False" />
+                <templates:ValidationEntry
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    Type="ZipCode"
+                    Placeholder="Kod pocztowy"
+                    Text="{Binding ZipCode}"
+                    Keyboard="Telephone"
+                    IsSpellCheck="False" />
+                <templates:ValidationEntry
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Grid.ColumnSpan="2"
+                    Type="Text"
+                    Placeholder="Miejscowość"
+                    Text="{Binding City}" />
+            </Grid>
+        </StackLayout>
+        
+        <Button
+            VerticalOptions="End"
+            Grid.Row="2"
+            Grid.ColumnSpan="2"
+            Style="{StaticResource PrimaryButton}"
+            Text="{Binding ButtonText}"
+            Command="{Binding AddEditAddressCommand}"
+            CommandParameter="{x:Reference ValidationEntryStack}" />
+    </Grid>
+</ContentPage>

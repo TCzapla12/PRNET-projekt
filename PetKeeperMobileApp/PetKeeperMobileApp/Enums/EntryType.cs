@@ -10,5 +10,6 @@ public enum EntryType
     Pesel,
     Telephone,
     BuildingApartment,
-    ZipCode
+    ZipCode,
+    Price
 }

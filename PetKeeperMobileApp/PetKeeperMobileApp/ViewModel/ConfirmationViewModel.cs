@@ -6,12 +6,12 @@ namespace PetKeeperMobileApp.ViewModel;
 
 public partial class ConfirmationViewModel : ObservableObject
 {
-    public ConfirmationViewModel(StatusIcon statusIcon) 
+    public ConfirmationViewModel(StatusIcon statusIcon, string? text = null) 
     {
         status = statusIcon;
         if (statusIcon == StatusIcon.Success)
-            buttonText = "OK";
-        else buttonText = "Spróbuj ponownie";
+            buttonText = text ?? "OK";
+        else buttonText = text ?? "Spróbuj ponownie";
     }
 
     [ObservableProperty]

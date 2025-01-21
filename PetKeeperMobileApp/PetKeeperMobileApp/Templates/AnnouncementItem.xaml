@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PetKeeperMobileApp.Templates.AnnouncementItem"
+             x:Name="AnnItem">
+
+    <ContentPage.Resources>
+        <converters:StringToVisibilityConverter
+        x:Key="StringToVisibilityConverter"
+        xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />
+    </ContentPage.Resources>
+
+    <Frame
+        Padding="10"
+        Margin="0, 0, 0, 20"
+        CornerRadius="8">
+        <StackLayout>
+            <HorizontalStackLayout>
+                <Label
+                    x:Name="ProfitLabel"
+                    Style="{StaticResource SubHeadline}"
+                    FontAttributes="Bold"/>
+                <Label
+                    Text=" zł"
+                    Style="{StaticResource SubHeadline}"
+                    FontAttributes="Bold"/>
+                <Label
+                    x:Name="NegotiableLabel"
+                    Text=" (do negocjacji)"
+                    Style="{StaticResource SubHeadline}"/>
+            </HorizontalStackLayout>
+            <Label
+                Text="Status: "
+                FontAttributes="Bold" />
+            <HorizontalStackLayout>
+                <Label 
+                    x:Name="StatusIconLabel"
+                    FontFamily="FAS"
+                    Margin="0, 3, 0, 0" />
+                <Label Text=" (" />
+                <Label x:Name="StatusLabel" />
+                <Label Text=")" />
+            </HorizontalStackLayout>
+            <Label
+                Text="Opis:"
+                FontAttributes="Bold" />
+            <Label x:Name="DescriptionLabel" />
+            <Label
+                Text="Zwierzę: "
+                FontAttributes="Bold" />
+            <Label x:Name="AnimalLabel"/>
+            <Label
+                Text="Adres: "
+                FontAttributes="Bold" />
+            <Label x:Name="AddressLabel"/>
+            <Label
+                Text="Realizacja: "
+                FontAttributes="Bold" />
+            <HorizontalStackLayout>
+                <Label x:Name="StartTermLabel"/>
+                <Label Text=" - " />
+                <Label x:Name="EndTermLabel"/>
+            </HorizontalStackLayout>
+        </StackLayout>
+    </Frame>
+</ContentView>

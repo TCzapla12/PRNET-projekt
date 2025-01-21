@@ -3,12 +3,47 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PetKeeperMobileApp.View.OwnerPage"
              xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             xmlns:models="clr-namespace:PetKeeperMobileApp.Models"
              x:DataType="viewmodel:OwnerViewModel"
+             xmlns:templates="clr-namespace:PetKeeperMobileApp.Templates"
              Title="OwnerPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Owner"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+
+    <ScrollView>
+        <Grid
+                RowDefinitions="Auto, Auto, Auto, Auto"
+                Padding="20"
+                RowSpacing="20">
+            <Label 
+                    Text="WŁAŚCICIEL"
+                    Style="{StaticResource Headline}" />
+            <Label
+                    Grid.Row="1"
+                    Text="Moje ogłoszenia"
+                    Style="{StaticResource SubHeadline}"
+                    HorizontalOptions="Start"/>
+            <VerticalStackLayout
+                Grid.Row="2"
+                Grid.ColumnSpan="2">
+                <templates:ErrorItem
+                        IsVisible="{Binding IsErrorVisible}"
+                        ButtonCommand="{Binding RefreshData}"
+                        ErrorException="{Binding Exception}" />
+                <CollectionView
+                     ItemsSource="{Binding AnnouncementList}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="{x:Type models:AnnouncementInfo}">
+                            <templates:AnnouncementItem 
+                                Announcement="{Binding .}"/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+            <Button
+                    Margin="0, 0, 0, 0"
+                    Grid.Row="3"
+                    Style="{StaticResource OutlineButton}"
+                    Text="Dodaj ogłoszenie"
+                    Command="{Binding CreateAnnouncementCommand}" />
+        </Grid>
+    </ScrollView>
 </ContentPage>

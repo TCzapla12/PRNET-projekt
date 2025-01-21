@@ -5,10 +5,25 @@
              xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
              x:DataType="viewmodel:KeeperViewModel"
              Title="KeeperPage">
-    <VerticalStackLayout>
+
+    <Grid
+        RowDefinitions="Auto, Auto"
+        Padding="20"
+        RowSpacing="20">
+
         <Label 
-            Text="Keeper"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+            Text="OPIEKUN"
+            Style="{StaticResource Headline}" />
+
+        <Grid
+            Grid.Row="1"
+            RowDefinitions="Auto, *"
+            RowSpacing="10">
+
+            <Button
+                Style="{StaticResource OutlineButton}"
+                Text="Szukaj ogłoszeń"
+                Command="{Binding SearchAnnouncementsCommand}" />
+        </Grid>
+    </Grid>
 </ContentPage>
