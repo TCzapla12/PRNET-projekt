@@ -2,65 +2,104 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PetKeeperMobileApp.Templates.AnnouncementItem"
+             xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
              x:Name="AnnItem">
 
-    <ContentPage.Resources>
-        <converters:StringToVisibilityConverter
-        x:Key="StringToVisibilityConverter"
-        xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />
-    </ContentPage.Resources>
+    <ContentView.Resources>
+        <x:String x:Key="pen">&#xf304;</x:String>
+        <x:String x:Key="trash">&#xf1f8;</x:String>
+    </ContentView.Resources>
 
     <Frame
         Padding="10"
         Margin="0, 0, 0, 20"
         CornerRadius="8">
-        <StackLayout>
-            <HorizontalStackLayout>
+        <Grid
+            ColumnDefinitions="*, Auto">
+            <StackLayout>
+                <HorizontalStackLayout>
+                    <Label
+                        x:Name="ProfitLabel"
+                        Style="{StaticResource SubHeadline}"
+                        FontAttributes="Bold"/>
+                    <Label
+                        Text=" zł"
+                        Style="{StaticResource SubHeadline}"
+                        FontAttributes="Bold"/>
+                    <Label
+                        x:Name="NegotiableLabel"
+                        Text=" (do negocjacji)"
+                        Style="{StaticResource SubHeadline}"/>
+                </HorizontalStackLayout>
                 <Label
-                    x:Name="ProfitLabel"
-                    Style="{StaticResource SubHeadline}"
-                    FontAttributes="Bold"/>
+                    Text="Status: "
+                    FontAttributes="Bold" />
+                <HorizontalStackLayout>
+                    <Label 
+                        x:Name="StatusIconLabel"
+                        FontFamily="FAS"
+                        Margin="0, 3, 0, 0" />
+                    <Label Text=" (" />
+                    <Label x:Name="StatusLabel" />
+                    <Label Text=")" />
+                </HorizontalStackLayout>
+                <VerticalStackLayout x:Name="OwnerStack">
+                    <Label
+                        Text="Właściciel: "
+                        FontAttributes="Bold" />
+                    <Label x:Name="OwnerLabel" />
+                </VerticalStackLayout>
+                
                 <Label
-                    Text=" zł"
-                    Style="{StaticResource SubHeadline}"
-                    FontAttributes="Bold"/>
+                    Text="Opis:"
+                    FontAttributes="Bold" />
+                <Label x:Name="DescriptionLabel" />
                 <Label
-                    x:Name="NegotiableLabel"
-                    Text=" (do negocjacji)"
-                    Style="{StaticResource SubHeadline}"/>
-            </HorizontalStackLayout>
-            <Label
-                Text="Status: "
-                FontAttributes="Bold" />
-            <HorizontalStackLayout>
-                <Label 
-                    x:Name="StatusIconLabel"
-                    FontFamily="FAS"
-                    Margin="0, 3, 0, 0" />
-                <Label Text=" (" />
-                <Label x:Name="StatusLabel" />
-                <Label Text=")" />
-            </HorizontalStackLayout>
-            <Label
-                Text="Opis:"
-                FontAttributes="Bold" />
-            <Label x:Name="DescriptionLabel" />
-            <Label
-                Text="Zwierzę: "
-                FontAttributes="Bold" />
-            <Label x:Name="AnimalLabel"/>
-            <Label
-                Text="Adres: "
-                FontAttributes="Bold" />
-            <Label x:Name="AddressLabel"/>
-            <Label
-                Text="Realizacja: "
-                FontAttributes="Bold" />
-            <HorizontalStackLayout>
-                <Label x:Name="StartTermLabel"/>
-                <Label Text=" - " />
-                <Label x:Name="EndTermLabel"/>
-            </HorizontalStackLayout>
-        </StackLayout>
+                    Text="Zwierzę: "
+                    FontAttributes="Bold" />
+                <Label x:Name="AnimalLabel"/>
+                <Label
+                    Text="Adres: "
+                    FontAttributes="Bold" />
+                <Label x:Name="AddressLabel"/>
+                <Label
+                    Text="Realizacja: "
+                    FontAttributes="Bold" />
+                <HorizontalStackLayout>
+                    <Label x:Name="StartTermLabel"/>
+                    <Label Text=" - " />
+                    <Label x:Name="EndTermLabel"/>
+                </HorizontalStackLayout>
+            </StackLayout>
+            <StackLayout
+                x:Name="EditStack"
+                IsVisible="False"
+                Grid.Column="1"
+                Margin="0, 5, -5, 0">
+                <ImageButton
+                    Margin="0, 0, 0, 10"
+                    HeightRequest="20"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:OwnerViewModel}}, Path=EditAnnouncementCommand}"
+                    CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}">
+                    <ImageButton.Source>
+                        <FontImageSource
+                            FontFamily="FAS"
+                            Glyph="{StaticResource pen}"
+                            Color="{StaticResource PrimaryDark}" />
+                    </ImageButton.Source>
+                </ImageButton>
+                <ImageButton
+                    HeightRequest="20"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:OwnerViewModel}}, Path=DeleteAnnouncementCommand}"
+                    CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}">
+                    <ImageButton.Source>
+                        <FontImageSource
+                            FontFamily="FAS"
+                            Glyph="{StaticResource trash}"
+                            Color="{StaticResource Tertiary}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </StackLayout>
+        </Grid>
     </Frame>
 </ContentView>

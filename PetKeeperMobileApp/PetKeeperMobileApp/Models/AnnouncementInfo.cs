@@ -21,4 +21,8 @@ public class AnnouncementInfo
     public StatusType Status { get; set; }
 
     public string Address { get; set; }
+
+    public string? Owner { get; set; }
+
+    public string? Keeper { get; set; }
 }

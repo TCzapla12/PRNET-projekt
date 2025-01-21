@@ -29,6 +29,5 @@
                 Background="{StaticResource Tertiary}"
                 Command="{Binding ButtonCommand, Mode=OneWay, Source={x:Reference ErrItem}}"/>
         </Grid>
-        
     </Frame>
 </ContentView>

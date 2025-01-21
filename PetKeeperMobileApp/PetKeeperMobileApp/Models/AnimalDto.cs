@@ -22,9 +22,4 @@ public class AnimalDto
             text += "\n" + animalDto.Description;
         return text;
     }
-
-    internal static string AnimalToString(Task<AnimalDto> task)
-    {
-        throw new NotImplementedException();
-    }
 }

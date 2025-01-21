@@ -32,6 +32,7 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="{x:Type models:AnnouncementInfo}">
                             <templates:AnnouncementItem
+                                IsOwnerView="True"
                                 Announcement="{Binding .}"/>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

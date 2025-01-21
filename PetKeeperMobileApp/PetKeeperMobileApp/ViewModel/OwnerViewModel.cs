@@ -38,12 +38,24 @@ public partial class OwnerViewModel : ObservableObject
         await Application.Current!.MainPage!.Navigation.PushModalAsync(new CreateAnnouncementPage(createAnnouncementViewModel));
     }
 
+    [RelayCommand]
+    async Task EditAnnouncement(string id)
+    {
+        //Console.WriteLine(id);
+    }
+
+    [RelayCommand]
+    async Task DeleteAnnouncement(string id)
+    {
+        //Console.WriteLine(id);
+    }
+
     public async Task LoadDataAsync()
     {
         var announcements = new List<AnnouncementInfo>();
         try
         {
-            _announcementsDto = await _grpcClient.GetAnnouncements();
+            _announcementsDto = await _grpcClient.GetUserAnnouncements();
             foreach (AnnouncementDto announcementDto in _announcementsDto)
                 announcements.Add(new AnnouncementInfo
                 {

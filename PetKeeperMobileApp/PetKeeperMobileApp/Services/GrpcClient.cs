@@ -68,15 +68,17 @@ public class GrpcClient : IGrpcClient
         return Wordings.REGISTER_SUCCESS;
     }
 
-    public async Task<UserDto> GetUser()
+    public async Task<UserDto> GetUser(string? id = null)
     {
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}", new GrpcChannelOptions
         {
             MaxReceiveMessageSize = 10 * 1024 * 1024
         });
+        var userIdentifier = new UserIdentifier();
+        if (id == null) userIdentifier.Email = await Storage.GetUserEmail();
+        else userIdentifier.Id = id;
         var client = new UserService.UserServiceClient(channel);
-        var reply = await client.GetUserAsync(new UserGet
-        { UserId = new UserIdentifier { Email = await Storage.GetUserEmail() } }, await Storage.GetMetadata());
+        var reply = await client.GetUserAsync(new UserGet { UserId = userIdentifier }, await Storage.GetMetadata());
         UserDto user = new()
         {
             Id = reply.Id,
@@ -270,12 +272,12 @@ public class GrpcClient : IGrpcClient
     #endregion
 
     #region Announcement
-    public async Task<List<AnnouncementDto>> GetAnnouncements()
+    public async Task<List<AnnouncementDto>> GetUserAnnouncements()
     {
         var announcements = new List<AnnouncementDto>();
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AnnouncementService.AnnouncementServiceClient(channel);
-        var reply = await client.GetAnnouncementsAsync(new AnnouncementGet { }, await Storage.GetMetadata());
+        var reply = await client.GetAnnouncementsAsync(new AnnouncementGet { AuthorId = await Storage.GetUserId() }, await Storage.GetMetadata());
         foreach (var announcement in reply.Announcements)
         {
             announcements.Add(new AnnouncementDto()
@@ -288,7 +290,40 @@ public class GrpcClient : IGrpcClient
                 StartTerm = announcement.StartTerm,
                 EndTerm = announcement.EndTerm,
                 Status = Enum.TryParse<StatusType>(announcement.Status, true, out var parsedStatus) ? parsedStatus : StatusType.Canceled,
-                AddressId = announcement.AddressId
+                AddressId = announcement.AddressId,
+                OwnerId = announcement.AuthorId,
+                KeeperId = announcement.KeeperId
+            });
+        }
+        return announcements;
+    }
+
+    public async Task<List<AnnouncementDto>> GetAnnouncements(int? minValue = null, int? maxValue = null, DateTime? startTerm = null, DateTime? endTerm = null)
+    {
+        var announcements = new List<AnnouncementDto>();
+        var announcementParams = new AnnouncementGet();
+        if (minValue != null) announcementParams.KeeperProfitLess = (uint)minValue;
+        if (maxValue != null) announcementParams.KeeperProfitMore = (uint)maxValue;
+        if (startTerm != null) announcementParams.StartTermAfter = (ulong)new DateTimeOffset((DateTime)startTerm).ToUnixTimeSeconds();
+        if (endTerm != null) announcementParams.EndTermBefore = (ulong)new DateTimeOffset((DateTime)endTerm).ToUnixTimeSeconds();
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new AnnouncementService.AnnouncementServiceClient(channel);
+        var reply = await client.GetAnnouncementsAsync(announcementParams, await Storage.GetMetadata());
+        foreach (var announcement in reply.Announcements)
+        {
+            announcements.Add(new AnnouncementDto()
+            {
+                Id = announcement.Id,
+                AnimalId = announcement.AnimalId,
+                Profit = announcement.KeeperProfit,
+                IsNegotiable = announcement.IsNegotiable,
+                Description = announcement.Description,
+                StartTerm = announcement.StartTerm,
+                EndTerm = announcement.EndTerm,
+                Status = Enum.TryParse<StatusType>(announcement.Status, true, out var parsedStatus) ? parsedStatus : StatusType.Canceled,
+                AddressId = announcement.AddressId,
+                OwnerId = announcement.AuthorId,
+                KeeperId = announcement.KeeperId
             });
         }
         return announcements;

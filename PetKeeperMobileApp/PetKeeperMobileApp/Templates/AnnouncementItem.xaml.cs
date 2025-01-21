@@ -10,8 +10,17 @@ public partial class AnnouncementItem : ContentView
         InitializeComponent();
     }
 
+    public static readonly BindableProperty IsOwnerViewProperty =
+        BindableProperty.Create(nameof(IsOwnerView), typeof(bool), typeof(AnnouncementItem), false);
+
     public static readonly BindableProperty AnnouncementProperty =
         BindableProperty.Create(nameof(Announcement), typeof(AnnouncementInfo), typeof(AnnouncementItem), null, propertyChanged: OnAnnouncementChanged);
+
+    public bool IsOwnerView
+    {
+        get => (bool)GetValue(IsOwnerViewProperty);
+        set => SetValue(IsOwnerViewProperty, value);
+    }
 
     public AnnouncementInfo Announcement
     {
@@ -19,8 +28,24 @@ public partial class AnnouncementItem : ContentView
         set => SetValue(AnnouncementProperty, value);
     }
 
+    private string annId;
+
+    public string AnnId
+    {
+        get => annId;
+        set
+        {
+            if (annId != value)
+            {
+                annId = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public void BindData(AnnouncementInfo announcement)
     {
+        AnnId = announcement.Id!;
         ProfitLabel.Text = announcement.Profit.ToString();
         NegotiableLabel.IsVisible = announcement.IsNegotiable;
         DescriptionLabel.Text = announcement.Description;
@@ -29,6 +54,11 @@ public partial class AnnouncementItem : ContentView
         SetStatusInfo(announcement.Status);
         AnimalLabel.Text = announcement.Animal;
         AddressLabel.Text = announcement.Address;
+
+        OwnerStack.IsVisible = !string.IsNullOrEmpty(announcement.Owner);
+        OwnerLabel.Text = announcement.Owner;
+
+        EditStack.IsVisible = announcement.Status == StatusType.Created && IsOwnerView;
     }
 
     private static void OnAnnouncementChanged(BindableObject bindable, object oldValue, object newValue)

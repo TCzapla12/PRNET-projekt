@@ -13,7 +13,7 @@ public interface IGrpcClient
 
     Task<string> Register(RegisterDto registerDto);
 
-    Task<UserDto> GetUser();
+    Task<UserDto> GetUser(string? id = null);
     #endregion
 
     #region Address
@@ -41,7 +41,9 @@ public interface IGrpcClient
     #endregion
 
     #region Announcement
-    Task<List<AnnouncementDto>> GetAnnouncements();
+    Task<List<AnnouncementDto>> GetUserAnnouncements();
+
+    Task<List<AnnouncementDto>> GetAnnouncements(int? minValue = null, int? maxValue = null, DateTime? startTerm = null, DateTime? endTerm = null);
 
     Task<string> CreateAnnouncement(AnnouncementDto announcementDto);
 
