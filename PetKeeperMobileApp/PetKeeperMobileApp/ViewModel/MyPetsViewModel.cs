@@ -16,7 +16,8 @@ public partial class MyPetsViewModel : ObservableObject
     private List<AnimalDto> _animalsDto;
     public MyPetsViewModel(IGrpcClient grpcClient) 
     {
-        _grpcClient = grpcClient; 
+        _grpcClient = grpcClient;
+        RefreshData = new RelayCommand(async () => { await LoadDataAsync(); });
     }
 
     [ObservableProperty]
@@ -24,6 +25,14 @@ public partial class MyPetsViewModel : ObservableObject
 
     [ObservableProperty]
     private bool isCreateButtonVisible;
+
+    [ObservableProperty]
+    private bool isErrorVisible;
+
+    [ObservableProperty]
+    private Exception exception;
+
+    public RelayCommand RefreshData { get; }
 
     [RelayCommand]
     async Task GoBack()
@@ -54,7 +63,7 @@ public partial class MyPetsViewModel : ObservableObject
         }
         catch (RpcException ex)
         {
-            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Status.Detail, new RelayCommand(async () =>
+            await Helpers.ShowConfirmationViewWithHandledCodes(ex, new RelayCommand(async () =>
             {
                 await LoadDataAsync();
             }));
@@ -71,24 +80,27 @@ public partial class MyPetsViewModel : ObservableObject
 
     public async Task LoadDataAsync()
     {
+        var animalsList = new List<AnimalInfo>();
         try
         {
             _animalsDto = await _grpcClient.GetAnimals();
-            var animalsList = new List<AnimalInfo>();
             for (int i = 0; i < _animalsDto.Count; i++)
             {
                 animalsList.Add(new AnimalInfo(_animalsDto[i]));
             }
-            Animals = new ObservableCollection<AnimalInfo>(animalsList);
+            IsErrorVisible = false;
         }
         catch (RpcException ex)
         {
-            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Status.Detail, new RelayCommand(async () => { }));
+            IsErrorVisible = true;
+            Exception = ex;
         }
         catch (Exception ex)
         {
-            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Message, new RelayCommand(async () => { }));
+            IsErrorVisible = true;
+            Exception = ex;
         }
+        Animals = new ObservableCollection<AnimalInfo>(animalsList);
         IsCreateButtonVisible = Animals.Count < 10;
     }
 }

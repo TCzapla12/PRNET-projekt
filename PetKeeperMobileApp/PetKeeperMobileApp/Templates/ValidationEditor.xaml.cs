@@ -10,10 +10,10 @@ public partial class ValidationEditor : ContentView
 	}
 
     public static readonly BindableProperty PlaceholderProperty =
-        BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(ValidationEntry), string.Empty);
+        BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(ValidationEditor), string.Empty);
 
     public static readonly BindableProperty TextProperty =
-        BindableProperty.Create(nameof(Text), typeof(string), typeof(ValidationEntry), string.Empty, BindingMode.TwoWay);
+        BindableProperty.Create(nameof(Text), typeof(string), typeof(ValidationEditor), string.Empty, BindingMode.TwoWay);
 
     public string Placeholder
     {

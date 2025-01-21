@@ -9,4 +9,11 @@ public partial class DashboardPage : ContentPage
 		InitializeComponent();
 		BindingContext = vm;
     }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        if (BindingContext is DashboardViewModel vm)
+            _ = vm.LoadDataAsync();            
+    }
 }

@@ -12,6 +12,8 @@ public interface IGrpcClient
     Task<string> ResetPassword(string email);
 
     Task<string> Register(RegisterDto registerDto);
+
+    Task<UserDto> GetUser();
     #endregion
 
     #region Address

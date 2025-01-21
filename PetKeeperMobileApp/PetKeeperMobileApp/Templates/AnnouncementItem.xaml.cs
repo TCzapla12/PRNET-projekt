@@ -11,7 +11,7 @@ public partial class AnnouncementItem : ContentView
     }
 
     public static readonly BindableProperty AnnouncementProperty =
-        BindableProperty.Create(nameof(Announcement), typeof(AnnouncementInfo), typeof(ValidationEntry), null, propertyChanged: OnAnnouncementChanged);
+        BindableProperty.Create(nameof(Announcement), typeof(AnnouncementInfo), typeof(AnnouncementItem), null, propertyChanged: OnAnnouncementChanged);
 
     public AnnouncementInfo Announcement
     {
@@ -19,7 +19,7 @@ public partial class AnnouncementItem : ContentView
         set => SetValue(AnnouncementProperty, value);
     }
 
-    public void BindDataAsync(AnnouncementInfo announcement)
+    public void BindData(AnnouncementInfo announcement)
     {
         ProfitLabel.Text = announcement.Profit.ToString();
         NegotiableLabel.IsVisible = announcement.IsNegotiable;
@@ -35,7 +35,7 @@ public partial class AnnouncementItem : ContentView
     {
         if (bindable is AnnouncementItem component && newValue is AnnouncementInfo announcement)
         {
-            component.BindDataAsync(announcement);
+            component.BindData(announcement);
         };
     }
 

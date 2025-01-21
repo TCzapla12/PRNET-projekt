@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Grpc.Core;
 using PetKeeperMobileApp.Enums;
 using PetKeeperMobileApp.View;
 using PetKeeperMobileApp.ViewModel;
@@ -9,9 +10,9 @@ namespace PetKeeperMobileApp.Utils;
 
 public class Helpers
 {
-    public static async Task ShowConfirmationView(StatusIcon statusIcon, string description, RelayCommand command)
+    public static async Task ShowConfirmationView(StatusIcon statusIcon, string description, RelayCommand command, string? text = null)
     {
-        var confirmationViewModel = new ConfirmationViewModel(statusIcon)
+        var confirmationViewModel = new ConfirmationViewModel(statusIcon, text)
         {
             Title = string.Empty,
             Description = description,
@@ -19,6 +20,14 @@ public class Helpers
         };
         await Application.Current!.MainPage!.Navigation.PushModalAsync(new ConfirmationPage(confirmationViewModel));
     }
+
+    public static async Task ShowConfirmationViewWithHandledCodes(RpcException exception, RelayCommand command)
+    {
+        if (exception.StatusCode == StatusCode.Unauthenticated)
+            await Helpers.ShowConfirmationView(StatusIcon.Error, Wordings.LOGOUT_DESCRIPTION, new RelayCommand(async () => { await Helpers.Logout(); }), Wordings.LOGOUT);
+        else
+            await Helpers.ShowConfirmationView(StatusIcon.Error, exception.Status.Detail, command);
+    }   
 
     public static ImageSource BytesToImage(byte[] bytes, string defaultImage = "question.png")
     {
@@ -98,5 +107,11 @@ public class Helpers
         }
         
         throw new ArgumentException();
+    }
+
+    public static async Task Logout()
+    {
+        Storage.RemoveCredentials();
+        await Shell.Current.GoToAsync($"//{RouteType.Login}");
     }
 }

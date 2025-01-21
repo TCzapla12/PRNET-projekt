@@ -26,6 +26,34 @@ public class MockGrpcClient : IGrpcClient
     {
         return Wordings.REGISTER_SUCCESS;
     }
+
+    public async Task<UserDto> GetUser()
+    {
+        ImageSource imageSource = "/data/data/com.prnet.petkeepermobileapp/cache/2203693cc04e0be7f4f024d5f9499e13/821da731fa9143d2b6e7cfe4f7c954ee/1000000034.png";
+        var bytes = await Helpers.ImageToBytes(imageSource);
+        return new UserDto
+        {
+            Id = "1",
+            Email = "a@a.com",
+            Username = "Test",
+            FirstName = "Artur",
+            LastName = "Abacki",
+            Phone = "123123123",
+            Pesel = "99999900001",
+            Photo = bytes,
+            PrimaryAddress = new AddressDto
+            {
+                Id = "1",
+                Street = "Abackiego",
+                HouseNumber = "1",
+                ApartmentNumber = "12",
+                City = "Warszawa",
+                ZipCode = "03-318",
+                IsPrimary = true
+            }
+        };
+    }
+
     #endregion
 
     #region Address

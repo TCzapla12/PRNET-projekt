@@ -1,5 +1,4 @@
 ﻿using Google.Protobuf;
-using Grpc.Core;
 using Grpc.Net.Client;
 using grpc_hello_world;
 using PetKeeperMobileApp.Enums;
@@ -67,6 +66,38 @@ public class GrpcClient : IGrpcClient
             user.DocumentPngs.Add(ByteString.CopyFrom(documentPng));
         var reply = await client.CreateUserAsync(user);
         return Wordings.REGISTER_SUCCESS;
+    }
+
+    public async Task<UserDto> GetUser()
+    {
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}", new GrpcChannelOptions
+        {
+            MaxReceiveMessageSize = 10 * 1024 * 1024
+        });
+        var client = new UserService.UserServiceClient(channel);
+        var reply = await client.GetUserAsync(new UserGet
+        { UserId = new UserIdentifier { Email = await Storage.GetUserEmail() } }, await Storage.GetMetadata());
+        UserDto user = new()
+        {
+            Id = reply.Id,
+            Email = reply.Email,
+            Username = reply.Username,
+            FirstName = reply.FirstName,
+            LastName = reply.LastName,
+            Phone = reply.Phone,
+            Pesel = reply.Pesel,
+            Photo = reply.AvatarPng.ToByteArray(),
+            PrimaryAddress = new AddressDto
+            {
+                Id = reply.PrimaryAddress.Id,
+                Street = reply.PrimaryAddress.Street,
+                HouseNumber = reply.PrimaryAddress.HouseNumber,
+                ApartmentNumber = reply.PrimaryAddress.ApartmentNumber,
+                City = reply.PrimaryAddress.City,
+                ZipCode = reply.PrimaryAddress.PostCode
+            }
+        };
+        return user;
     }
     #endregion
 
@@ -241,10 +272,10 @@ public class GrpcClient : IGrpcClient
     #region Announcement
     public async Task<List<AnnouncementDto>> GetAnnouncements()
     {
+        var announcements = new List<AnnouncementDto>();
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AnnouncementService.AnnouncementServiceClient(channel);
         var reply = await client.GetAnnouncementsAsync(new AnnouncementGet { }, await Storage.GetMetadata());
-        var announcements = new List<AnnouncementDto>();
         foreach (var announcement in reply.Announcements)
         {
             announcements.Add(new AnnouncementDto()

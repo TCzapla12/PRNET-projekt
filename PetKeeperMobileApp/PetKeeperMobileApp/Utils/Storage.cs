@@ -12,15 +12,15 @@ public class Storage
         };
     }
 
-    public static async Task SaveCredentials(string token)
+    public static async Task SaveCredentials(string email, string token)
     {
-        //await SecureStorage.SetAsync("id", id);
+        await SecureStorage.SetAsync("email", email);
         await SecureStorage.SetAsync("token", token);
     }
 
     public static void RemoveCredentials()
     {
-        //SecureStorage.Remove("id");
+        SecureStorage.Remove("email");
         SecureStorage.Remove("token");
     }
 
@@ -29,8 +29,8 @@ public class Storage
         return await SecureStorage.GetAsync("token") ?? string.Empty;
     }
 
-    //public static async Task<string> GetUserId()
-    //{
-    //    return await SecureStorage.GetAsync("id") ?? string.Empty;
-    //}
+    public static async Task<string> GetUserEmail()
+    {
+        return await SecureStorage.GetAsync("email") ?? string.Empty;
+    }
 }

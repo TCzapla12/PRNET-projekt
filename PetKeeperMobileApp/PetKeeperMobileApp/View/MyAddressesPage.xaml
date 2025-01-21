@@ -22,96 +22,100 @@
 
     <ScrollView>
         <Grid 
-            RowDefinitions="40, Auto, Auto"
-            ColumnDefinitions="Auto, *"
-            Padding="20"
-            RowSpacing="20">
+                RowDefinitions="40, Auto, Auto"
+                ColumnDefinitions="Auto, *"
+                Padding="20"
+                RowSpacing="20">
 
             <ImageButton
-                HeightRequest="30"
-                Command="{Binding GoBackCommand}">
+                    HeightRequest="30"
+                    Command="{Binding GoBackCommand}">
                 <ImageButton.Source>
                     <FontImageSource
-                        FontFamily="FAS"
-                        Glyph="{StaticResource arrow-left}"
-                        Color="{StaticResource PrimaryDark}" />
+                            FontFamily="FAS"
+                            Glyph="{StaticResource arrow-left}"
+                            Color="{StaticResource PrimaryDark}" />
                 </ImageButton.Source>
             </ImageButton>
 
             <Label 
-                Grid.ColumnSpan="2"
-                Text="MOJE ADRESY"
-                Style="{StaticResource Headline}" />
-
-            <CollectionView
+                    Grid.ColumnSpan="2"
+                    Text="MOJE ADRESY"
+                    Style="{StaticResource Headline}" />
+            <VerticalStackLayout
                 Grid.Row="1"
-                Grid.ColumnSpan="2"
-                ItemsSource="{Binding Addresses}">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="{x:Type models:AddressInfo}">
-                        <Frame
-                            Padding="10"
-                            Margin="0, 0, 0, 20"
-                            CornerRadius="8">
-                            <Grid
-                                ColumnDefinitions="*, Auto">
-                                <StackLayout>
-                                    <HorizontalStackLayout>
-                                        <Label Text="Adres " 
-                                       Style="{StaticResource SubHeadline}"
-                                       FontAttributes="Bold" />
-                                        <Label Text="{Binding Index, Converter={StaticResource IndexToNumberConverter}}" 
-                                       Style="{StaticResource SubHeadline}"
-                                       FontAttributes="Bold" />
-                                    </HorizontalStackLayout>
-                                    <HorizontalStackLayout>
-                                        <Label Text="ul. " />
-                                        <Label Text="{Binding Address1}" />
-                                    </HorizontalStackLayout>
-                                    <Label Text="{Binding Address2}" />
-                                </StackLayout>
-                                <StackLayout
-                                    Grid.Column="1"
-                                    Margin="0, 5, -5, 0">
-                                    <ImageButton
-                                        Margin="0, 0, 0, 10"
-                                        HeightRequest="20"
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MyAddressesViewModel}}, Path=EditAddressCommand}"
-                                        CommandParameter="{Binding Id}">
-                                        <ImageButton.Source>
-                                            <FontImageSource
-                                                FontFamily="FAS"
-                                                Glyph="{StaticResource pen}"
-                                                Color="{StaticResource PrimaryDark}" />
-                                        </ImageButton.Source>
-                                    </ImageButton>
-                                    <ImageButton
-                                        IsVisible="{Binding Index, Converter={StaticResource IndexToVisibilityConverter}}"
-                                        HeightRequest="20"
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MyAddressesViewModel}}, Path=DeleteAddressCommand}"
-                                        CommandParameter="{Binding Id}">
-                                        <ImageButton.Source>
-                                            <FontImageSource
-                                                FontFamily="FAS"
-                                                Glyph="{StaticResource trash}"
-                                                Color="{StaticResource Tertiary}" />
-                                        </ImageButton.Source>
-                                    </ImageButton>
-                                </StackLayout>
-                            </Grid>
-                        </Frame>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-
+                Grid.ColumnSpan="2">
+                <templates:ErrorItem
+                    IsVisible="{Binding IsErrorVisible}"
+                    ButtonCommand="{Binding RefreshData}"
+                    ErrorException="{Binding Exception}" />
+                <CollectionView 
+                    ItemsSource="{Binding Addresses}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="{x:Type models:AddressInfo}">
+                            <Frame
+                                Padding="10"
+                                Margin="0, 0, 0, 20"
+                                CornerRadius="8">
+                                <Grid
+                                    ColumnDefinitions="*, Auto">
+                                    <StackLayout>
+                                        <HorizontalStackLayout>
+                                            <Label Text="Adres " 
+                                                Style="{StaticResource SubHeadline}"
+                                                FontAttributes="Bold" />
+                                            <Label Text="{Binding Index, Converter={StaticResource IndexToNumberConverter}}" 
+                                               Style="{StaticResource SubHeadline}"
+                                               FontAttributes="Bold" />
+                                        </HorizontalStackLayout>
+                                        <HorizontalStackLayout>
+                                            <Label Text="ul. " />
+                                            <Label Text="{Binding Address1}" />
+                                        </HorizontalStackLayout>
+                                        <Label Text="{Binding Address2}" />
+                                    </StackLayout>
+                                    <StackLayout
+                                        Grid.Column="1"
+                                        Margin="0, 5, -5, 0">
+                                        <ImageButton
+                                            Margin="0, 0, 0, 10"
+                                            HeightRequest="20"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MyAddressesViewModel}}, Path=EditAddressCommand}"
+                                            CommandParameter="{Binding Id}">
+                                            <ImageButton.Source>
+                                                <FontImageSource
+                                                    FontFamily="FAS"
+                                                    Glyph="{StaticResource pen}"
+                                                    Color="{StaticResource PrimaryDark}" />
+                                            </ImageButton.Source>
+                                        </ImageButton>
+                                        <ImageButton
+                                            IsVisible="{Binding Index, Converter={StaticResource IndexToVisibilityConverter}}"
+                                            HeightRequest="20"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MyAddressesViewModel}}, Path=DeleteAddressCommand}"
+                                            CommandParameter="{Binding Id}">
+                                            <ImageButton.Source>
+                                                <FontImageSource
+                                                    FontFamily="FAS"
+                                                    Glyph="{StaticResource trash}"
+                                                    Color="{StaticResource Tertiary}" />
+                                            </ImageButton.Source>
+                                        </ImageButton>
+                                    </StackLayout>
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
             <Button
-                Margin="0, -20, 0, 0"
-                Grid.Row="2"
-                Grid.ColumnSpan="2"
-                Style="{StaticResource PrimaryButton}"
-                Text="Dodaj adres"
-                IsVisible="{Binding IsCreateButtonVisible}"
-                Command="{Binding CreateAddressCommand}"/>
+                    Margin="0, -20, 0, 0"
+                    Grid.Row="2"
+                    Grid.ColumnSpan="2"
+                    Style="{StaticResource PrimaryButton}"
+                    Text="Dodaj adres"
+                    IsVisible="{Binding IsCreateButtonVisible}"
+                    Command="{Binding CreateAddressCommand}"/>
         </Grid>
     </ScrollView>
 </ContentPage>

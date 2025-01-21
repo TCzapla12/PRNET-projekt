@@ -75,6 +75,9 @@
 	  <MauiXaml Update="Templates\AnnouncementItem.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Templates\ErrorItem.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Templates\ValidationEditor.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

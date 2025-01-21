@@ -19,6 +19,7 @@ public partial class MyAddressesViewModel : ObservableObject
     public MyAddressesViewModel(IGrpcClient grpcClient) 
     {
         _grpcClient = grpcClient;
+        RefreshData = new RelayCommand(async () => { await LoadDataAsync(); });
     }
 
     [ObservableProperty]
@@ -26,6 +27,14 @@ public partial class MyAddressesViewModel : ObservableObject
 
     [ObservableProperty]
     private bool isCreateButtonVisible;
+
+    [ObservableProperty]
+    private bool isErrorVisible;
+
+    [ObservableProperty]
+    private Exception exception;
+
+    public RelayCommand RefreshData { get; }
 
     [RelayCommand]
     async Task GoBack()
@@ -56,7 +65,7 @@ public partial class MyAddressesViewModel : ObservableObject
         }
         catch (RpcException ex)
         {
-            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Status.Detail, new RelayCommand(async () =>
+            await Helpers.ShowConfirmationViewWithHandledCodes(ex, new RelayCommand(async () =>
             {
                 await LoadDataAsync();
             }));
@@ -73,25 +82,29 @@ public partial class MyAddressesViewModel : ObservableObject
 
     public async Task LoadDataAsync()
     {
+        var addressesList = new List<AddressInfo>();
         try
         {
             _addressesDto = await _grpcClient.GetAddresses();
             _addressesDto.OrderBy(a => a.IsPrimary ?? false);
-            var addressesList = new List<AddressInfo>();
+            
             for (int i = 0; i < _addressesDto.Count; i++)
             {
                 addressesList.Add(new AddressInfo(i, _addressesDto[i]));
             }
-            Addresses = new ObservableCollection<AddressInfo>(addressesList);
+            IsErrorVisible = false;
         }
         catch (RpcException ex)
         {
-            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Status.Detail, new RelayCommand(async () => {}));
+            IsErrorVisible = true;
+            Exception = ex;
         }
         catch (Exception ex)
         {
-            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Message, new RelayCommand(async () => {}));
+            IsErrorVisible = true;
+            Exception = ex;
         }
+        Addresses = new ObservableCollection<AddressInfo>(addressesList);
         IsCreateButtonVisible = Addresses.Count < 3;
     }
 }

@@ -26,8 +26,8 @@ namespace PetKeeperMobileApp
 
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<MainViewModel>();
-            builder.Services.AddSingleton<DashboardPage>();
-            builder.Services.AddSingleton<DashboardViewModel>();
+            builder.Services.AddTransient<DashboardPage>();
+            builder.Services.AddTransient<DashboardViewModel>();
 
             builder.Services.AddTransient<OwnerPage>();
             builder.Services.AddTransient<OwnerViewModel>();

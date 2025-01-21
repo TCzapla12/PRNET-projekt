@@ -112,7 +112,7 @@ public partial class CreateAnnouncementViewModel : ObservableObject
         }
         catch (RpcException ex)
         {
-            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Status.Detail, new RelayCommand(async () =>
+            await Helpers.ShowConfirmationViewWithHandledCodes(ex, new RelayCommand(async () =>
             {
                 await CreateAnnouncement(container);
             }));
