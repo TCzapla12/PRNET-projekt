@@ -30,8 +30,12 @@ namespace grpc_hello_world.Services
                 ownerId = request.OwnerId;
             var animalId = Guid.NewGuid();
 
+            byte[] photoBytes = request.Photo.ToByteArray();
+            if (!UserManagementService.IsPngOrJpg(photoBytes))
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Supplied photo is not PNG or JPG"));
+
             var userFileDir = Path.Combine(UserManagementService._fileDir, ownerId.ToString());
-            var photoFilePath = Path.Combine(userFileDir, animalId.ToString(), "photo.png");
+            var photoFilePath = Path.Combine(userFileDir, animalId.ToString(), "photo");
             Directory.CreateDirectory(Path.Combine(userFileDir, animalId.ToString()));
 
             var animal = new Animal
@@ -54,7 +58,7 @@ namespace grpc_hello_world.Services
                 throw new RpcException(new Status(StatusCode.AlreadyExists, e.Message));
             }
 
-            await File.WriteAllBytesAsync(photoFilePath, request.Photo.ToByteArray());
+            await File.WriteAllBytesAsync(photoFilePath, photoBytes);
 
             return new AnimalMinimal { Id = animal.Id.ToString(), OwnerId = ownerId };
         }
@@ -191,7 +195,7 @@ namespace grpc_hello_world.Services
                 if (property.Name == "Photo")
                 {
                     var userFileDir = Path.Combine(UserManagementService._fileDir, animal.OwnerId.ToString());
-                    var photoFilePath = Path.Combine(userFileDir, animal.Id.ToString(), "photo.png");
+                    var photoFilePath = Path.Combine(userFileDir, animal.Id.ToString(), "photo");
                     byte[] currentValueBytes = UserManagementService.PngSignature;
                     try
                     {
@@ -202,8 +206,8 @@ namespace grpc_hello_world.Services
                         throw new RpcException(new Status(StatusCode.DataLoss, "Animals is missing a photo"));
                     }
                     byte[] newValueBytes = request.Photo.ToByteArray();
-                    if (!UserManagementService.IsPng(newValueBytes))
-                        throw new RpcException(new Status(StatusCode.InvalidArgument, "Supplied photo is not a PNG"));
+                    if (!UserManagementService.IsPngOrJpg(newValueBytes))
+                        throw new RpcException(new Status(StatusCode.InvalidArgument, "Supplied photo is not a PNG or JPG"));
 
                     condition = !currentValueBytes.SequenceEqual(newValueBytes);
                     if (condition)

@@ -26,7 +26,14 @@ namespace grpc_hello_world.Services
         {
             /* override flag is needed because we get a user unauthenticated */
             User? user = await UserManagementService.GetUserAsync(request.UserId, context, _context, true);
-
+            if (!user.IsVerified && !user.IsAdmin)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User not verified yet. Please wait for ID verification"));
+            }
+            if (user.IsBanned)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User is banned"));
+            }
             if (UserManagementService.VerifyPassword(request.Password, user.PasswordHash))
             {
                 var token = GenerateJwtToken(user.Id.ToString(), user.Email, user.IsAdmin);
