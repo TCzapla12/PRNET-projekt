@@ -10,40 +10,38 @@
 
     <ScrollView>
         <Grid
-                RowDefinitions="Auto, Auto, Auto, Auto"
-                Padding="20"
-                RowSpacing="20">
+            RowDefinitions="Auto, Auto, Auto, Auto"
+            Padding="20"
+            RowSpacing="20">
             <Label 
-                    Text="WŁAŚCICIEL"
-                    Style="{StaticResource Headline}" />
+                Text="WŁAŚCICIEL"
+                Style="{StaticResource Headline}" />
             <Label
-                    Grid.Row="1"
-                    Text="Moje ogłoszenia"
-                    Style="{StaticResource SubHeadline}"
-                    HorizontalOptions="Start"/>
+                Grid.Row="1"
+                Text="Moje ogłoszenia"
+                Style="{StaticResource SubHeadline}"
+                HorizontalOptions="Start"/>
             <VerticalStackLayout
-                Grid.Row="2"
-                Grid.ColumnSpan="2">
+                Grid.Row="2">
                 <templates:ErrorItem
-                        IsVisible="{Binding IsErrorVisible}"
-                        ButtonCommand="{Binding RefreshData}"
-                        ErrorException="{Binding Exception}" />
+                    IsVisible="{Binding IsErrorVisible}"
+                    ButtonCommand="{Binding RefreshData}"
+                    ErrorException="{Binding Exception}" />
                 <CollectionView
                      ItemsSource="{Binding AnnouncementList}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="{x:Type models:AnnouncementInfo}">
-                            <templates:AnnouncementItem 
+                            <templates:AnnouncementItem
                                 Announcement="{Binding .}"/>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </VerticalStackLayout>
             <Button
-                    Margin="0, 0, 0, 0"
-                    Grid.Row="3"
-                    Style="{StaticResource OutlineButton}"
-                    Text="Dodaj ogłoszenie"
-                    Command="{Binding CreateAnnouncementCommand}" />
+                Grid.Row="3"
+                Style="{StaticResource OutlineButton}"
+                Text="Dodaj ogłoszenie"
+                Command="{Binding CreateAnnouncementCommand}" />
         </Grid>
     </ScrollView>
 </ContentPage>

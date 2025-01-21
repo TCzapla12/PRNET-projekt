@@ -5,7 +5,6 @@
              x:Name="ErrItem">
 
     <Frame
-        Margin="20, 20, 20, 0"
         CornerRadius="8"
         BackgroundColor="{StaticResource Tertiary}"
         BorderColor="{StaticResource Tertiary}" >
