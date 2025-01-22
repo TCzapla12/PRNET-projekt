@@ -15,13 +15,34 @@ public partial class CreateAnnouncementViewModel : ObservableObject
     private IGrpcClient _grpcClient;
     private List<AddressDto> _addressesDto;
     private List<AnimalDto> _animalsDto;
+    private AnnouncementInfo? _announcementInfo = null;
 
     public CreateAnnouncementViewModel(IGrpcClient grpcClient) 
     { 
         _grpcClient = grpcClient;
 
+        Title = "Nowe ogłoszenie";
+        ButtonText = "Dodaj";
+
         LoadDataAsync();
     }
+
+    public CreateAnnouncementViewModel(IGrpcClient grpcClient, AnnouncementInfo announcementInfo)
+    {
+        _grpcClient = grpcClient;
+        _announcementInfo = announcementInfo;
+
+        Title = "Edytuj ogłoszenie";
+        ButtonText = "Edytuj";
+
+        LoadDataWithAnnouncementAsync();
+    }
+
+    [ObservableProperty]
+    private string title;
+
+    [ObservableProperty]
+    private string buttonText;
 
     [ObservableProperty]
     private string profit;
@@ -45,7 +66,7 @@ public partial class CreateAnnouncementViewModel : ObservableObject
     private string address;
 
     [ObservableProperty]
-    private DateTime minimumDate = DateTime.Now;
+    private DateTime minimumDate = DateTime.Today;
 
     [ObservableProperty]
     private DateTime startTerm;
@@ -69,7 +90,7 @@ public partial class CreateAnnouncementViewModel : ObservableObject
     }
 
     [RelayCommand]
-    async Task CreateAnnouncement(object container)
+    async Task CreateEditAnnouncement(object container)
     {
         bool areAllFieldsValid = true;
         StartTerm = StartTerm.Add(StartTermTime);
@@ -92,19 +113,39 @@ public partial class CreateAnnouncementViewModel : ObservableObject
 
         try
         {
-            AnnouncementDto announcement = new()
+            var message = String.Empty;
+            if(_announcementInfo == null)
             {
-                AnimalId = _animalsDto[AnimalList.IndexOf(Animal)].Id!,
-                AddressId = _addressesDto[AddressList.IndexOf(Address)].Id!,
-                Profit = uint.Parse(this.Profit),
-                IsNegotiable = this.IsNegotiable,
-                Description = this.Description,
-                StartTerm = (ulong)new DateTimeOffset(this.StartTerm).ToUnixTimeSeconds(),
-                EndTerm = (ulong)new DateTimeOffset(this.EndTerm).ToUnixTimeSeconds(),
-                Status = StatusType.Created
-            };
-            var message = await _grpcClient.CreateAnnouncement(announcement);
-
+                AnnouncementDto announcement = new()
+                {
+                    AnimalId = _animalsDto[AnimalList.IndexOf(Animal)].Id!,
+                    AddressId = _addressesDto[AddressList.IndexOf(Address)].Id!,
+                    Profit = uint.Parse(this.Profit),
+                    IsNegotiable = this.IsNegotiable,
+                    Description = this.Description,
+                    StartTerm = (ulong)new DateTimeOffset(this.StartTerm).ToUnixTimeSeconds(),
+                    EndTerm = (ulong)new DateTimeOffset(this.EndTerm).ToUnixTimeSeconds(),
+                    Status = StatusType.Created
+                };
+                message = await _grpcClient.CreateAnnouncement(announcement);
+            }
+            else
+            {
+                AnnouncementDto announcement = new()
+                {
+                    Id = _announcementInfo.Id,
+                    AnimalId = _animalsDto[AnimalList.IndexOf(Animal)].Id!,
+                    AddressId = _addressesDto[AddressList.IndexOf(Address)].Id!,
+                    Profit = uint.Parse(this.Profit),
+                    IsNegotiable = this.IsNegotiable,
+                    Description = this.Description,
+                    StartTerm = (ulong)new DateTimeOffset(this.StartTerm).ToUnixTimeSeconds(),
+                    EndTerm = (ulong)new DateTimeOffset(this.EndTerm).ToUnixTimeSeconds(),
+                    Status = StatusType.Created
+                };
+                message = await _grpcClient.UpdateAnnouncement(announcement);
+            }
+            
             await Helpers.ShowConfirmationView(StatusIcon.Success, message, new RelayCommand(async () =>
             {
                 await ButtonAction();
@@ -114,14 +155,14 @@ public partial class CreateAnnouncementViewModel : ObservableObject
         {
             await Helpers.ShowConfirmationViewWithHandledCodes(ex, new RelayCommand(async () =>
             {
-                await CreateAnnouncement(container);
+                await CreateEditAnnouncement(container);
             }));
         }
         catch (Exception ex)
         {
             await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Message, new RelayCommand(async () =>
             {
-                await CreateAnnouncement(container);
+                await CreateEditAnnouncement(container);
             }));
         }
     }
@@ -155,5 +196,24 @@ public partial class CreateAnnouncementViewModel : ObservableObject
                 await LoadDataAsync();
             }));
         }
+    }
+
+    private async Task LoadDataWithAnnouncementAsync()
+    {
+        await LoadDataAsync();
+
+        Profit = _announcementInfo!.Profit.ToString();
+        IsNegotiable = _announcementInfo.IsNegotiable;
+        Animal = _announcementInfo.Animal;
+        Address = _announcementInfo.Address;
+        Description = _announcementInfo.Description!;
+        if (DateTimeOffset.FromUnixTimeSeconds((long)_announcementInfo.StartTerm).DateTime >= MinimumDate)
+            StartTerm = DateTimeOffset.FromUnixTimeSeconds((long)_announcementInfo.StartTerm).DateTime;
+        else StartTerm = DateTime.Today;
+        if (DateTimeOffset.FromUnixTimeSeconds((long)_announcementInfo.EndTerm).DateTime >= MinimumDate)
+            EndTerm = DateTimeOffset.FromUnixTimeSeconds((long)_announcementInfo.EndTerm).DateTime;
+        else EndTerm = DateTime.Today;
+        StartTermTime = DateTimeOffset.FromUnixTimeSeconds((long)_announcementInfo.StartTerm).TimeOfDay;
+        EndTermTime = DateTimeOffset.FromUnixTimeSeconds((long)_announcementInfo.EndTerm).TimeOfDay;
     }
 }

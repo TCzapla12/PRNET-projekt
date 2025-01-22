@@ -5,6 +5,7 @@ using PetKeeperMobileApp.Enums;
 using PetKeeperMobileApp.Models;
 using PetKeeperMobileApp.Services;
 using PetKeeperMobileApp.Utils;
+using PetKeeperMobileApp.View;
 using System.Collections.ObjectModel;
 
 namespace PetKeeperMobileApp.ViewModel;
@@ -91,10 +92,11 @@ public partial class SearchViewModel : ObservableObject
                     if(string.IsNullOrWhiteSpace(SearchText) || address.City.ToLower().Contains(SearchText.Trim().ToLower()))
                     {
                         var owner = await _grpcClient.GetUser(announcementDto.OwnerId);
+                        var animal = await _grpcClient.GetAnimal(announcementDto.AnimalId);
                         announcements.Add(new AnnouncementInfo
                         {
                             Id = announcementDto.Id,
-                            Animal = AnimalDto.AnimalToString(await _grpcClient.GetAnimal(announcementDto.AnimalId)),
+                            Animal = AnimalDto.AnimalToString(animal),
                             Profit = announcementDto.Profit,
                             IsNegotiable = announcementDto.IsNegotiable,
                             Description = announcementDto.Description,
@@ -102,7 +104,10 @@ public partial class SearchViewModel : ObservableObject
                             EndTerm = announcementDto.EndTerm,
                             Status = announcementDto.Status,
                             Address = AddressDto.AddressMinimalToString(address),
-                            Owner = owner.Username
+                            Owner = owner.Username,
+                            OwnerInfo = new UserInfo(owner),
+                            AnimalInfo = new AnimalInfo(animal),
+                            AddressInfo = new AddressInfo(address)
                         });
                     }
                 }
@@ -124,5 +129,12 @@ public partial class SearchViewModel : ObservableObject
             }));
         }
         AnnouncementList = new ObservableCollection<AnnouncementInfo>(announcements);
+    }
+
+    [RelayCommand]
+    async Task ShowAnnouncement(string id)
+    {
+        var showAnnouncementViewModel = new ShowAnnouncementViewModel(_grpcClient, AnnouncementList.Where(a => a.Id == id).First());
+        await Application.Current!.MainPage!.Navigation.PushModalAsync(new ShowAnnouncementPage(showAnnouncementViewModel));
     }
 }

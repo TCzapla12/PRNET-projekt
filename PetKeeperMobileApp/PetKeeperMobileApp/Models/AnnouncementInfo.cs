@@ -25,4 +25,10 @@ public class AnnouncementInfo
     public string? Owner { get; set; }
 
     public string? Keeper { get; set; }
+
+    public UserInfo? OwnerInfo { get; set; }
+
+    public AnimalInfo? AnimalInfo { get; set; }
+
+    public AddressInfo? AddressInfo { get; set; }
 }

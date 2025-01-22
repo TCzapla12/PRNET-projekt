@@ -1,8 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Grpc.Core;
+using PetKeeperMobileApp.Enums;
 using PetKeeperMobileApp.Models;
 using PetKeeperMobileApp.Services;
+using PetKeeperMobileApp.Utils;
 using PetKeeperMobileApp.View;
 using System.Collections.ObjectModel;
 
@@ -41,13 +43,33 @@ public partial class OwnerViewModel : ObservableObject
     [RelayCommand]
     async Task EditAnnouncement(string id)
     {
-        //Console.WriteLine(id);
+        var editAnnouncementViewModel = new CreateAnnouncementViewModel(_grpcClient, AnnouncementList.Where(a => a.Id == id).First());
+        await Application.Current!.MainPage!.Navigation.PushModalAsync(new CreateAnnouncementPage(editAnnouncementViewModel));
     }
 
     [RelayCommand]
     async Task DeleteAnnouncement(string id)
     {
-        //Console.WriteLine(id);
+        try
+        {
+            await _grpcClient.DeleteAnnouncement(id);
+            await LoadDataAsync();
+        }
+        catch (RpcException ex)
+        {
+            await Helpers.ShowConfirmationViewWithHandledCodes(ex, new RelayCommand(async () =>
+            {
+                await DeleteAnnouncement(id);
+            }));
+        }
+        catch (Exception ex)
+        {
+            await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Message, new RelayCommand(async () =>
+            {
+                await DeleteAnnouncement(id);
+            }));
+        }
+        await LoadDataAsync();
     }
 
     public async Task LoadDataAsync()

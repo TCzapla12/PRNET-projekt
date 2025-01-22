@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PetKeeperMobileApp.View.ShowAnnouncementPage"
+             xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             x:DataType="viewmodel:ShowAnnouncementViewModel"
+             Title="ShowAnnouncementPage">
+    
+    <ContentPage.Resources>
+        <x:String x:Key="xmark">&#xf00d;</x:String>
+    </ContentPage.Resources>
+    
+    <Grid
+        RowDefinitions="40, Auto, Auto, Auto, Auto, Auto, Auto, Auto, *"
+        ColumnDefinitions="Auto, *"
+        Padding="20"
+        RowSpacing="10">
+
+        <ImageButton
+            HeightRequest="30"
+            Command="{Binding ButtonActionCommand}">
+            <ImageButton.Source>
+                <FontImageSource
+                    FontFamily="FAS"
+                    Glyph="{StaticResource xmark}"
+                    Color="{StaticResource PrimaryDark}" />
+            </ImageButton.Source>
+        </ImageButton>
+
+        <Label
+            Grid.ColumnSpan="2"
+            Text="Ogłoszenie"
+            Style="{StaticResource Headline}" />
+
+        <HorizontalStackLayout 
+            Margin="0, 10, 0, 0"
+            Grid.Row="1"
+            Grid.ColumnSpan="2">
+            <Label
+                Text="{Binding Profit}"
+                Style="{StaticResource SubHeadline}"
+                FontAttributes="Bold"/>
+            <Label
+                Text=" zł"
+                Style="{StaticResource SubHeadline}"
+                FontAttributes="Bold"/>
+            <Label
+                IsVisible="{Binding IsNegotiable}"
+                Text=" (do negocjacji)"
+                Style="{StaticResource SubHeadline}"/>
+        </HorizontalStackLayout>
+
+        <HorizontalStackLayout
+            Grid.Row="2"
+            Grid.ColumnSpan="2">
+            <Label
+                Text="Status: "
+                FontAttributes="Bold" />
+            <Label 
+                Text="{Binding StatusIcon}"
+                TextColor="{Binding StatusColor}"
+                FontFamily="FAS"
+                Margin="0, 3, 0, 0" />
+            <Label Text=" (" />
+            <Label Text="{Binding StatusText}" />
+            <Label Text=")" />
+        </HorizontalStackLayout>
+
+        <HorizontalStackLayout
+            Grid.Row="3"
+            Grid.ColumnSpan="2">
+            <Label
+                Text="Opis: "
+                FontAttributes="Bold" />
+            <Label Text="{Binding Description}"/>
+        </HorizontalStackLayout>
+
+        <VerticalStackLayout
+            Grid.Row="4"
+            Grid.ColumnSpan="2">
+            <Label
+                Text="Zwierzę: "
+                FontAttributes="Bold" />
+            <Frame
+                 CornerRadius="8"
+                 WidthRequest="200"
+                 HeightRequest="200"
+                 Margin="0, 0, 0, 10">
+                <ImageButton
+                     WidthRequest="200"
+                     HeightRequest="200"
+                     Source="{Binding AnimalPhoto}" />
+            </Frame>
+            <Label 
+                Text="{Binding AnimalText}" HorizontalTextAlignment="Center"/>
+        </VerticalStackLayout>
+
+        <HorizontalStackLayout
+            Grid.Row="5"
+            Grid.ColumnSpan="2">
+            <Label
+                Text="Adres: "
+                FontAttributes="Bold" />
+            <Label Text="{Binding AddressText}"/>
+        </HorizontalStackLayout>
+
+        <VerticalStackLayout
+            Grid.Row="6"
+            Grid.ColumnSpan="2">
+            <Label
+                Text="Właściciel: "
+                FontAttributes="Bold" />
+            <Frame
+                 CornerRadius="100"
+                 WidthRequest="100"
+                 HeightRequest="100"
+                 Margin="0, 0, 0, 10">
+                <ImageButton
+                     WidthRequest="100"
+                     HeightRequest="100"
+                     Source="{Binding OwnerPhoto}" />
+            </Frame>
+            <Label 
+                Text="{Binding UserText}" HorizontalTextAlignment="Center"/>
+        </VerticalStackLayout>
+
+        <HorizontalStackLayout
+            Grid.Row="7"
+            Grid.ColumnSpan="2">
+            <Label
+                Text="Realizacja: "
+                FontAttributes="Bold" />
+            <Label Text="{Binding StartTerm}"/>
+            <Label Text=" - " />
+            <Label Text="{Binding EndTerm}"/>
+        </HorizontalStackLayout>
+
+        <Button
+            Grid.Row="8"
+            Grid.ColumnSpan="2"
+            VerticalOptions="End"
+            Style="{StaticResource PrimaryButton}"
+            Text="Zgłoś zainteresowanie"
+            Command="{Binding ChangeAnnouncementToPendingCommand}"/>
+    </Grid>
+</ContentPage>

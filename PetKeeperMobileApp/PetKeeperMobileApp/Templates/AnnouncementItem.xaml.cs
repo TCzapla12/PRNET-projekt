@@ -1,5 +1,6 @@
 using PetKeeperMobileApp.Enums;
 using PetKeeperMobileApp.Models;
+using PetKeeperMobileApp.Utils;
 
 namespace PetKeeperMobileApp.Templates;
 
@@ -51,7 +52,9 @@ public partial class AnnouncementItem : ContentView
         DescriptionLabel.Text = announcement.Description;
         StartTermLabel.Text = DateTimeOffset.FromUnixTimeSeconds((long)announcement.StartTerm).DateTime.ToString("dd.MM.yyyy HH:mm");
         EndTermLabel.Text = DateTimeOffset.FromUnixTimeSeconds((long)announcement.EndTerm).DateTime.ToString("dd.MM.yyyy HH:mm");
-        SetStatusInfo(announcement.Status);
+         
+        (StatusIconLabel.Text, StatusIconLabel.TextColor, StatusLabel.Text) = Helpers.GetStatusInfo(announcement.Status);
+
         AnimalLabel.Text = announcement.Animal;
         AddressLabel.Text = announcement.Address;
 
@@ -67,53 +70,5 @@ public partial class AnnouncementItem : ContentView
         {
             component.BindData(announcement);
         };
-    }
-
-    private void SetStatusInfo(StatusType status)
-    {
-        switch (status)
-        {
-            case StatusType.Created:
-                StatusIconLabel.Text = "\uf111";
-                StatusIconLabel.TextColor = Color.FromArgb("#064849");
-                StatusLabel.Text = "aktualne";
-                break;
-
-            case StatusType.Pending:
-                StatusIconLabel.Text = "\uf28b";
-                StatusIconLabel.TextColor = Color.FromArgb("#EF8159");
-                StatusLabel.Text = "z³o¿ono propozycjê";
-                break;
-
-            case StatusType.Accepted:
-                StatusIconLabel.Text = "\uf058";
-                StatusIconLabel.TextColor = Color.FromArgb("#064849");
-                StatusLabel.Text = "potwierdzone";
-                break;
-
-            case StatusType.Ongoing:
-                StatusIconLabel.Text = "\uf144";
-                StatusIconLabel.TextColor = Color.FromArgb("#064849");
-                StatusLabel.Text = "trwa";
-                break;
-
-            case StatusType.Finished:
-                StatusIconLabel.Text = "\uf28d";
-                StatusIconLabel.TextColor = Colors.Green;
-                StatusLabel.Text = "zakoñczone";
-                break;
-
-            case StatusType.Canceled:
-                StatusIconLabel.Text = "\uf057";
-                StatusIconLabel.TextColor = Colors.Red;
-                StatusLabel.Text = "anulowane";
-                break;
-
-            default:
-                StatusIconLabel.Text = "\uf059";
-                StatusIconLabel.TextColor = Colors.Red;
-                StatusLabel.Text = "nieznany status";
-                break;
-        }
     }
 }

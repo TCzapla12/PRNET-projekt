@@ -110,7 +110,6 @@ public partial class EditAnimalViewModel : ObservableObject
 
         try
         {
-            AnimalType type = Helpers.GetEnumFromDescription<AnimalType>(this.AnimalType);
             var message = String.Empty;
             if (_animalDto == null)
             {

@@ -65,14 +65,14 @@ public partial class MyPetsViewModel : ObservableObject
         {
             await Helpers.ShowConfirmationViewWithHandledCodes(ex, new RelayCommand(async () =>
             {
-                await LoadDataAsync();
+                await DeleteAnimal(id);
             }));
         }
         catch (Exception ex)
         {
             await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Message, new RelayCommand(async () =>
             {
-                await LoadDataAsync();
+                await DeleteAnimal(id);
             }));
         }
         await LoadDataAsync();

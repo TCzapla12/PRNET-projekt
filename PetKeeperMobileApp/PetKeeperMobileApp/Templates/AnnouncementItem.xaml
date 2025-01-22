@@ -101,5 +101,10 @@
                 </ImageButton>
             </StackLayout>
         </Grid>
+        <Frame.GestureRecognizers>
+            <TapGestureRecognizer
+                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:SearchViewModel}}, Path=ShowAnnouncementCommand}"
+                CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}"/>
+        </Frame.GestureRecognizers>
     </Frame>
 </ContentView>

@@ -67,14 +67,14 @@ public partial class MyAddressesViewModel : ObservableObject
         {
             await Helpers.ShowConfirmationViewWithHandledCodes(ex, new RelayCommand(async () =>
             {
-                await LoadDataAsync();
+                await DeleteAddress(id);
             }));
         }
         catch (Exception ex)
         {
             await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Message, new RelayCommand(async () =>
             {
-                await LoadDataAsync();
+                await DeleteAddress(id);
             }));
         }
         await LoadDataAsync();

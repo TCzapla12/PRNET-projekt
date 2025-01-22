@@ -27,7 +27,7 @@ public class Helpers
             await Helpers.ShowConfirmationView(StatusIcon.Error, Wordings.LOGOUT_DESCRIPTION, new RelayCommand(async () => { await Helpers.Logout(); }), Wordings.LOGOUT);
         else
             await Helpers.ShowConfirmationView(StatusIcon.Error, exception.Status.Detail, command);
-    }   
+    }
 
     public static ImageSource BytesToImage(byte[] bytes, string defaultImage = "question.png")
     {
@@ -50,7 +50,7 @@ public class Helpers
             byte[] bytesAvailable = new byte[stream.Length];
             stream.Read(bytesAvailable, 0, bytesAvailable.Length);
             return bytesAvailable;
-        }   
+        }
     }
 
     public static ImageSource AnimalBytesToImage(byte[] bytes, AnimalType type) => type switch
@@ -61,7 +61,7 @@ public class Helpers
         _ => Helpers.BytesToImage(bytes),
     };
 
-    public static async Task<byte[]> CropImage(string imagePath, int  width, int height)
+    public static async Task<byte[]> CropImage(string imagePath, int width, int height)
     {
         using var originalImage = SKBitmap.Decode(imagePath);
 
@@ -95,19 +95,31 @@ public class Helpers
     public static TEnum GetEnumFromDescription<TEnum>(string description) where TEnum : Enum
     {
         var enumType = typeof(TEnum);
-        
+
         foreach (var field in enumType.GetFields())
         {
             var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
-            
+
             if (attribute != null && attribute.Description == description)
             {
                 return (TEnum)field.GetValue(null);
             }
         }
-        
+
         throw new ArgumentException();
     }
+
+    public static (string, Color, string) GetStatusInfo(StatusType status) => 
+        status switch
+        {
+            StatusType.Created => ("\uf111", Color.FromArgb("#064849"), "aktualne"),
+            StatusType.Pending => ("\uf28b", Color.FromArgb("#EF8159"), "złożono propozycję"),
+            StatusType.Accepted => ("\uf058", Color.FromArgb("#064849"), "potwierdzone"),
+            StatusType.Ongoing => ("\uf144", Color.FromArgb("#064849"), "trwa"),
+            StatusType.Finished => ("\uf28d", Colors.Green, "zakończone"),
+            StatusType.Canceled => ("\uf057", Colors.Red, "anulowane"),
+            _ => ("\uf059", Colors.Red, "nieznany status"),
+        };
 
     public static async Task Logout()
     {
