@@ -28,6 +28,8 @@ public class AnnouncementInfo
 
     public UserInfo? OwnerInfo { get; set; }
 
+    public UserInfo? KeeperInfo { get; set; }
+
     public AnimalInfo? AnimalInfo { get; set; }
 
     public AddressInfo? AddressInfo { get; set; }

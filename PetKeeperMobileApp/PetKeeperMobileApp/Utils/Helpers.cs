@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Grpc.Core;
 using PetKeeperMobileApp.Enums;
+using PetKeeperMobileApp.Models;
 using PetKeeperMobileApp.View;
 using PetKeeperMobileApp.ViewModel;
 using SkiaSharp;
@@ -113,13 +114,19 @@ public class Helpers
         status switch
         {
             StatusType.Created => ("\uf111", Color.FromArgb("#064849"), "aktualne"),
-            StatusType.Pending => ("\uf28b", Color.FromArgb("#EF8159"), "złożono propozycję"),
+            StatusType.Pending => ("\uf28b", Color.FromArgb("#EF8159"), "oczekiwanie"),
             StatusType.Accepted => ("\uf058", Color.FromArgb("#064849"), "potwierdzone"),
-            StatusType.Ongoing => ("\uf144", Color.FromArgb("#064849"), "trwa"),
+            StatusType.Ongoing => ("\uf144", Color.FromArgb("#A2CCB7"), "trwa"),
             StatusType.Finished => ("\uf28d", Colors.Green, "zakończone"),
             StatusType.Canceled => ("\uf057", Colors.Red, "anulowane"),
             _ => ("\uf059", Colors.Red, "nieznany status"),
         };
+
+    public static List<AnnouncementInfo> SortAnnouncements(List<AnnouncementInfo> announcements)
+    {
+        var customOrder = new[] { StatusType.Ongoing, StatusType.Pending, StatusType.Created, StatusType.Finished, StatusType.Canceled };
+        return announcements.OrderBy(a => Array.IndexOf(customOrder, a.Status)).ToList();
+    }
 
     public static async Task Logout()
     {

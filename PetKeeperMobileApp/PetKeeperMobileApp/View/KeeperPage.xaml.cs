@@ -9,4 +9,11 @@ public partial class KeeperPage : ContentPage
 		InitializeComponent();
 		BindingContext = vm;
 	}
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        if (BindingContext is KeeperViewModel vm)
+            _ = vm.LoadDataAsync();
+    }
 }

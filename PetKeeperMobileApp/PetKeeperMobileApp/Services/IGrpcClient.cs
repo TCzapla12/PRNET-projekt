@@ -43,11 +43,13 @@ public interface IGrpcClient
     #region Announcement
     Task<List<AnnouncementDto>> GetUserAnnouncements();
 
-    Task<List<AnnouncementDto>> GetAnnouncements(int? minValue = null, int? maxValue = null, DateTime? startTerm = null, DateTime? endTerm = null);
+    Task<List<AnnouncementDto>> GetAnnouncements(int? minValue = null, int? maxValue = null, DateTime? startTerm = null, DateTime? endTerm = null, string? keeperId = null);
 
     Task<string> CreateAnnouncement(AnnouncementDto announcementDto);
 
     Task<string> UpdateAnnouncement(AnnouncementDto announcementDto);
+
+    Task<string> UpdateAnnouncementStatus(UpdateAnnouncementDto announcementUpdateDto);
 
     Task<string> DeleteAnnouncement(string id);
     #endregion

@@ -208,7 +208,8 @@ public class MockGrpcClient : IGrpcClient
             ];
     }
 
-    public async Task<List<AnnouncementDto>> GetAnnouncements(int? minValue = null, int? maxValue = null, DateTime? startTerm = null, DateTime? endTerm = null)
+    public async Task<List<AnnouncementDto>> GetAnnouncements(int? minValue = null, int? maxValue = null, 
+        DateTime? startTerm = null, DateTime? endTerm = null, string? keeperId = null)
     {
         return [
             new AnnouncementDto() {
@@ -297,6 +298,11 @@ public class MockGrpcClient : IGrpcClient
     }
 
     public async Task<string> UpdateAnnouncement(AnnouncementDto announcementDto)
+    {
+        return Wordings.SUCCESS;
+    }
+
+    public async Task<string> UpdateAnnouncementStatus(UpdateAnnouncementDto announcementUpdateDto)
     {
         return Wordings.SUCCESS;
     }

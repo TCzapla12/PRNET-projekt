@@ -58,10 +58,18 @@ public partial class AnnouncementItem : ContentView
         AnimalLabel.Text = announcement.Animal;
         AddressLabel.Text = announcement.Address;
 
-        OwnerStack.IsVisible = !string.IsNullOrEmpty(announcement.Owner);
-        OwnerLabel.Text = announcement.Owner;
-
-        EditStack.IsVisible = announcement.Status == StatusType.Created && IsOwnerView;
+        if (IsOwnerView)
+        {
+            EditStack.IsVisible = announcement.Status == StatusType.Created;
+            PendingStack.IsVisible = announcement.Status == StatusType.Pending;
+            KeeperStack.IsVisible = !string.IsNullOrEmpty(announcement.Keeper);
+            KeeperLabel.Text = announcement.Keeper;
+        }
+        else
+        {
+            OwnerStack.IsVisible = true;
+            OwnerLabel.Text = announcement.Owner;
+        }
     }
 
     private static void OnAnnouncementChanged(BindableObject bindable, object oldValue, object newValue)

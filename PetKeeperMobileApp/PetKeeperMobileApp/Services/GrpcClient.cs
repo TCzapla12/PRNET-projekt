@@ -298,7 +298,7 @@ public class GrpcClient : IGrpcClient
         return announcements;
     }
 
-    public async Task<List<AnnouncementDto>> GetAnnouncements(int? minValue = null, int? maxValue = null, DateTime? startTerm = null, DateTime? endTerm = null)
+    public async Task<List<AnnouncementDto>> GetAnnouncements(int? minValue = null, int? maxValue = null, DateTime? startTerm = null, DateTime? endTerm = null, string? keeperId = null)
     {
         var announcements = new List<AnnouncementDto>();
         var announcementParams = new AnnouncementGet();
@@ -306,6 +306,7 @@ public class GrpcClient : IGrpcClient
         if (maxValue != null) announcementParams.KeeperProfitMore = (uint)maxValue;
         if (startTerm != null) announcementParams.StartTermAfter = (ulong)new DateTimeOffset((DateTime)startTerm).ToUnixTimeSeconds();
         if (endTerm != null) announcementParams.EndTermBefore = (ulong)new DateTimeOffset((DateTime)endTerm).ToUnixTimeSeconds();
+        if (keeperId != null) announcementParams.KeeperId = keeperId;
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AnnouncementService.AnnouncementServiceClient(channel);
         var reply = await client.GetAnnouncementsAsync(announcementParams, await Storage.GetMetadata());
@@ -364,6 +365,21 @@ public class GrpcClient : IGrpcClient
             Status = announcementDto.Status.ToString().ToLower(),
             AddressId = announcementDto.AddressId
         };
+        var reply = await client.UpdateAnnouncementAsync(announcement, await Storage.GetMetadata());
+        return Wordings.SUCCESS;
+    }
+
+    public async Task<string> UpdateAnnouncementStatus(UpdateAnnouncementDto announcementUpdateDto)
+    {
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new AnnouncementService.AnnouncementServiceClient(channel);
+        AnnouncementUpdate announcement = new()
+        {
+            Id = announcementUpdateDto.Id,
+            Status = announcementUpdateDto.Status.ToString().ToLower(),
+        };
+        if (announcementUpdateDto.KeeperId != null)
+            announcement.KeeperId = announcementUpdateDto.KeeperId;
         var reply = await client.UpdateAnnouncementAsync(announcement, await Storage.GetMetadata());
         return Wordings.SUCCESS;
     }

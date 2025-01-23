@@ -18,7 +18,8 @@
             <Label 
                 x:Name="DescriptionLabel"
                 Grid.Row="1"/>
-            <Button 
+            <Button
+                x:Name="RefreshButton"
                 Grid.Column="1"
                 Grid.RowSpan="2"
                 HorizontalOptions="End"

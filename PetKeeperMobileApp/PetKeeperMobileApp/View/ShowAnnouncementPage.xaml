@@ -108,7 +108,7 @@
             Grid.Row="6"
             Grid.ColumnSpan="2">
             <Label
-                Text="Właściciel: "
+                Text="{Binding UserLabelText}"
                 FontAttributes="Bold" />
             <Frame
                  CornerRadius="100"
@@ -118,7 +118,7 @@
                 <ImageButton
                      WidthRequest="100"
                      HeightRequest="100"
-                     Source="{Binding OwnerPhoto}" />
+                     Source="{Binding UserPhoto}" />
             </Frame>
             <Label 
                 Text="{Binding UserText}" HorizontalTextAlignment="Center"/>
@@ -136,11 +136,37 @@
         </HorizontalStackLayout>
 
         <Button
+            IsVisible="{Binding IsCreatedButtonVisible}"
             Grid.Row="8"
             Grid.ColumnSpan="2"
             VerticalOptions="End"
             Style="{StaticResource PrimaryButton}"
-            Text="Zgłoś zainteresowanie"
+            Text="Zaopiekuj się"
             Command="{Binding ChangeAnnouncementToPendingCommand}"/>
+
+        <Grid
+            ColumnDefinitions="*, *"
+            ColumnSpacing="10"
+            Grid.Row="8"
+            Grid.ColumnSpan="2"
+            VerticalOptions="End"
+            IsVisible="{Binding IsPendingButtonVisible}">
+            <Button
+                
+                Style="{StaticResource PrimaryButton}"
+                BackgroundColor="{StaticResource Primary}"
+                TextColor="Black"
+                Text="Rozpocznij"
+                Command="{Binding StartAnnouncementCommand}"
+                CommandParameter="{Binding AnnId}"/>
+            <Button
+                Grid.Column="1"
+                Style="{StaticResource PrimaryButton}"
+                BackgroundColor="{StaticResource Tertiary}"
+                TextColor="Black"
+                Text="Odrzuć"
+                Command="{Binding RejectAnnouncementCommand}"
+                CommandParameter="{Binding AnnId}"/>
+        </Grid>
     </Grid>
 </ContentPage>

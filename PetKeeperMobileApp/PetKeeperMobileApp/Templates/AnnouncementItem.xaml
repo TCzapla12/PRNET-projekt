@@ -8,6 +8,9 @@
     <ContentView.Resources>
         <x:String x:Key="pen">&#xf304;</x:String>
         <x:String x:Key="trash">&#xf1f8;</x:String>
+        <x:String x:Key="info">&#xf129;</x:String>
+        <x:String x:Key="start">&#xf04b;</x:String>
+        <x:String x:Key="reject">&#xf00d;</x:String>
     </ContentView.Resources>
 
     <Frame
@@ -43,13 +46,18 @@
                     <Label x:Name="StatusLabel" />
                     <Label Text=")" />
                 </HorizontalStackLayout>
-                <VerticalStackLayout x:Name="OwnerStack">
+                <VerticalStackLayout x:Name="OwnerStack" IsVisible="False">
                     <Label
                         Text="Właściciel: "
                         FontAttributes="Bold" />
                     <Label x:Name="OwnerLabel" />
                 </VerticalStackLayout>
-                
+                <VerticalStackLayout x:Name="KeeperStack" IsVisible="False">
+                    <Label
+                        Text="Opiekun: "
+                        FontAttributes="Bold" />
+                    <Label x:Name="KeeperLabel" />
+                </VerticalStackLayout>
                 <Label
                     Text="Opis:"
                     FontAttributes="Bold" />
@@ -77,7 +85,7 @@
                 Grid.Column="1"
                 Margin="0, 5, -5, 0">
                 <ImageButton
-                    Margin="0, 0, 0, 10"
+                    Margin="0, 0, 0, 25"
                     HeightRequest="20"
                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:OwnerViewModel}}, Path=EditAnnouncementCommand}"
                     CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}">
@@ -100,10 +108,54 @@
                     </ImageButton.Source>
                 </ImageButton>
             </StackLayout>
+            <StackLayout
+                x:Name="PendingStack"
+                IsVisible="False"
+                Grid.Column="1"
+                Margin="0, 5, -5, 0">
+                <ImageButton
+                    Margin="0, 0, 0, 20"
+                    HeightRequest="25"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:OwnerViewModel}}, Path=ShowAnnouncementCommand}"
+                    CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}">
+                    <ImageButton.Source>
+                        <FontImageSource
+                            FontFamily="FAS"
+                            Glyph="{StaticResource info}"
+                            Color="{StaticResource PrimaryDark}" />
+                    </ImageButton.Source>
+                </ImageButton>
+                <ImageButton
+                    Margin="0, 0, 0, 20"
+                    HeightRequest="25"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:OwnerViewModel}}, Path=StartAnnouncementCommand}"
+                    CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}">
+                    <ImageButton.Source>
+                        <FontImageSource
+                            FontFamily="FAS"
+                            Glyph="{StaticResource start}"
+                            Color="{StaticResource Primary}" />
+                    </ImageButton.Source>
+                </ImageButton>
+                <ImageButton
+                    HeightRequest="30"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:OwnerViewModel}}, Path=RejectAnnouncementCommand}"
+                    CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}">
+                    <ImageButton.Source>
+                        <FontImageSource
+                            FontFamily="FAS"
+                            Glyph="{StaticResource reject}"
+                            Color="{StaticResource Tertiary}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </StackLayout>
         </Grid>
         <Frame.GestureRecognizers>
             <TapGestureRecognizer
                 Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:SearchViewModel}}, Path=ShowAnnouncementCommand}"
+                CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}"/>
+            <TapGestureRecognizer
+                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:KeeperViewModel}}, Path=ShowAnnouncementCommand}"
                 CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}"/>
         </Frame.GestureRecognizers>
     </Frame>

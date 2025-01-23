@@ -20,7 +20,7 @@
                 Grid.Row="1"
                 Text="Moje ogłoszenia"
                 Style="{StaticResource SubHeadline}"
-                HorizontalOptions="Start"/>
+                HorizontalOptions="Start" />
             <VerticalStackLayout
                 Grid.Row="2">
                 <templates:ErrorItem
