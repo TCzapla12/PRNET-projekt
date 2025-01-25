@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS announcements (
     started_date BIGINT, -- Timestamp kiedy rzeczywiscie zwierze zostanie oddane
     finished_date BIGINT, -- Timestamp kiedy rzeczywiscie zwierze zostanie zwrocone
     
-    status TEXT NOT NULL CHECK (status IN ('created', 'pending', 'accepted', 'ongoing', 'finished', 'canceled')),
+    status TEXT NOT NULL CHECK (status IN ('created', 'pending', 'ongoing', 'finished', 'canceled')),
 
     address_id UUID REFERENCES addresses(id) ON DELETE CASCADE  -- 
 );
