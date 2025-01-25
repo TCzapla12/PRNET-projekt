@@ -23,7 +23,8 @@ update_requests = [
         id=announcement_ids[0],  # Belongs to user[1]
         keeper_profit=450,
         is_negotiable=False,
-        address_id=secondary_address_ids[1]
+        address_id=secondary_address_ids[1],
+        keeper_id=user_ids[0]
     ),
     user_pb2.AnnouncementUpdate(  # Attempt updating other person's announcement (should fail)
         id=announcement_ids[1],  # Belongs to user[2]
