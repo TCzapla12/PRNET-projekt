@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Grpc.Core;
+using PetKeeperMobileApp.Enums;
 using PetKeeperMobileApp.Models;
 using PetKeeperMobileApp.Services;
 using PetKeeperMobileApp.Utils;
@@ -44,6 +45,18 @@ public partial class KeeperViewModel : ObservableObject
         await Application.Current!.MainPage!.Navigation.PushModalAsync(new ShowAnnouncementPage(showAnnouncementViewModel));
     }
 
+    [RelayCommand]
+    async Task GoToFinishedAnnouncements()
+    {
+        await Shell.Current.GoToAsync(nameof(ShowFinalAnnouncementsPage) + "?IsFinishedView=true");
+    }
+
+    [RelayCommand]
+    async Task GoToCanceledAnnouncements()
+    {
+        await Shell.Current.GoToAsync(nameof(ShowFinalAnnouncementsPage));
+    }
+
     public async Task LoadDataAsync()
     {
         var announcements = new List<AnnouncementInfo>();
@@ -55,7 +68,8 @@ public partial class KeeperViewModel : ObservableObject
             foreach (AnnouncementDto announcementDto in _announcementsDto)
             {
                 //if(announcementDto.Status != Enums.StatusType.Created)
-                if (announcementDto.Status != Enums.StatusType.Created && announcementDto.KeeperId == await Storage.GetUserId())
+                if (announcementDto.Status != StatusType.Created && announcementDto.Status != StatusType.Finished &&
+                    announcementDto.Status != StatusType.Canceled && announcementDto.KeeperId == await Storage.GetUserId())
                 {
                     var address = await _grpcClient.GetAddress(announcementDto.AddressId); 
                     var owner = await _grpcClient.GetUser(announcementDto.OwnerId);

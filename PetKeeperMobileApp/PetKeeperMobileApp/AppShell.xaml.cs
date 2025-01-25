@@ -7,6 +7,7 @@ namespace PetKeeperMobileApp
         public AppShell()
         {
             InitializeComponent();
+
             Routing.RegisterRoute(nameof(ForgotPasswordPage), typeof(ForgotPasswordPage));
             Routing.RegisterRoute(nameof(ConfirmationPage), typeof(ConfirmationPage));
             Routing.RegisterRoute(nameof(RegistrationPage), typeof(RegistrationPage));
@@ -17,6 +18,7 @@ namespace PetKeeperMobileApp
             Routing.RegisterRoute(nameof(EditAnimalPage), typeof(EditAnimalPage));
             Routing.RegisterRoute(nameof(SearchPage), typeof(SearchPage));
             Routing.RegisterRoute(nameof(ShowAnnouncementPage), typeof(ShowAnnouncementPage));
+            Routing.RegisterRoute(nameof(ShowFinalAnnouncementsPage), typeof(ShowFinalAnnouncementsPage));
         }
 
         protected override void OnNavigating(ShellNavigatingEventArgs args)

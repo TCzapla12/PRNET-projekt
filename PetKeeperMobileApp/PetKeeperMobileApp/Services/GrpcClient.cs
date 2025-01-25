@@ -272,12 +272,17 @@ public class GrpcClient : IGrpcClient
     #endregion
 
     #region Announcement
-    public async Task<List<AnnouncementDto>> GetUserAnnouncements()
+    public async Task<List<AnnouncementDto>> GetUserAnnouncements(StatusType? status = null)
     {
         var announcements = new List<AnnouncementDto>();
+        var announcementParams = new AnnouncementGet()
+        {
+            AuthorId = await Storage.GetUserId()
+        };
+        if (status != null) announcementParams.Status = status.ToString()!.ToLower();
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AnnouncementService.AnnouncementServiceClient(channel);
-        var reply = await client.GetAnnouncementsAsync(new AnnouncementGet { AuthorId = await Storage.GetUserId() }, await Storage.GetMetadata());
+        var reply = await client.GetAnnouncementsAsync(announcementParams, await Storage.GetMetadata());
         foreach (var announcement in reply.Announcements)
         {
             announcements.Add(new AnnouncementDto()
@@ -298,7 +303,8 @@ public class GrpcClient : IGrpcClient
         return announcements;
     }
 
-    public async Task<List<AnnouncementDto>> GetAnnouncements(int? minValue = null, int? maxValue = null, DateTime? startTerm = null, DateTime? endTerm = null, string? keeperId = null)
+    public async Task<List<AnnouncementDto>> GetAnnouncements(int? minValue = null, int? maxValue = null, 
+        DateTime? startTerm = null, DateTime? endTerm = null, string? keeperId = null, StatusType? status = null)
     {
         var announcements = new List<AnnouncementDto>();
         var announcementParams = new AnnouncementGet();
@@ -307,6 +313,7 @@ public class GrpcClient : IGrpcClient
         if (startTerm != null) announcementParams.StartTermAfter = (ulong)new DateTimeOffset((DateTime)startTerm).ToUnixTimeSeconds();
         if (endTerm != null) announcementParams.EndTermBefore = (ulong)new DateTimeOffset((DateTime)endTerm).ToUnixTimeSeconds();
         if (keeperId != null) announcementParams.KeeperId = keeperId;
+        if (status != null) announcementParams.Status = status.ToString()!.ToLower();
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AnnouncementService.AnnouncementServiceClient(channel);
         var reply = await client.GetAnnouncementsAsync(announcementParams, await Storage.GetMetadata());

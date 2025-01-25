@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PetKeeperMobileApp.Templates.AnnouncementShort"
+             xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             x:Name="AnnShort">
+
+    <ContentView.Resources>
+        <x:String x:Key="finish">&#xf04d;</x:String>
+        <x:String x:Key="cancel">&#xf05e;</x:String>
+    </ContentView.Resources>
+    
+    <Frame
+        Padding="10"
+        Margin="0, 0, 0, 20"
+        CornerRadius="8">
+        <Grid
+            ColumnDefinitions="*, Auto" >
+            <Image
+                Grid.ColumnSpan="2"
+                Opacity="0.15"
+                Margin="100, 0, 0, 0"
+                x:Name="TypeImage"
+                HeightRequest="100">
+            </Image>
+            <StackLayout>
+                <HorizontalStackLayout>
+                    <Label
+                        x:Name="ProfitLabel"
+                        Style="{StaticResource SubHeadline}"
+                        FontAttributes="Bold"/>
+                    <Label
+                        Text=" zł"
+                        Style="{StaticResource SubHeadline}"
+                        FontAttributes="Bold"/>
+                    <Label
+                        x:Name="NegotiableLabel"
+                        Text=" (do negocjacji)"
+                        Style="{StaticResource SubHeadline}"/>
+                </HorizontalStackLayout>
+                <Label
+                    Text="Realizacja: "
+                    FontAttributes="Bold" />
+                <HorizontalStackLayout>
+                    <Label x:Name="StartTermLabel"/>
+                    <Label Text=" - " />
+                    <Label x:Name="EndTermLabel"/>
+                </HorizontalStackLayout>
+                <Label
+                    Text="Adres: "
+                    FontAttributes="Bold" />
+                <Label x:Name="AddressLabel"/>
+            </StackLayout>
+            <StackLayout
+                x:Name="OngoingStack"
+                IsVisible="False"
+                Grid.Column="1"
+                Margin="0, 5, -5, 0">
+                <ImageButton
+                    Margin="0, 0, 0, 20"
+                    HeightRequest="25"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:DashboardViewModel}}, Path=FinishAnnouncementCommand}"
+                    CommandParameter="{Binding AnnId, Source={x:Reference AnnShort }}">
+                    <ImageButton.Source>
+                        <FontImageSource
+                            FontFamily="FAS"
+                            Glyph="{StaticResource finish}"
+                            Color="{StaticResource PrimaryDark}" />
+                    </ImageButton.Source>
+                </ImageButton>
+                <ImageButton
+                    HeightRequest="20"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:DashboardViewModel}}, Path=CancelAnnouncementCommand}"
+                    CommandParameter="{Binding AnnId, Source={x:Reference AnnShort }}">
+                    <ImageButton.Source>
+                        <FontImageSource
+                            FontFamily="FAS"
+                            Glyph="{StaticResource cancel}"
+                            Color="{StaticResource Tertiary}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </StackLayout>
+        </Grid>
+
+        <Frame.GestureRecognizers>
+            <TapGestureRecognizer
+                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:DashboardViewModel}}, Path=ShowAnnouncementCommand}"
+                CommandParameter="{Binding AnnId, Source={x:Reference AnnShort }}"/>
+        </Frame.GestureRecognizers>
+    </Frame>
+</ContentView>

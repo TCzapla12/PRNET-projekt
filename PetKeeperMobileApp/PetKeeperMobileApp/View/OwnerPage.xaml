@@ -38,11 +38,26 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </VerticalStackLayout>
-            <Button
+            <Grid
                 Grid.Row="3"
-                Style="{StaticResource OutlineButton}"
-                Text="Dodaj ogłoszenie"
-                Command="{Binding CreateAnnouncementCommand}" />
+                RowDefinitions="Auto, Auto, *"
+                RowSpacing="10">
+                <Button
+                    Style="{StaticResource OutlineButton}"
+                    Text="Dodaj ogłoszenie"
+                    Command="{Binding CreateAnnouncementCommand}" />
+                <Button
+                    Grid.Row="1"
+                    Style="{StaticResource OutlineButton}"
+                    Text="Zakończone"
+                    Command="{Binding GoToFinishedAnnouncementsCommand}" />
+                <Button
+                    Grid.Row="2"
+                    Style="{StaticResource OutlineButton}"
+                    Text="Anulowane"
+                    Command="{Binding GoToCanceledAnnouncementsCommand}" />
+            </Grid>
+            
         </Grid>
     </ScrollView>
 </ContentPage>

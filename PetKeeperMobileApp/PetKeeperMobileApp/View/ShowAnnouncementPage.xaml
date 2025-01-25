@@ -106,7 +106,8 @@
 
         <VerticalStackLayout
             Grid.Row="6"
-            Grid.ColumnSpan="2">
+            Grid.ColumnSpan="2"
+            IsVisible="{Binding IsNotCreatedStatus}">
             <Label
                 Text="{Binding UserLabelText}"
                 FontAttributes="Bold" />
@@ -136,13 +137,22 @@
         </HorizontalStackLayout>
 
         <Button
-            IsVisible="{Binding IsCreatedButtonVisible}"
+            IsVisible="{Binding IsKeeperCreatedButtonVisible}"
             Grid.Row="8"
             Grid.ColumnSpan="2"
             VerticalOptions="End"
             Style="{StaticResource PrimaryButton}"
             Text="Zaopiekuj się"
-            Command="{Binding ChangeAnnouncementToPendingCommand}"/>
+            Command="{Binding ChangeAnnouncementToPendingCommand}" />
+
+        <Button
+            IsVisible="{Binding IsKeeperPendingButtonVisible}"
+            Grid.Row="8"
+            Grid.ColumnSpan="2"
+            VerticalOptions="End"
+            Style="{StaticResource PrimaryButton}"
+            Text="Odwołaj opiekę"
+            Command="{Binding ChangeAnnouncementToCreatedCommand}" />
 
         <Grid
             ColumnDefinitions="*, *"
@@ -150,23 +160,58 @@
             Grid.Row="8"
             Grid.ColumnSpan="2"
             VerticalOptions="End"
-            IsVisible="{Binding IsPendingButtonVisible}">
+            IsVisible="{Binding IsOwnerCreatedButtonVisible}">
             <Button
-                
                 Style="{StaticResource PrimaryButton}"
-                BackgroundColor="{StaticResource Primary}"
-                TextColor="Black"
-                Text="Rozpocznij"
-                Command="{Binding StartAnnouncementCommand}"
-                CommandParameter="{Binding AnnId}"/>
+                BackgroundColor="{StaticResource PrimaryDark}"
+                Text="Edytuj"
+                Command="{Binding EditAnnouncementCommand}" />
             <Button
                 Grid.Column="1"
-                Style="{StaticResource PrimaryButton}"
+                Style="{StaticResource SecondaryButton}"
                 BackgroundColor="{StaticResource Tertiary}"
-                TextColor="Black"
+                Text="Usuń"
+                Command="{Binding DeleteAnnouncementCommand}" />
+        </Grid>
+
+        <Grid
+            ColumnDefinitions="*, *"
+            ColumnSpacing="10"
+            Grid.Row="8"
+            Grid.ColumnSpan="2"
+            VerticalOptions="End"
+            IsVisible="{Binding IsOwnerPendingButtonVisible}">
+            <Button
+                Style="{StaticResource PrimaryButton}"
+                BackgroundColor="{StaticResource PrimaryDark}"
+                Text="Rozpocznij"
+                Command="{Binding StartAnnouncementCommand}" />
+            <Button
+                Grid.Column="1"
+                Style="{StaticResource SecondaryButton}"
+                BackgroundColor="{StaticResource Tertiary}"
                 Text="Odrzuć"
-                Command="{Binding RejectAnnouncementCommand}"
-                CommandParameter="{Binding AnnId}"/>
+                Command="{Binding RejectAnnouncementCommand}" />
+        </Grid>
+
+        <Grid
+            ColumnDefinitions="*, *"
+            ColumnSpacing="10"
+            Grid.Row="8"
+            Grid.ColumnSpan="2"
+            VerticalOptions="End"
+            IsVisible="{Binding IsOwnerOngoingButtonVisible}">
+            <Button
+                Style="{StaticResource PrimaryButton}"
+                BackgroundColor="{StaticResource PrimaryDark}"
+                Text="Zakończ"
+                Command="{Binding FinishAnnouncementCommand}" />
+            <Button
+                Grid.Column="1"
+                Style="{StaticResource SecondaryButton}"
+                BackgroundColor="{StaticResource Tertiary}"
+                Text="Anuluj"
+                Command="{Binding CancelAnnouncementCommand}" />
         </Grid>
     </Grid>
 </ContentPage>

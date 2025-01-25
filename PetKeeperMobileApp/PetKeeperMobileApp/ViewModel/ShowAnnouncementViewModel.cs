@@ -5,6 +5,7 @@ using PetKeeperMobileApp.Enums;
 using PetKeeperMobileApp.Models;
 using PetKeeperMobileApp.Services;
 using PetKeeperMobileApp.Utils;
+using PetKeeperMobileApp.View;
 using System.Text.RegularExpressions;
 
 namespace PetKeeperMobileApp.ViewModel;
@@ -67,13 +68,22 @@ public partial class ShowAnnouncementViewModel : ObservableObject
     private string userLabelText;
 
     [ObservableProperty]
-    private bool isCreatedButtonVisible;
+    private bool isKeeperCreatedButtonVisible;
 
     [ObservableProperty]
-    private bool isPendingButtonVisible;
+    private bool isKeeperPendingButtonVisible;
 
     [ObservableProperty]
-    private string annId;
+    private bool isOwnerCreatedButtonVisible;
+
+    [ObservableProperty]
+    private bool isOwnerPendingButtonVisible;
+
+    [ObservableProperty]
+    private bool isOwnerOngoingButtonVisible;
+
+    [ObservableProperty]
+    private bool isNotCreatedStatus = true;
 
     [RelayCommand]
     async Task ButtonAction()
@@ -84,79 +94,83 @@ public partial class ShowAnnouncementViewModel : ObservableObject
     [RelayCommand]
     async Task ChangeAnnouncementToPending()
     {
-        try
-        {
-            var updateAnnouncementDto = new UpdateAnnouncementDto()
-            {
-                Id = _announcementInfo.Id!,
-                Status = Enums.StatusType.Pending,
-                KeeperId = await Storage.GetUserId()
-            };
-            //TODO: keeper nie może zmienić statusu
-            //var message = "TO DO";
-            var message = await _grpcClient.UpdateAnnouncementStatus(updateAnnouncementDto);
-            await Helpers.ShowConfirmationView(Enums.StatusIcon.Success, message, new RelayCommand(async () =>
-            {
-                await ButtonAction(); 
-                await Shell.Current.GoToAsync("..");
-            }));
-        }
-        catch (RpcException ex)
-        {
-            await Helpers.ShowConfirmationViewWithHandledCodes(ex, new RelayCommand(async () =>
-            {
-                await ChangeAnnouncementToPending();
-            }));
-        }
-        catch (Exception ex)
-        {
-            await Helpers.ShowConfirmationView(Enums.StatusIcon.Error, ex.Message, new RelayCommand(async () =>
-            {
-                await ChangeAnnouncementToPending();
-            }));
-        }
+        await ChangeAnnouncement(StatusType.Pending, true);
     }
 
     [RelayCommand]
-    async Task StartAnnouncement(string id)
+    async Task ChangeAnnouncementToCreated()
+    {
+        await ChangeAnnouncement(StatusType.Created);
+    }
+
+    [RelayCommand]
+    async Task StartAnnouncement()
+    {
+        await ChangeAnnouncement(StatusType.Ongoing);
+    }
+
+    [RelayCommand]
+    async Task RejectAnnouncement()
+    {
+        await ChangeAnnouncement(StatusType.Created);
+    }
+
+    [RelayCommand]
+    async Task FinishAnnouncement()
+    {
+        await ChangeAnnouncement(StatusType.Finished);
+    }
+
+    [RelayCommand]
+    async Task CancelAnnouncement()
+    {
+        await ChangeAnnouncement(StatusType.Canceled);
+    }
+
+    [RelayCommand]
+    async Task EditAnnouncement()
+    {
+        var editAnnouncementViewModel = new CreateAnnouncementViewModel(_grpcClient, _announcementInfo);
+        await ButtonAction();
+        await Application.Current!.MainPage!.Navigation.PushModalAsync(new CreateAnnouncementPage(editAnnouncementViewModel));
+    }
+
+    [RelayCommand]
+    async Task DeleteAnnouncement()
     {
         try
         {
-            var updateAnnouncementDto = new UpdateAnnouncementDto()
-            {
-                Id = id,
-                Status = StatusType.Ongoing,
-            };
-            var message = await _grpcClient.UpdateAnnouncementStatus(updateAnnouncementDto);
+            var message = await _grpcClient.DeleteAnnouncement(_announcementInfo.Id!);
             await Helpers.ShowConfirmationView(Enums.StatusIcon.Success, message, new RelayCommand(async () => { await ButtonAction(); }));
         }
         catch (RpcException ex)
         {
             await Helpers.ShowConfirmationViewWithHandledCodes(ex, new RelayCommand(async () =>
             {
-                await StartAnnouncement(id);
+                await DeleteAnnouncement();
             }));
         }
         catch (Exception ex)
         {
             await Helpers.ShowConfirmationView(Enums.StatusIcon.Error, ex.Message, new RelayCommand(async () =>
             {
-                await StartAnnouncement(id);
+                await DeleteAnnouncement();
             }));
         }
     }
 
-    [RelayCommand]
-    async Task RejectAnnouncement(string id)
+    private async Task ChangeAnnouncement(StatusType status, bool addKeeperId = false)
     {
         try
         {
             var updateAnnouncementDto = new UpdateAnnouncementDto()
             {
-                Id = id,
-                Status = StatusType.Created,
+                Id = _announcementInfo.Id!,
+                Status = status,
                 //KeeperId = string.Empty
             };
+            if (addKeeperId) updateAnnouncementDto.KeeperId = await Storage.GetUserId();
+            //TODO: keeper nie może zmienić statusu
             //TODO: nie można nullować keeperId
             var message = await _grpcClient.UpdateAnnouncementStatus(updateAnnouncementDto);
             await Helpers.ShowConfirmationView(Enums.StatusIcon.Success, message, new RelayCommand(async () => { await ButtonAction(); }));
@@ -165,21 +179,20 @@ public partial class ShowAnnouncementViewModel : ObservableObject
         {
             await Helpers.ShowConfirmationViewWithHandledCodes(ex, new RelayCommand(async () =>
             {
-                await RejectAnnouncement(id);
+                await ChangeAnnouncement(status, addKeeperId);
             }));
         }
         catch (Exception ex)
         {
             await Helpers.ShowConfirmationView(Enums.StatusIcon.Error, ex.Message, new RelayCommand(async () =>
             {
-                await RejectAnnouncement(id);
+                await ChangeAnnouncement(status, addKeeperId);
             }));
         }
     }
 
     private void BindData()
     {
-        AnnId = _announcementInfo.Id!;
         Profit = _announcementInfo.Profit.ToString();
         IsNegotiable = _announcementInfo.IsNegotiable;
         Description = _announcementInfo.Description!;
@@ -191,12 +204,18 @@ public partial class ShowAnnouncementViewModel : ObservableObject
         AddressText = $"{_announcementInfo.AddressInfo!.Address1}\n{_announcementInfo.AddressInfo!.Address2}";
         if (_isOwnerView)
         {
-            UserLabelText = "Opiekun: ";
-            string formattedPhone = Regex.Replace(_announcementInfo.KeeperInfo!.Phone, @"(\d{3})(?=\d)", "$1-");
-            UserText = $"{_announcementInfo.KeeperInfo!.Username} ({_announcementInfo.KeeperInfo!.FirstName} {_announcementInfo.KeeperInfo!.LastName})\n" +
-            $"+48 {formattedPhone}, {_announcementInfo.KeeperInfo!.Email}";
-            UserPhoto = _announcementInfo.KeeperInfo!.Photo;
-            IsPendingButtonVisible = true;
+            if(_announcementInfo.Status != StatusType.Created)
+            {
+                UserLabelText = "Opiekun: ";
+                string formattedPhone = Regex.Replace(_announcementInfo.KeeperInfo!.Phone, @"(\d{3})(?=\d)", "$1-");
+                UserText = $"{_announcementInfo.KeeperInfo!.Username} ({_announcementInfo.KeeperInfo!.FirstName} {_announcementInfo.KeeperInfo!.LastName})\n" +
+                $"+48 {formattedPhone}, {_announcementInfo.KeeperInfo!.Email}";
+                UserPhoto = _announcementInfo.KeeperInfo!.Photo;
+            }
+            else IsNotCreatedStatus = false;
+            IsOwnerPendingButtonVisible = _announcementInfo.Status == StatusType.Pending;
+            IsOwnerOngoingButtonVisible = _announcementInfo.Status == StatusType.Ongoing;
+            IsOwnerCreatedButtonVisible = _announcementInfo.Status == StatusType.Created;
         }
         else
         {
@@ -205,7 +224,8 @@ public partial class ShowAnnouncementViewModel : ObservableObject
             UserText = $"{_announcementInfo.OwnerInfo!.Username} ({_announcementInfo.OwnerInfo!.FirstName} {_announcementInfo.OwnerInfo!.LastName})\n" +
             $"+48 {formattedPhone}, {_announcementInfo.OwnerInfo!.Email}";
             UserPhoto = _announcementInfo.OwnerInfo!.Photo;
-            IsCreatedButtonVisible = true;
+            IsKeeperCreatedButtonVisible = _announcementInfo.Status == StatusType.Created;
+            IsKeeperPendingButtonVisible = _announcementInfo.Status == StatusType.Pending;
         }
     }
 }

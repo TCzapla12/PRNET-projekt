@@ -1,4 +1,5 @@
-﻿using PetKeeperMobileApp.Models;
+﻿using PetKeeperMobileApp.Enums;
+using PetKeeperMobileApp.Models;
 
 namespace PetKeeperMobileApp.Services;
 
@@ -41,9 +42,10 @@ public interface IGrpcClient
     #endregion
 
     #region Announcement
-    Task<List<AnnouncementDto>> GetUserAnnouncements();
+    Task<List<AnnouncementDto>> GetUserAnnouncements(StatusType? status = null);
 
-    Task<List<AnnouncementDto>> GetAnnouncements(int? minValue = null, int? maxValue = null, DateTime? startTerm = null, DateTime? endTerm = null, string? keeperId = null);
+    Task<List<AnnouncementDto>> GetAnnouncements(int? minValue = null, int? maxValue = null,
+        DateTime? startTerm = null, DateTime? endTerm = null, string? keeperId = null, StatusType? status = null);
 
     Task<string> CreateAnnouncement(AnnouncementDto announcementDto);
 

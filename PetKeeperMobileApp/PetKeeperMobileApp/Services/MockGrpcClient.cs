@@ -167,7 +167,7 @@ public class MockGrpcClient : IGrpcClient
     #endregion
 
     #region Announcement
-    public async Task<List<AnnouncementDto>> GetUserAnnouncements()
+    public async Task<List<AnnouncementDto>> GetUserAnnouncements(StatusType? status = null)
     {
         return [
             new AnnouncementDto() {
@@ -209,7 +209,7 @@ public class MockGrpcClient : IGrpcClient
     }
 
     public async Task<List<AnnouncementDto>> GetAnnouncements(int? minValue = null, int? maxValue = null, 
-        DateTime? startTerm = null, DateTime? endTerm = null, string? keeperId = null)
+        DateTime? startTerm = null, DateTime? endTerm = null, string? keeperId = null, StatusType? status = null)
     {
         return [
             new AnnouncementDto() {

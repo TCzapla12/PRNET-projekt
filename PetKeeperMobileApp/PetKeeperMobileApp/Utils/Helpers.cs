@@ -116,7 +116,7 @@ public class Helpers
             StatusType.Created => ("\uf111", Color.FromArgb("#064849"), "aktualne"),
             StatusType.Pending => ("\uf28b", Color.FromArgb("#EF8159"), "oczekiwanie"),
             StatusType.Accepted => ("\uf058", Color.FromArgb("#064849"), "potwierdzone"),
-            StatusType.Ongoing => ("\uf144", Color.FromArgb("#A2CCB7"), "trwa"),
+            StatusType.Ongoing => ("\uf144", Color.FromArgb("#2AE3C2"), "trwa"),
             StatusType.Finished => ("\uf28d", Colors.Green, "zakończone"),
             StatusType.Canceled => ("\uf057", Colors.Red, "anulowane"),
             _ => ("\uf059", Colors.Red, "nieznany status"),

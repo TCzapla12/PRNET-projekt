@@ -1,15 +1,13 @@
-using PetKeeperMobileApp.Enums;
 using PetKeeperMobileApp.Models;
-using PetKeeperMobileApp.Utils;
 
 namespace PetKeeperMobileApp.Templates;
 
-public partial class AnnouncementItem : ContentView
+public partial class AnnouncementShort : ContentView
 {
-    public AnnouncementItem()
-    {
-        InitializeComponent();
-    }
+	public AnnouncementShort()
+	{
+		InitializeComponent();
+	}
 
     public static readonly BindableProperty IsOwnerViewProperty =
         BindableProperty.Create(nameof(IsOwnerView), typeof(bool), typeof(AnnouncementItem), false);
@@ -49,33 +47,17 @@ public partial class AnnouncementItem : ContentView
         AnnId = announcement.Id!;
         ProfitLabel.Text = announcement.Profit.ToString();
         NegotiableLabel.IsVisible = announcement.IsNegotiable;
-        DescriptionLabel.Text = announcement.Description;
         StartTermLabel.Text = DateTimeOffset.FromUnixTimeSeconds((long)announcement.StartTerm).DateTime.ToString("dd.MM.yyyy HH:mm");
         EndTermLabel.Text = DateTimeOffset.FromUnixTimeSeconds((long)announcement.EndTerm).DateTime.ToString("dd.MM.yyyy HH:mm");
-         
-        (StatusIconLabel.Text, StatusIconLabel.TextColor, StatusLabel.Text) = Helpers.GetStatusInfo(announcement.Status);
-
-        AnimalLabel.Text = announcement.Animal;
         AddressLabel.Text = announcement.Address;
-
-        if (IsOwnerView)
-        {
-            EditStack.IsVisible = announcement.Status == StatusType.Created;
-            PendingStack.IsVisible = announcement.Status == StatusType.Pending;
-            OngoingStack.IsVisible = announcement.Status == StatusType.Ongoing;
-            KeeperStack.IsVisible = !string.IsNullOrEmpty(announcement.Keeper);
-            KeeperLabel.Text = announcement.Keeper;
-        }
-        else
-        {
-            OwnerStack.IsVisible = true;
-            OwnerLabel.Text = announcement.Owner;
-        }
+        if (IsOwnerView) OngoingStack.IsVisible = true;
+        if (IsOwnerView) TypeImage.Source = "paw.jpg";
+        else TypeImage.Source = "briefcase.jpg";
     }
 
     private static void OnAnnouncementChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (bindable is AnnouncementItem component && newValue is AnnouncementInfo announcement)
+        if (bindable is AnnouncementShort component && newValue is AnnouncementInfo announcement)
         {
             component.BindData(announcement);
         };

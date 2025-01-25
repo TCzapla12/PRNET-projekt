@@ -81,42 +81,47 @@ public partial class OwnerViewModel : ObservableObject
     [RelayCommand]
     async Task StartAnnouncement(string id)
     {
-        try
-        {
-            var updateAnnouncementDto = new UpdateAnnouncementDto()
-            {
-                Id = id,
-                Status = StatusType.Ongoing,
-            };
-            var message = await _grpcClient.UpdateAnnouncementStatus(updateAnnouncementDto);
-            await Helpers.ShowConfirmationView(StatusIcon.Success, message, new RelayCommand(() => { }));
-        }
-        catch (RpcException ex)
-        {
-            await Helpers.ShowConfirmationViewWithHandledCodes(ex, new RelayCommand(async () =>
-            {
-                await StartAnnouncement(id);
-            }));
-        }
-        catch (Exception ex)
-        {
-            await Helpers.ShowConfirmationView(Enums.StatusIcon.Error, ex.Message, new RelayCommand(async () =>
-            {
-                await StartAnnouncement(id);
-            }));
-        }
-        await LoadDataAsync();
+        await ChangeAnnouncement(id, StatusType.Ongoing);
     }
 
     [RelayCommand]
     async Task RejectAnnouncement(string id)
+    {
+        await ChangeAnnouncement(id, StatusType.Created);
+    }
+
+    [RelayCommand]
+    async Task FinishAnnouncement(string id)
+    {
+        await ChangeAnnouncement(id, StatusType.Finished);
+    }
+
+    [RelayCommand]
+    async Task CancelAnnouncement(string id)
+    {
+        await ChangeAnnouncement(id, StatusType.Canceled);
+    }
+
+    [RelayCommand]
+    async Task GoToFinishedAnnouncements()
+    {
+        await Shell.Current.GoToAsync(nameof(ShowFinalAnnouncementsPage) + "?IsOwnerView=true&IsFinishedView=true");
+    }
+
+    [RelayCommand]
+    async Task GoToCanceledAnnouncements()
+    {
+        await Shell.Current.GoToAsync(nameof(ShowFinalAnnouncementsPage) + "?IsOwnerView=true");
+    }
+
+    private async Task ChangeAnnouncement(string id, StatusType status)
     {
         try
         {
             var updateAnnouncementDto = new UpdateAnnouncementDto()
             {
                 Id = id,
-                Status = StatusType.Created,
+                Status = status,
                 //KeeperId = string.Empty
             };
             //TODO: nie można nullować keeperId
@@ -127,14 +132,14 @@ public partial class OwnerViewModel : ObservableObject
         {
             await Helpers.ShowConfirmationViewWithHandledCodes(ex, new RelayCommand(async () =>
             {
-                await RejectAnnouncement(id);
+                await ChangeAnnouncement(id, status);
             }));
         }
         catch (Exception ex)
         {
             await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Message, new RelayCommand(async () =>
             {
-                await RejectAnnouncement(id);
+                await ChangeAnnouncement(id, status);
             }));
         }
         await LoadDataAsync();
@@ -148,31 +153,34 @@ public partial class OwnerViewModel : ObservableObject
             _announcementsDto = await _grpcClient.GetUserAnnouncements();
             foreach (AnnouncementDto announcementDto in _announcementsDto)
             {
-                UserDto? keeper = null;
-                UserInfo? keeperInfo = null;
-                if (!string.IsNullOrEmpty(announcementDto.KeeperId))
+                if (announcementDto.Status != StatusType.Finished && announcementDto.Status != StatusType.Canceled)
                 {
-                    keeper = await _grpcClient.GetUser(announcementDto.KeeperId);
-                    keeperInfo = new UserInfo(keeper);
-                }
-                var animal = await _grpcClient.GetAnimal(announcementDto.AnimalId);
-                var address = await _grpcClient.GetAddress(announcementDto.AddressId);
-                announcements.Add(new AnnouncementInfo
-                {
-                    Id = announcementDto.Id,
-                    Animal = AnimalDto.AnimalToString(animal),
-                    Profit = announcementDto.Profit,
-                    IsNegotiable = announcementDto.IsNegotiable,
-                    Description = announcementDto.Description,
-                    StartTerm = announcementDto.StartTerm,
-                    EndTerm = announcementDto.EndTerm,
-                    Status = announcementDto.Status,
-                    Address = AddressDto.AddressToString(address),
-                    Keeper = keeper?.Username ?? string.Empty,
-                    KeeperInfo = keeperInfo,
-                    AnimalInfo = new AnimalInfo(animal),
-                    AddressInfo = new AddressInfo(address)
-                });
+                    UserDto? keeper = null;
+                    UserInfo? keeperInfo = null;
+                    if (!string.IsNullOrEmpty(announcementDto.KeeperId))
+                    {
+                        keeper = await _grpcClient.GetUser(announcementDto.KeeperId);
+                        keeperInfo = new UserInfo(keeper);
+                    }
+                    var animal = await _grpcClient.GetAnimal(announcementDto.AnimalId);
+                    var address = await _grpcClient.GetAddress(announcementDto.AddressId);
+                    announcements.Add(new AnnouncementInfo
+                    {
+                        Id = announcementDto.Id,
+                        Animal = AnimalDto.AnimalToString(animal),
+                        Profit = announcementDto.Profit,
+                        IsNegotiable = announcementDto.IsNegotiable,
+                        Description = announcementDto.Description,
+                        StartTerm = announcementDto.StartTerm,
+                        EndTerm = announcementDto.EndTerm,
+                        Status = announcementDto.Status,
+                        Address = AddressDto.AddressToString(address),
+                        Keeper = keeper?.Username ?? string.Empty,
+                        KeeperInfo = keeperInfo,
+                        AnimalInfo = new AnimalInfo(animal),
+                        AddressInfo = new AddressInfo(address)
+                    });
+                }  
             }
             announcements = Helpers.SortAnnouncements(announcements);
             IsErrorVisible = false;
