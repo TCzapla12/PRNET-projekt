@@ -363,6 +363,22 @@
 
     private string GetBase64Image(Google.Protobuf.ByteString imageBytes)
     {
-        return $"data:image/png;base64,{Convert.ToBase64String(imageBytes.ToByteArray())}";
+        var byteArray = imageBytes.ToByteArray();
+
+        string mimeType;
+        if (byteArray.Length >= 4 && byteArray[0] == 0x89 && byteArray[1] == 0x50 && byteArray[2] == 0x4E && byteArray[3] == 0x47)
+        {
+            mimeType = "image/png"; // PNG magic number: 89 50 4E 47
+        }
+        else if (byteArray.Length >= 3 && byteArray[0] == 0xFF && byteArray[1] == 0xD8 && byteArray[2] == 0xFF)
+        {
+            mimeType = "image/jpeg"; // JPEG magic number: FF D8 FF
+        }
+        else
+        {
+            throw new ArgumentException("Unsupported image format");
+        }
+
+        return $"data:{mimeType};base64,{Convert.ToBase64String(byteArray)}";
     }
 }
