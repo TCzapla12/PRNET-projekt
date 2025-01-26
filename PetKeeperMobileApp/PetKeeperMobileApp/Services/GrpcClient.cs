@@ -399,4 +399,74 @@ public class GrpcClient : IGrpcClient
         return Wordings.SUCCESS;
     }
     #endregion
+
+    #region Opinions
+    public async Task<List<OpinionDto>> GetOpinions(string? authorId = null, string? keeperId = null)
+    {
+        var opinions = new List<OpinionDto>();
+        var opinionParams = new OpinionGet();
+        if (authorId != null) opinionParams.AuthorId = authorId;
+        if (keeperId != null) opinionParams.KeeperId = keeperId;
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new OpinionService.OpinionServiceClient(channel);
+        var reply = await client.GetOpinionsAsync(opinionParams, await Storage.GetMetadata());
+        foreach (var opinion in reply.Opinions)
+        {
+            opinions.Add(new OpinionDto()
+            {
+                Id = opinion.Id,
+                AuthorId = opinion.AuthorId,
+                KeeperId = opinion.KeeperId,
+                Description = opinion.Description,
+                CreatedDate = opinion.CreatedDate,
+                Rating = opinion.Rating,
+                AnnouncementId = opinion.AnnouncementId
+            });
+        }
+        return opinions;
+    }
+
+    public async Task<string> CreateOpinion(OpinionDto opinionDto)
+    {
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new OpinionService.OpinionServiceClient(channel);
+        OpinionCreate opinion = new()
+        {
+            AuthorId = opinionDto.AuthorId,
+            KeeperId = opinionDto.KeeperId,
+            Description = opinionDto.Description ?? string.Empty,
+            CreatedDate = opinionDto.CreatedDate,
+            Rating = opinionDto.Rating,
+            AnnouncementId = opinionDto.AnnouncementId
+        };
+        var reply = await client.CreateOpinionAsync(opinion, await Storage.GetMetadata());
+        return Wordings.SUCCESS;
+    }
+
+    public async Task<string> UpdateOpinion(OpinionDto opinionDto)
+    {
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new OpinionService.OpinionServiceClient(channel);
+        OpinionUpdate opinion = new()
+        {
+            Id = opinionDto.Id,
+            AuthorId = opinionDto.AuthorId,
+            KeeperId = opinionDto.KeeperId,
+            Description = opinionDto.Description ?? string.Empty,
+            CreatedDate = opinionDto.CreatedDate,
+            Rating = opinionDto.Rating,
+            AnnouncementId = opinionDto.AnnouncementId
+        };
+        var reply = await client.UpdateOpinionAsync(opinion, await Storage.GetMetadata());
+        return Wordings.SUCCESS;
+    }
+
+    public async Task<string> DeleteOpinion(string id)
+    {
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new OpinionService.OpinionServiceClient(channel);
+        var reply = await client.DeleteOpinionAsync(new OpinionMinimal { Id = id }, await Storage.GetMetadata());
+        return Wordings.SUCCESS;
+    }
+    #endregion
 }

@@ -55,4 +55,14 @@ public interface IGrpcClient
 
     Task<string> DeleteAnnouncement(string id);
     #endregion
+
+    #region Opinions
+    Task<List<OpinionDto>> GetOpinions(string? authorId = null, string? keeperId = null);
+
+    Task<string> CreateOpinion(OpinionDto opinionDto);
+
+    Task<string> UpdateOpinion(OpinionDto opinionDto);
+
+    Task<string> DeleteOpinion(string id);
+    #endregion
 }

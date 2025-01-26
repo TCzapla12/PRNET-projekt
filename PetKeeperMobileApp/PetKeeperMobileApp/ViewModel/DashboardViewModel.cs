@@ -83,7 +83,11 @@ public partial class DashboardViewModel : ObservableObject
             };
             //TODO: nie można nullować keeperId
             var message = await _grpcClient.UpdateAnnouncementStatus(updateAnnouncementDto);
-            await Helpers.ShowConfirmationView(StatusIcon.Success, message, new RelayCommand(() => { }));
+            await Helpers.ShowConfirmationView(StatusIcon.Success, message, new RelayCommand(async () => 
+            {
+                var addOpinionViewModel = new AddOpinionViewModel(_grpcClient, OwnerAnnouncementList.Where(a => a.Id == id).First());
+                await Application.Current!.MainPage!.Navigation.PushModalAsync(new AddOpinionPage(addOpinionViewModel));
+            }));
         }
         catch (RpcException ex)
         {

@@ -126,7 +126,16 @@ public partial class OwnerViewModel : ObservableObject
             };
             //TODO: nie można nullować keeperId
             var message = await _grpcClient.UpdateAnnouncementStatus(updateAnnouncementDto);
-            await Helpers.ShowConfirmationView(StatusIcon.Success, message, new RelayCommand(() => { }));
+            if (status != StatusType.Finished && status != StatusType.Canceled)
+                await Helpers.ShowConfirmationView(StatusIcon.Success, message, new RelayCommand(() => { }));
+            else
+            {
+                await Helpers.ShowConfirmationView(StatusIcon.Success, message, new RelayCommand(async () =>
+                {
+                    var addOpinionViewModel = new AddOpinionViewModel(_grpcClient, AnnouncementList.Where(a => a.Id == id).First());
+                    await Application.Current!.MainPage!.Navigation.PushModalAsync(new AddOpinionPage(addOpinionViewModel));
+                }));
+            }
         }
         catch (RpcException ex)
         {

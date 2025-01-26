@@ -312,4 +312,44 @@ public class MockGrpcClient : IGrpcClient
         return Wordings.SUCCESS;
     }
     #endregion
+
+    #region Opinions
+    public async  Task<List<OpinionDto>> GetOpinions(string? authorId = null, string? keeperId = null)
+    {
+        return [
+            new OpinionDto{
+                Id = "1",
+                AuthorId = "1",
+                KeeperId = "2",
+                Description = "Nie dobrze",
+                CreatedDate = (ulong)new DateTimeOffset(DateTime.Today).ToUnixTimeSeconds(),
+                Rating = 2,
+                AnnouncementId = "1"
+            },
+            new OpinionDto{
+                Id = "2",
+                AuthorId = "2",
+                KeeperId = "1",
+                Description = "Dobrze",
+                CreatedDate = (ulong)new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(),
+                Rating = 5,
+                AnnouncementId = "2"
+            }];
+    }
+
+    public async Task<string> CreateOpinion(OpinionDto opinionDto)
+    {
+        return Wordings.SUCCESS;
+    }
+
+    public async Task<string> UpdateOpinion(OpinionDto opinionDto)
+    {
+        return Wordings.SUCCESS;
+    }
+
+    public async Task<string> DeleteOpinion(string id)
+    {
+        return Wordings.SUCCESS;
+    }
+    #endregion
 }

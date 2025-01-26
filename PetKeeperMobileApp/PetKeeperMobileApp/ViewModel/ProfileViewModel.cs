@@ -19,4 +19,16 @@ public partial class ProfileViewModel : ObservableObject
     {
         await Shell.Current.GoToAsync(nameof(MyPetsPage));
     }
+
+    [RelayCommand]
+    async Task ShowMyOpinions()
+    {
+        await Shell.Current.GoToAsync(nameof(ShowOpinionsPage) + "?IsMyView=true");
+    }
+
+    [RelayCommand]
+    async Task ShowGivenOpinions()
+    {
+        await Shell.Current.GoToAsync(nameof(ShowOpinionsPage));
+    }
 }

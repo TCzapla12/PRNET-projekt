@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PetKeeperMobileApp.View.ShowOpinionsPage"
+             xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             xmlns:templates="clr-namespace:PetKeeperMobileApp.Templates"
+             xmlns:models="clr-namespace:PetKeeperMobileApp.Models"
+             x:DataType="viewmodel:ShowOpinionsViewModel"
+             Title="ShowOpinionsPage"
+             x:Name="ShowOp">
+
+    <ContentPage.Resources>
+        <x:String x:Key="arrow-left">&#xf060;</x:String>
+    </ContentPage.Resources>
+    
+    <ScrollView>
+        <Grid
+            RowDefinitions="40, Auto"
+            ColumnDefinitions="Auto, *"
+            Padding="20"
+            RowSpacing="20">
+
+            <ImageButton
+                HeightRequest="30"
+                Command="{Binding GoBackCommand}">
+                <ImageButton.Source>
+                    <FontImageSource
+                        FontFamily="FAS"
+                        Glyph="{StaticResource arrow-left}"
+                        Color="{StaticResource PrimaryDark}" />
+                </ImageButton.Source>
+            </ImageButton>
+
+            <Label 
+                Grid.ColumnSpan="2"
+                Text="{Binding Title}"
+                Style="{StaticResource Headline}" />
+
+            <VerticalStackLayout
+                Grid.Row="1"
+                Grid.ColumnSpan="2">
+                <templates:ErrorItem
+                    IsVisible="{Binding IsErrorVisible}"
+                    ButtonCommand="{Binding RefreshData}"
+                    ErrorException="{Binding Exception}"
+                    Margin="0, 0, 0, 20" />
+                <CollectionView
+                    ItemsSource="{Binding OpinionList}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="{x:Type models:OpinionInfo}">
+                            <templates:OpinionItem 
+                                Opinion="{Binding .}"
+                                IsMyView="{Binding Source={x:Reference ShowOp}, Path=BindingContext.IsMyView}"/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </Grid>
+    </ScrollView>
+</ContentPage>

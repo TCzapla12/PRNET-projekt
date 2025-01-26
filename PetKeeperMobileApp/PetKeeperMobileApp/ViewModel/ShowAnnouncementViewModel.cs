@@ -173,7 +173,17 @@ public partial class ShowAnnouncementViewModel : ObservableObject
             //TODO: keeper nie może zmienić statusu
             //TODO: nie można nullować keeperId
             var message = await _grpcClient.UpdateAnnouncementStatus(updateAnnouncementDto);
-            await Helpers.ShowConfirmationView(Enums.StatusIcon.Success, message, new RelayCommand(async () => { await ButtonAction(); }));
+            if(status != StatusType.Finished && status != StatusType.Canceled)
+                await Helpers.ShowConfirmationView(Enums.StatusIcon.Success, message, new RelayCommand(async () => { await ButtonAction(); }));
+            else
+            {
+                await Helpers.ShowConfirmationView(Enums.StatusIcon.Success, message, new RelayCommand(async () =>
+                {
+                    await ButtonAction();
+                    var addOpinionViewModel = new AddOpinionViewModel(_grpcClient, _announcementInfo);
+                    await Application.Current!.MainPage!.Navigation.PushModalAsync(new AddOpinionPage(addOpinionViewModel));
+                }));
+            }    
         }
         catch (RpcException ex)
         {
