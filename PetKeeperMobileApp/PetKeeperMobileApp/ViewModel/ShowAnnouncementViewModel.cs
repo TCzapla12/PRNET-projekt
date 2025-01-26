@@ -166,15 +166,17 @@ public partial class ShowAnnouncementViewModel : ObservableObject
             var updateAnnouncementDto = new UpdateAnnouncementDto()
             {
                 Id = _announcementInfo.Id!,
-                Status = status,
-                //KeeperId = string.Empty
+                Status = status
             };
             if (addKeeperId) updateAnnouncementDto.KeeperId = await Storage.GetUserId();
-            //TODO: keeper nie może zmienić statusu
-            //TODO: nie można nullować keeperId
             var message = await _grpcClient.UpdateAnnouncementStatus(updateAnnouncementDto);
-            if(status != StatusType.Finished && status != StatusType.Canceled)
+            if(status != StatusType.Finished && status != StatusType.Canceled && status != StatusType.Pending)
                 await Helpers.ShowConfirmationView(Enums.StatusIcon.Success, message, new RelayCommand(async () => { await ButtonAction(); }));
+            else if (status == StatusType.Pending)
+                await Helpers.ShowConfirmationView(Enums.StatusIcon.Success, message, new RelayCommand(async () => { 
+                    await ButtonAction();
+                    await Shell.Current.GoToAsync("..");
+                }));
             else
             {
                 await Helpers.ShowConfirmationView(Enums.StatusIcon.Success, message, new RelayCommand(async () =>

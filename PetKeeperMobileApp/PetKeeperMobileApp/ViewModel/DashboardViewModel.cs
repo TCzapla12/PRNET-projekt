@@ -78,14 +78,13 @@ public partial class DashboardViewModel : ObservableObject
             var updateAnnouncementDto = new UpdateAnnouncementDto()
             {
                 Id = id,
-                Status = status,
-                //KeeperId = string.Empty
+                Status = status
             };
-            //TODO: nie można nullować keeperId
             var message = await _grpcClient.UpdateAnnouncementStatus(updateAnnouncementDto);
+            var tmpElement = OwnerAnnouncementList.Where(a => a.Id == id).First();
             await Helpers.ShowConfirmationView(StatusIcon.Success, message, new RelayCommand(async () => 
             {
-                var addOpinionViewModel = new AddOpinionViewModel(_grpcClient, OwnerAnnouncementList.Where(a => a.Id == id).First());
+                var addOpinionViewModel = new AddOpinionViewModel(_grpcClient, tmpElement);
                 await Application.Current!.MainPage!.Navigation.PushModalAsync(new AddOpinionPage(addOpinionViewModel));
             }));
         }
