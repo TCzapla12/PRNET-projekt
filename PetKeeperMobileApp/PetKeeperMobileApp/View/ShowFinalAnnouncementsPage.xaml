@@ -37,6 +37,17 @@
                 Text="{Binding Title}"
                 Style="{StaticResource Headline}"/>
 
+            <ActivityIndicator
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                IsRunning="{Binding IsLoading}"
+                IsVisible="{Binding IsLoading}"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                HeightRequest="50"
+                Color="{StaticResource PrimaryDark}"
+                Margin="0, 20, 0, 20" />
+
             <VerticalStackLayout
                 Grid.Row="1"
                 Grid.ColumnSpan="2">

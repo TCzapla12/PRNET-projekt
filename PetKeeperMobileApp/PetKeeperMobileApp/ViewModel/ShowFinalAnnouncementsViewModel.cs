@@ -41,6 +41,9 @@ public partial class ShowFinalAnnouncementsViewModel : ObservableObject, IQueryA
     }
 
     [ObservableProperty]
+    private bool isLoading;
+
+    [ObservableProperty]
     private string title;
 
     [ObservableProperty]
@@ -72,6 +75,7 @@ public partial class ShowFinalAnnouncementsViewModel : ObservableObject, IQueryA
 
     public async Task LoadDataAsync()
     {
+        IsLoading = true;
         var announcements = new List<AnnouncementInfo>();
         try
         {
@@ -160,5 +164,6 @@ public partial class ShowFinalAnnouncementsViewModel : ObservableObject, IQueryA
             Exception = ex;
         }
         AnnouncementList = new ObservableCollection<AnnouncementInfo>(announcements);
+        IsLoading = false;
     }
 }

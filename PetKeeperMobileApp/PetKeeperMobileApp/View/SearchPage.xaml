@@ -125,6 +125,18 @@
                 </Frame>
             </HorizontalStackLayout>
         </ScrollView>
+
+        <ActivityIndicator
+            Grid.Row="3"
+            Grid.ColumnSpan="4"
+            IsRunning="{Binding IsLoading}"
+            IsVisible="{Binding IsLoading}"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            HeightRequest="50"
+            Color="{StaticResource PrimaryDark}"
+            Margin="0, 20, 0, 20" />
+
         <CollectionView
             Grid.Row="3"
             Grid.ColumnSpan="4"

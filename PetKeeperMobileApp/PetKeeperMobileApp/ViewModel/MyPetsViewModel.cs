@@ -21,6 +21,9 @@ public partial class MyPetsViewModel : ObservableObject
     }
 
     [ObservableProperty]
+    private bool isLoading;
+
+    [ObservableProperty]
     private ObservableCollection<AnimalInfo> animals;
 
     [ObservableProperty]
@@ -80,6 +83,7 @@ public partial class MyPetsViewModel : ObservableObject
 
     public async Task LoadDataAsync()
     {
+        IsLoading = true;
         var animalsList = new List<AnimalInfo>();
         try
         {
@@ -102,5 +106,6 @@ public partial class MyPetsViewModel : ObservableObject
         }
         Animals = new ObservableCollection<AnimalInfo>(animalsList);
         IsCreateButtonVisible = Animals.Count < 10;
+        IsLoading = false;
     }
 }

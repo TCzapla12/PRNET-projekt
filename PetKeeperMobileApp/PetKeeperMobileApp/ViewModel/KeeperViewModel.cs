@@ -24,6 +24,9 @@ public partial class KeeperViewModel : ObservableObject
     }
 
     [ObservableProperty]
+    private bool isLoading;
+
+    [ObservableProperty]
     private ObservableCollection<AnnouncementInfo> announcementList;
 
     [ObservableProperty]
@@ -59,6 +62,7 @@ public partial class KeeperViewModel : ObservableObject
 
     public async Task LoadDataAsync()
     {
+        IsLoading = true;
         var announcements = new List<AnnouncementInfo>();
         try
         {
@@ -106,5 +110,6 @@ public partial class KeeperViewModel : ObservableObject
             Exception = ex;
         }
         AnnouncementList = new ObservableCollection<AnnouncementInfo>(announcements);
+        IsLoading = false;
     }
 }

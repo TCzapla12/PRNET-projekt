@@ -22,6 +22,9 @@ public partial class SearchViewModel : ObservableObject
     private List<AnnouncementDto> _announcementsDto;
 
     [ObservableProperty]
+    private bool isLoading;
+
+    [ObservableProperty]
     private string searchText;
 
     [ObservableProperty]
@@ -51,6 +54,7 @@ public partial class SearchViewModel : ObservableObject
     [RelayCommand]
     async Task GetLocation()
     {
+        IsLoading = true;
         try
         {
             var status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
@@ -75,11 +79,13 @@ public partial class SearchViewModel : ObservableObject
         {
             await Helpers.ShowConfirmationView(StatusIcon.Error, ex.Message, new RelayCommand(async () => await GetLocation()));
         }
+        IsLoading = false;
     }
 
     [RelayCommand]
     async Task SearchAnnouncements()
     {
+        IsLoading = true;
         var announcements = new List<AnnouncementInfo>();
         try
         {
@@ -129,6 +135,7 @@ public partial class SearchViewModel : ObservableObject
             }));
         }
         AnnouncementList = new ObservableCollection<AnnouncementInfo>(announcements);
+        IsLoading = false;
     }
 
     [RelayCommand]

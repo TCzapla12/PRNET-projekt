@@ -24,6 +24,9 @@ public partial class DashboardViewModel : ObservableObject
     }
 
     [ObservableProperty]
+    private bool isLoading;
+
+    [ObservableProperty]
     private string firstName;
 
     [ObservableProperty]
@@ -107,6 +110,7 @@ public partial class DashboardViewModel : ObservableObject
 
     public async Task LoadDataAsync()
     {
+        IsLoading = true;
         var ownerAnnouncements = new List<AnnouncementInfo>();
         var keeperAnnouncements = new List<AnnouncementInfo>();
         var myId = await Storage.GetUserId();
@@ -181,5 +185,6 @@ public partial class DashboardViewModel : ObservableObject
         }
         OwnerAnnouncementList = new ObservableCollection<AnnouncementInfo>(ownerAnnouncements);
         KeeperAnnouncementList = new ObservableCollection<AnnouncementInfo>(keeperAnnouncements);
+        IsLoading = false;
     }
 }

@@ -23,6 +23,9 @@ public partial class MyAddressesViewModel : ObservableObject
     }
 
     [ObservableProperty]
+    private bool isLoading;
+
+    [ObservableProperty]
     private ObservableCollection<AddressInfo> addresses;
 
     [ObservableProperty]
@@ -82,6 +85,7 @@ public partial class MyAddressesViewModel : ObservableObject
 
     public async Task LoadDataAsync()
     {
+        IsLoading = true;
         var addressesList = new List<AddressInfo>();
         try
         {
@@ -106,5 +110,6 @@ public partial class MyAddressesViewModel : ObservableObject
         }
         Addresses = new ObservableCollection<AddressInfo>(addressesList);
         IsCreateButtonVisible = Addresses.Count < 3;
+        IsLoading = false;
     }
 }
