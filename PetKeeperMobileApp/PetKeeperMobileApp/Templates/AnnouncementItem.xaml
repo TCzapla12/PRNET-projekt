@@ -60,6 +60,14 @@
                     <Label x:Name="KeeperLabel" />
                 </VerticalStackLayout>
                 <Label
+                    Text="Realizacja: "
+                    FontAttributes="Bold" />
+                <HorizontalStackLayout>
+                    <Label x:Name="StartTermLabel"/>
+                    <Label Text=" - " />
+                    <Label x:Name="EndTermLabel"/>
+                </HorizontalStackLayout>
+                <Label
                     Text="Opis:"
                     FontAttributes="Bold" />
                 <Label x:Name="DescriptionLabel" />
@@ -71,14 +79,6 @@
                     Text="Adres: "
                     FontAttributes="Bold" />
                 <Label x:Name="AddressLabel"/>
-                <Label
-                    Text="Realizacja: "
-                    FontAttributes="Bold" />
-                <HorizontalStackLayout>
-                    <Label x:Name="StartTermLabel"/>
-                    <Label Text=" - " />
-                    <Label x:Name="EndTermLabel"/>
-                </HorizontalStackLayout>
             </StackLayout>
             <StackLayout
                 x:Name="EditStack"

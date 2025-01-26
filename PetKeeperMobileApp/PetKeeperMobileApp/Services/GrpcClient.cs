@@ -369,7 +369,6 @@ public class GrpcClient : IGrpcClient
             Description = announcementDto.Description,
             StartTerm = announcementDto.StartTerm,
             EndTerm = announcementDto.EndTerm,
-            Status = announcementDto.Status.ToString().ToLower(),
             AddressId = announcementDto.AddressId
         };
         var reply = await client.UpdateAnnouncementAsync(announcement, await Storage.GetMetadata());

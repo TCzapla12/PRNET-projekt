@@ -39,7 +39,7 @@
             Grid.ColumnSpan="2">
             <Editor 
                 HeightRequest="300"
-                VerticalTextAlignment="End"
+                VerticalTextAlignment="Start"
                 BackgroundColor="{StaticResource Primary100}"
                 MaxLength="300"
                 AutoSize="TextChanges" 

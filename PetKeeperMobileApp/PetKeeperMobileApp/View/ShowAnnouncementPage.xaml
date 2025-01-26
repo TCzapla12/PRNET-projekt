@@ -9,209 +9,213 @@
     <ContentPage.Resources>
         <x:String x:Key="xmark">&#xf00d;</x:String>
     </ContentPage.Resources>
-    
-    <Grid
-        RowDefinitions="40, Auto, Auto, Auto, Auto, Auto, Auto, Auto, *"
-        ColumnDefinitions="Auto, *"
-        Padding="20"
-        RowSpacing="10">
 
-        <ImageButton
-            HeightRequest="30"
-            Command="{Binding ButtonActionCommand}">
-            <ImageButton.Source>
-                <FontImageSource
+    <ScrollView>
+        <Grid
+            RowDefinitions="40, Auto, Auto, Auto, Auto, Auto, Auto, Auto, *"
+            ColumnDefinitions="Auto, *"
+            Padding="20"
+            RowSpacing="10">
+
+            <ImageButton
+                HeightRequest="30"
+                Command="{Binding ButtonActionCommand}">
+                <ImageButton.Source>
+                    <FontImageSource
+                        FontFamily="FAS"
+                        Glyph="{StaticResource xmark}"
+                        Color="{StaticResource PrimaryDark}" />
+                </ImageButton.Source>
+            </ImageButton>
+
+            <Label
+                Grid.ColumnSpan="2"
+                Text="Ogłoszenie"
+                Style="{StaticResource Headline}" />
+
+            <HorizontalStackLayout 
+                Margin="0, 10, 0, 0"
+                Grid.Row="1"
+                Grid.ColumnSpan="2">
+                <Label
+                    Text="{Binding Profit}"
+                    Style="{StaticResource SubHeadline}"
+                    FontAttributes="Bold"/>
+                <Label
+                    Text=" zł"
+                    Style="{StaticResource SubHeadline}"
+                    FontAttributes="Bold"/>
+                <Label
+                    IsVisible="{Binding IsNegotiable}"
+                    Text=" (do negocjacji)"
+                    Style="{StaticResource SubHeadline}"/>
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout
+                Grid.Row="2"
+                Grid.ColumnSpan="2">
+                <Label
+                    Text="Status: "
+                    FontAttributes="Bold" />
+                <Label 
+                    Text="{Binding StatusIcon}"
+                    TextColor="{Binding StatusColor}"
                     FontFamily="FAS"
-                    Glyph="{StaticResource xmark}"
-                    Color="{StaticResource PrimaryDark}" />
-            </ImageButton.Source>
-        </ImageButton>
+                    Margin="0, 3, 0, 0" />
+                <Label Text=" (" />
+                <Label Text="{Binding StatusText}" />
+                <Label Text=")" />
+            </HorizontalStackLayout>
 
-        <Label
-            Grid.ColumnSpan="2"
-            Text="Ogłoszenie"
-            Style="{StaticResource Headline}" />
+            <HorizontalStackLayout
+                Grid.Row="3"
+                Grid.ColumnSpan="2">
+                <Label
+                    Text="Realizacja: "
+                    FontAttributes="Bold" />
+                <Label Text="{Binding StartTerm}"/>
+                <Label Text=" - " />
+                <Label Text="{Binding EndTerm}"/>
+            </HorizontalStackLayout>
 
-        <HorizontalStackLayout 
-            Margin="0, 10, 0, 0"
-            Grid.Row="1"
-            Grid.ColumnSpan="2">
-            <Label
-                Text="{Binding Profit}"
-                Style="{StaticResource SubHeadline}"
-                FontAttributes="Bold"/>
-            <Label
-                Text=" zł"
-                Style="{StaticResource SubHeadline}"
-                FontAttributes="Bold"/>
-            <Label
-                IsVisible="{Binding IsNegotiable}"
-                Text=" (do negocjacji)"
-                Style="{StaticResource SubHeadline}"/>
-        </HorizontalStackLayout>
+            <Grid
+                Grid.Row="4"
+                Grid.ColumnSpan="2"
+                ColumnDefinitions="Auto, *">
+                <Label
+                    Text="Opis: "
+                    FontAttributes="Bold" />
+                <Label Text="{Binding Description}"
+                       Grid.Column="1" />
+            </Grid>
 
-        <HorizontalStackLayout
-            Grid.Row="2"
-            Grid.ColumnSpan="2">
-            <Label
-                Text="Status: "
-                FontAttributes="Bold" />
-            <Label 
-                Text="{Binding StatusIcon}"
-                TextColor="{Binding StatusColor}"
-                FontFamily="FAS"
-                Margin="0, 3, 0, 0" />
-            <Label Text=" (" />
-            <Label Text="{Binding StatusText}" />
-            <Label Text=")" />
-        </HorizontalStackLayout>
-
-        <HorizontalStackLayout
-            Grid.Row="3"
-            Grid.ColumnSpan="2">
-            <Label
-                Text="Opis: "
-                FontAttributes="Bold" />
-            <Label Text="{Binding Description}"/>
-        </HorizontalStackLayout>
-
-        <VerticalStackLayout
-            Grid.Row="4"
-            Grid.ColumnSpan="2">
-            <Label
-                Text="Zwierzę: "
-                FontAttributes="Bold" />
-            <Frame
-                 CornerRadius="8"
-                 WidthRequest="200"
-                 HeightRequest="200"
-                 Margin="0, 0, 0, 10">
-                <ImageButton
+            <VerticalStackLayout
+                Grid.Row="5"
+                Grid.ColumnSpan="2">
+                <Label
+                    Text="Zwierzę: "
+                    FontAttributes="Bold" />
+                <Frame
+                     CornerRadius="8"
                      WidthRequest="200"
                      HeightRequest="200"
-                     Source="{Binding AnimalPhoto}" />
-            </Frame>
-            <Label 
-                Text="{Binding AnimalText}" HorizontalTextAlignment="Center"/>
-        </VerticalStackLayout>
+                     Margin="0, 0, 0, 10">
+                    <ImageButton
+                         WidthRequest="200"
+                         HeightRequest="200"
+                         Source="{Binding AnimalPhoto}" />
+                </Frame>
+                <Label 
+                    Text="{Binding AnimalText}" HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
 
-        <HorizontalStackLayout
-            Grid.Row="5"
-            Grid.ColumnSpan="2">
-            <Label
-                Text="Adres: "
-                FontAttributes="Bold" />
-            <Label Text="{Binding AddressText}"/>
-        </HorizontalStackLayout>
+            <HorizontalStackLayout
+                Grid.Row="6"
+                Grid.ColumnSpan="2">
+                <Label
+                    Text="Adres: "
+                    FontAttributes="Bold" />
+                <Label Text="{Binding AddressText}"/>
+            </HorizontalStackLayout>
 
-        <VerticalStackLayout
-            Grid.Row="6"
-            Grid.ColumnSpan="2"
-            IsVisible="{Binding IsNotCreatedStatus}">
-            <Label
-                Text="{Binding UserLabelText}"
-                FontAttributes="Bold" />
-            <Frame
-                 CornerRadius="100"
-                 WidthRequest="100"
-                 HeightRequest="100"
-                 Margin="0, 0, 0, 10">
-                <ImageButton
+            <VerticalStackLayout
+                Grid.Row="7"
+                Grid.ColumnSpan="2"
+                IsVisible="{Binding IsNotCreatedStatus}">
+                <Label
+                    Text="{Binding UserLabelText}"
+                    FontAttributes="Bold" />
+                <Frame
+                     CornerRadius="100"
                      WidthRequest="100"
                      HeightRequest="100"
-                     Source="{Binding UserPhoto}" />
-            </Frame>
-            <Label 
-                Text="{Binding UserText}" HorizontalTextAlignment="Center"/>
-        </VerticalStackLayout>
+                     Margin="0, 0, 0, 10">
+                    <ImageButton
+                         WidthRequest="100"
+                         HeightRequest="100"
+                         Source="{Binding UserPhoto}" />
+                </Frame>
+                <Label 
+                    Text="{Binding UserText}" HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
 
-        <HorizontalStackLayout
-            Grid.Row="7"
-            Grid.ColumnSpan="2">
-            <Label
-                Text="Realizacja: "
-                FontAttributes="Bold" />
-            <Label Text="{Binding StartTerm}"/>
-            <Label Text=" - " />
-            <Label Text="{Binding EndTerm}"/>
-        </HorizontalStackLayout>
-
-        <Button
-            IsVisible="{Binding IsKeeperCreatedButtonVisible}"
-            Grid.Row="8"
-            Grid.ColumnSpan="2"
-            VerticalOptions="End"
-            Style="{StaticResource PrimaryButton}"
-            Text="Zaopiekuj się"
-            Command="{Binding ChangeAnnouncementToPendingCommand}" />
-
-        <Button
-            IsVisible="{Binding IsKeeperPendingButtonVisible}"
-            Grid.Row="8"
-            Grid.ColumnSpan="2"
-            VerticalOptions="End"
-            Style="{StaticResource PrimaryButton}"
-            Text="Odwołaj opiekę"
-            Command="{Binding ChangeAnnouncementToCreatedCommand}" />
-
-        <Grid
-            ColumnDefinitions="*, *"
-            ColumnSpacing="10"
-            Grid.Row="8"
-            Grid.ColumnSpan="2"
-            VerticalOptions="End"
-            IsVisible="{Binding IsOwnerCreatedButtonVisible}">
             <Button
+                IsVisible="{Binding IsKeeperCreatedButtonVisible}"
+                Grid.Row="8"
+                Grid.ColumnSpan="2"
+                VerticalOptions="End"
                 Style="{StaticResource PrimaryButton}"
-                BackgroundColor="{StaticResource PrimaryDark}"
-                Text="Edytuj"
-                Command="{Binding EditAnnouncementCommand}" />
-            <Button
-                Grid.Column="1"
-                Style="{StaticResource SecondaryButton}"
-                BackgroundColor="{StaticResource Tertiary}"
-                Text="Usuń"
-                Command="{Binding DeleteAnnouncementCommand}" />
-        </Grid>
+                Text="Zaopiekuj się"
+                Command="{Binding ChangeAnnouncementToPendingCommand}" />
 
-        <Grid
-            ColumnDefinitions="*, *"
-            ColumnSpacing="10"
-            Grid.Row="8"
-            Grid.ColumnSpan="2"
-            VerticalOptions="End"
-            IsVisible="{Binding IsOwnerPendingButtonVisible}">
             <Button
+                IsVisible="{Binding IsKeeperPendingButtonVisible}"
+                Grid.Row="8"
+                Grid.ColumnSpan="2"
+                VerticalOptions="End"
                 Style="{StaticResource PrimaryButton}"
-                BackgroundColor="{StaticResource PrimaryDark}"
-                Text="Rozpocznij"
-                Command="{Binding StartAnnouncementCommand}" />
-            <Button
-                Grid.Column="1"
-                Style="{StaticResource SecondaryButton}"
-                BackgroundColor="{StaticResource Tertiary}"
-                Text="Odrzuć"
-                Command="{Binding RejectAnnouncementCommand}" />
-        </Grid>
+                Text="Odwołaj opiekę"
+                Command="{Binding ChangeAnnouncementToCreatedCommand}" />
 
-        <Grid
-            ColumnDefinitions="*, *"
-            ColumnSpacing="10"
-            Grid.Row="8"
-            Grid.ColumnSpan="2"
-            VerticalOptions="End"
-            IsVisible="{Binding IsOwnerOngoingButtonVisible}">
-            <Button
-                Style="{StaticResource PrimaryButton}"
-                BackgroundColor="{StaticResource PrimaryDark}"
-                Text="Zakończ"
-                Command="{Binding FinishAnnouncementCommand}" />
-            <Button
-                Grid.Column="1"
-                Style="{StaticResource SecondaryButton}"
-                BackgroundColor="{StaticResource Tertiary}"
-                Text="Anuluj"
-                Command="{Binding CancelAnnouncementCommand}" />
+            <Grid
+                ColumnDefinitions="*, *"
+                ColumnSpacing="10"
+                Grid.Row="8"
+                Grid.ColumnSpan="2"
+                VerticalOptions="End"
+                IsVisible="{Binding IsOwnerCreatedButtonVisible}">
+                <Button
+                    Style="{StaticResource PrimaryButton}"
+                    BackgroundColor="{StaticResource PrimaryDark}"
+                    Text="Edytuj"
+                    Command="{Binding EditAnnouncementCommand}" />
+                <Button
+                    Grid.Column="1"
+                    Style="{StaticResource SecondaryButton}"
+                    BackgroundColor="{StaticResource Tertiary}"
+                    Text="Usuń"
+                    Command="{Binding DeleteAnnouncementCommand}" />
+            </Grid>
+
+            <Grid
+                ColumnDefinitions="*, *"
+                ColumnSpacing="10"
+                Grid.Row="8"
+                Grid.ColumnSpan="2"
+                VerticalOptions="End"
+                IsVisible="{Binding IsOwnerPendingButtonVisible}">
+                <Button
+                    Style="{StaticResource PrimaryButton}"
+                    BackgroundColor="{StaticResource PrimaryDark}"
+                    Text="Rozpocznij"
+                    Command="{Binding StartAnnouncementCommand}" />
+                <Button
+                    Grid.Column="1"
+                    Style="{StaticResource SecondaryButton}"
+                    BackgroundColor="{StaticResource Tertiary}"
+                    Text="Odrzuć"
+                    Command="{Binding RejectAnnouncementCommand}" />
+            </Grid>
+
+            <Grid
+                ColumnDefinitions="*, *"
+                ColumnSpacing="10"
+                Grid.Row="8"
+                Grid.ColumnSpan="2"
+                VerticalOptions="End"
+                IsVisible="{Binding IsOwnerOngoingButtonVisible}">
+                <Button
+                    Style="{StaticResource PrimaryButton}"
+                    BackgroundColor="{StaticResource PrimaryDark}"
+                    Text="Zakończ"
+                    Command="{Binding FinishAnnouncementCommand}" />
+                <Button
+                    Grid.Column="1"
+                    Style="{StaticResource SecondaryButton}"
+                    BackgroundColor="{StaticResource Tertiary}"
+                    Text="Anuluj"
+                    Command="{Binding CancelAnnouncementCommand}" />
+            </Grid>
         </Grid>
-    </Grid>
+    </ScrollView>
 </ContentPage>
