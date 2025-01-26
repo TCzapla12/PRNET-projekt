@@ -46,7 +46,7 @@ namespace grpc_hello_world.Models
         public ulong EndTerm { get; set; }
 
         [Column("created_date")]
-        public ulong CreatedDate { get; }
+        public ulong CreatedDate { get; private set; }
 
         [Column("started_date")]
         public ulong? StartedDate { get; set; }

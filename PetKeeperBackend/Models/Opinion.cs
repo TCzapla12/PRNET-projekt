@@ -26,7 +26,7 @@ namespace grpc_hello_world.Models
         // Foreign Key: Announcement Id (linked to Announcement)
         [Column("announcement_id")]
         public Guid? AnnouncementId { get; set; }
-        [ForeignKey("KeeperId")]
+        [ForeignKey("AnnouncementId")]
         public Announcement Announcement { get; set; }
 
         [Column("rating")]
@@ -36,6 +36,6 @@ namespace grpc_hello_world.Models
         public string Description { get; set; }
 
         [Column("created_date")]
-        public ulong CreatedDate { get; }
+        public ulong CreatedDate { get; private set; }
     }
 }
