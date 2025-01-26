@@ -17,7 +17,7 @@ public class GrpcClient : IGrpcClient
     {
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AuthService.AuthServiceClient(channel);
-        var reply = await client.AuthenticateAsync(new AuthRequest { UserId = new UserIdentifier() { Email = authDto.Email }, Password = authDto.HashPassword });
+        var reply = await client.AuthenticateAsync(new AuthRequest { UserId = new UserIdentifier() { Email = authDto.Email }, Password = authDto.Password });
         return new CredentialsDto 
         { 
             Token = reply.Token,
@@ -54,7 +54,7 @@ public class GrpcClient : IGrpcClient
         {
             Email = registerDto.Email,
             Username = registerDto.Username,
-            Password = registerDto.HashPassword,
+            Password = registerDto.Password,
             FirstName = registerDto.FirstName,
             LastName = registerDto.LastName,
             Phone = registerDto.Phone,
