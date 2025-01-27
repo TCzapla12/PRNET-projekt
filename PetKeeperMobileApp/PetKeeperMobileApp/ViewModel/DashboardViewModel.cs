@@ -110,6 +110,8 @@ public partial class DashboardViewModel : ObservableObject
 
     public async Task LoadDataAsync()
     {
+        FirstName = "...";
+        Photo = "user.jpg";
         IsLoading = true;
         var ownerAnnouncements = new List<AnnouncementInfo>();
         var keeperAnnouncements = new List<AnnouncementInfo>();

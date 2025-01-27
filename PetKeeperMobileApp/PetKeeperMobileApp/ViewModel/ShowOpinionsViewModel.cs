@@ -28,8 +28,8 @@ public partial class ShowOpinionsViewModel : ObservableObject, IQueryAttributabl
             IsMyView = bool.Parse((string)isOwnerView);
 
         if (IsMyView)
-            Title = "Otrzymane opinie";
-        else Title = "Wystawione opinie";
+            Title = "OTRZYMANE OPINIE";
+        else Title = "WYSTAWIONE OPINIE";
     }
 
     [ObservableProperty]

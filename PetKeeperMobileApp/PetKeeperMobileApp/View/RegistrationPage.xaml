@@ -71,7 +71,7 @@
 
                 <Grid
                     RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto"
-                    ColumnDefinitions="30, 80, *, 110"
+                    ColumnDefinitions="35, 80, *, 110"
                     RowSpacing="20">
 
                     <templates:ValidationEntry

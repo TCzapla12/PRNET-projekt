@@ -86,13 +86,17 @@
                 Grid.Row="2"
                 Grid.ColumnSpan="4">
             <HorizontalStackLayout Spacing="10">
+                <Label
+                    Style="{StaticResource SubHeadline}"
+                    VerticalTextAlignment="Center"
+                    Text="Profit:" />
                 <Frame
                         WidthRequest="100"
                         HeightRequest="44"
                         CornerRadius="8"
                         Padding="5, 0, 5, -10">
                     <Entry
-                            Placeholder="Min. profit"
+                            Placeholder="Min."
                             IsSpellCheckEnabled="False"
                             Keyboard="Numeric"
                             Text="{Binding MinValue}" />
@@ -102,11 +106,15 @@
                         CornerRadius="8"
                         Padding="5, 0, 5, -10">
                     <Entry
-                            Placeholder="Maks. profit"
+                            Placeholder="Maks."
                             IsSpellCheckEnabled="False"
                             Keyboard="Numeric"
                             Text="{Binding MaxValue}" />
                 </Frame>
+                <Label
+                    Style="{StaticResource SubHeadline}"
+                    VerticalTextAlignment="Center"
+                    Text="Realizacja:" />
                 <Frame
                         WidthRequest="100"
                         CornerRadius="8"
