@@ -17,25 +17,41 @@ services:
     ports:
       - "5432:5432"
 
-  dotnet_app:
+  petkeeper_api:
     build:
       context: ./PetKeeperBackend
       dockerfile: Dockerfile
-    container_name: dotnet_app
+    container_name: petkeeper_api
+    volumes:
+      - user_data:/home/app/uploads/
     depends_on:
       - postgres
     networks:
       app_network:
-        ipv4_address: 172.168.100.20          # Static IP for the .NET app
+        ipv4_address: 172.168.100.20
     ports:
       - "8080:8080"
       - "8081:8081"
+
+  petkeeper_admin_webapp:
+    build:
+      context: ./PetKeeperAdminWebapp
+      dockerfile: Dockerfile
+    container_name: petkeeper_admin_webapp
+    depends_on:
+      - petkeeper_api
+    networks:
+      app_network:
+        ipv4_address: 172.168.100.2
+    ports:
+      - "5000:5000"
 
 networks:
   app_network:
     ipam:
       config:
-        - subnet: 172.168.100.0/24            # Custom subnet for static IPs
+        - subnet: 172.168.100.0/24
 
 volumes:
-  pg_data:                                  # Volume for PostgreSQL persistence
+  pg_data:
+  user_data:

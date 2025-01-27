@@ -12,6 +12,7 @@ message UserIdentifier {
         string id = 2;
         string username = 3;
     }
+    optional string primary_address_id = 4;
 }
 
 message AuthRequest {
@@ -28,7 +29,15 @@ service UserService {
     rpc CreateUser (UserCreate) returns (UserIdentifier);
     rpc GetUser (UserGet) returns (UserFull);
     rpc UpdateUser (UserUpdate) returns (UserUpdate);  // Only updated fields are returned
+    rpc UpdateUserCredentials (UserUpdateCredentials) returns  (UserUpdate);
     rpc DeleteUser (UserIdentifier) returns (UserIdentifier);
+}
+
+message UserUpdateCredentials {
+    optional UserIdentifier user_id = 1;
+    optional string email = 2;
+    optional string username = 3;
+    optional string password_hash = 4;
 }
 
 message UserUpdate {
@@ -38,13 +47,17 @@ message UserUpdate {
     optional string phone = 4;
     optional string pesel = 5;
     // Updating addresses done in a different endpoint
-    optional string avatar_url = 6;
-    optional string document_url = 7;
+    optional bytes avatar_png = 6;
+    repeated bytes document_pngs = 7;
     // States
     optional bool is_activated = 8;
     optional bool is_verified = 9;
     optional bool is_banned = 10;
     optional bool is_admin = 11;
+    // Only for UserUpdateCredentials
+    optional string email = 12;
+    optional string username = 13;
+    optional bool password_hash = 14;
 }
 
 message UserCreate {
@@ -56,9 +69,8 @@ message UserCreate {
     AddressCreate primary_address = 6;
     string phone = 7;
     string pesel = 8;
-    
-    optional string avatar_url = 9;
-    repeated string document_url = 10;
+    optional bytes avatar_png = 9;
+    repeated bytes document_pngs = 10;
 }
 
 message UserGet {
@@ -68,8 +80,8 @@ message UserGet {
     optional string phone = 4;
     optional string pesel = 5;
     // Updating addresses done in a different endpoint
-    optional string avatar_url = 6;
-    optional string document_url = 7;
+    optional bytes avatar_png = 6;
+    repeated bytes document_pngs = 7;
     // States
     optional bool is_activated = 8;
     optional bool is_verified = 9;
@@ -86,8 +98,8 @@ message UserFull {
     string phone = 6;
     string pesel = 7;
     AddressCreate primary_address = 8;
-    string avatar_url = 9;
-    repeated string document_url = 10;
+    bytes avatar_png = 9;
+    repeated bytes document_pngs = 10;
     // States
     bool is_activated = 11;
     bool is_verified = 12;
@@ -99,13 +111,13 @@ message UserFull {
 service AddressService {
     rpc CreateAddress (AddressCreate) returns (AddressMinimal);
     rpc GetUserAddresses (AddressGet) returns (AddressList);
-    rpc GetAddress (AddressGet) returns (AddressList);
+    rpc GetAddresses (AddressGet) returns (AddressList);
     rpc UpdateAddress (AddressUpdate) returns (AddressUpdate);
     rpc DeleteAddress (AddressMinimal) returns (AddressMinimal);
 }
 message AddressMinimal {
     string id = 1;
-    string owner_id = 2;
+    optional string owner_id = 2;
 }
 
 message AddressCreate {
@@ -116,16 +128,21 @@ message AddressCreate {
     string city = 5;
     string post_code = 6;
     optional string owner_id = 7;
-    string description = 8;
+    optional bool is_primary = 8;
+    optional string description = 9;
 }
 message AddressGet {
     optional string id = 1;
     optional string street = 2;
     optional string house_number = 3;
-    optional string city = 4;
-    optional string post_code = 5;
-    optional string owner_id = 6;
+    optional string apartment_number = 4;
+    optional string city = 5;
+    optional string post_code = 6;
+    optional bool is_primary = 7;
+    optional string owner_id = 8;
+    optional string description = 9;
 }
+
 message AddressUpdate {
     string id = 1;
     optional string street = 2;
@@ -133,35 +150,125 @@ message AddressUpdate {
     optional string apartment_number = 4;
     optional string city = 5;
     optional string post_code = 6;
-    optional string description = 7;
+    optional string owner_id = 7;
+    optional bool is_primary = 8;
+    optional string description = 9;
 }
 
 message AddressList {
     repeated AddressCreate addresses = 1;
 }
 
-service AnnouncementService {
-    rpc GetAnnouncement (AnnouncementFull) returns (CreateAnnouncementResponse);
+service AnimalService {
+    rpc CreateAnimal (AnimalCreate) returns (AnimalMinimal);
+    rpc GetAnimals (AnimalGet) returns (AnimalList);
+    rpc DeleteAnimal (AnimalMinimal) returns (AnimalMinimal);
+    rpc UpdateAnimal (AnimalUpdate) returns (AnimalUpdate);
 }
 
-message AnnouncementFull {
-    optional string id = 1;
-    string author_email = 2;
-    string keeper_email = 3;
-    optional uint32 keeper_profit = 4;
-    optional bool is_negotiable = 5;
-    optional bool is_long_term = 6;
-    optional string description = 7;
-    optional uint32 start_term = 8;
-    optional uint32 end_term = 9;
-    optional uint32 created_date = 10;
-    optional uint32 finished_date = 11;
-    optional string status = 12;
-    optional string address_street = 13;
-    optional string address_house_number = 14;
-    optional string address_city = 15;
-    optional string address_post_code = 16;
-}
-message CreateAnnouncementResponse {
+message AnimalMinimal {
     string id = 1;
+    optional string owner_id = 2;
+}
+
+message AnimalCreate {
+    optional string id = 1;
+    optional string owner_id = 2;
+    string name = 3;
+    string type = 4;
+    bytes photo = 5;
+    string description = 6;
+}
+
+message AnimalGet {
+    optional string id = 1;
+    optional string owner_id = 2;
+    optional string name = 3;
+    optional string type = 4;
+    optional string description = 5;
+}
+
+message AnimalUpdate {
+    string id = 1;
+    optional string name = 2;
+    optional string type = 3;
+    optional bytes photo = 4;
+    optional string description = 5;
+}
+
+message AnimalList {
+    repeated AnimalCreate animals = 1;
+}
+
+
+service AnnouncementService {
+    rpc CreateAnnouncement (AnnouncementCreate) returns (AnnouncementMinimal);
+    rpc GetAnnouncements (AnnouncementGet) returns (AnnouncementList);
+    rpc UpdateAnnouncement (AnnouncementUpdate) returns (AnnouncementUpdate);
+    rpc DeleteAnnouncement (AnnouncementMinimal) returns (AnnouncementMinimal);
+}
+
+message AnnouncementMinimal {
+    string id = 1;
+    string author_id = 2;
+    optional string keeper_id = 3;
+    optional string animal_id = 4;
+    optional string address_id = 5;
+}
+
+message AnnouncementCreate {
+    optional string id = 1;
+    optional string author_id = 2;
+    optional string keeper_id = 3;
+    string animal_id = 4;
+    uint32 keeper_profit = 5;
+    bool is_negotiable = 6;
+    optional string description = 7;
+    uint64 start_term = 8;
+    uint64 end_term = 9;
+    optional uint64 created_date = 10;
+    optional uint64 finished_date = 11;
+    optional string status = 12;
+    string address_id = 13;
+}
+
+message AnnouncementGet {
+    optional string id = 1;
+    optional string author_id = 2;
+    optional string keeper_id = 3;
+    optional string animal_id = 4;
+    optional uint32 keeper_profit_less = 5;
+    optional uint32 keeper_profit_more = 6;
+    optional bool is_negotiable = 7;
+    optional string description = 8;
+    optional uint64 start_term_before = 9;
+    optional uint64 end_term_before = 10;
+    optional uint64 created_date_before = 11;
+    optional uint64 finished_date_before = 12;
+    optional uint64 start_term_after = 13;
+    optional uint64 end_term_after = 14;
+    optional uint64 created_date_after = 15;
+    optional uint64 finished_date_after = 16;
+    optional string status = 17;
+    optional string address_id = 18;
+}
+
+message AnnouncementUpdate {
+    string id = 1;
+    optional string author_id = 2;
+    optional string keeper_id = 3;
+    optional string animal_id = 4;
+    optional uint32 keeper_profit = 5;
+    optional bool is_negotiable = 6;
+    optional string description = 7;
+    optional uint64 start_term = 8;
+    optional uint64 end_term = 9;
+    optional uint64 created_date = 10;
+    optional uint64 finished_date = 11;
+    optional string status = 12;
+    optional string address_id = 13;
+}
+
+message AnnouncementList {
+    repeated AnnouncementUpdate announcements = 1;
 }

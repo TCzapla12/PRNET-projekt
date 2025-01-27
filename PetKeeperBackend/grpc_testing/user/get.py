@@ -19,23 +19,33 @@ get_reqs = [
     user_pb2.UserGet(user_id=user_pb2.UserIdentifier(id=ids[2]))
 ]
 
-for usr, get_req in zip(users, get_reqs):
-    token = get_token(usr['email'], usr['password'], channel=channel)
-    get_response = stub.GetUser(get_req, metadata=[("authorization", f"Bearer {token}")])
+# for usr, get_req in zip(users, get_reqs):
+#     token = get_token(usr['email'], usr['password'], channel=channel)
+#     get_response = stub.GetUser(get_req, metadata=[("authorization", f"Bearer {token}")])
+#
+#     try:
+#         os.makedirs(f"../images/received/{usr['email']}")
+#     except FileExistsError:
+#         pass
+#     if len(get_response.avatar_png) > 0:
+#         im = Image.open(BytesIO(get_response.avatar_png))
+#         im.save(f"../images/received/{usr['email']}/avatar.png")
+#         get_response.ClearField("avatar_png")
+#
+#     im = Image.open(BytesIO(get_response.document_pngs[0]))
+#     im.save(f"../images/received/{usr['email']}/documentFront.png")
+#     im = Image.open(BytesIO(get_response.document_pngs[1]))
+#     im.save(f"../images/received/{usr['email']}/documentBack.png")
+#     get_response.ClearField("document_pngs")
+#
+#     print("GetUser Response:\n", get_response)
 
-    try:
-        os.makedirs(f"../images/received/{usr['email']}")
-    except FileExistsError:
-        pass
-    if len(get_response.avatar_png) > 0:
-        im = Image.open(BytesIO(get_response.avatar_png))
-        im.save(f"../images/received/{usr['email']}/avatar.png")
-        get_response.ClearField("avatar_png")
 
-    im = Image.open(BytesIO(get_response.document_pngs[0]))
-    im.save(f"../images/received/{usr['email']}/documentFront.png")
-    im = Image.open(BytesIO(get_response.document_pngs[1]))
-    im.save(f"../images/received/{usr['email']}/documentBack.png")
-    get_response.ClearField("document_pngs")
+token = get_token(users[2]['email'], users[2]['password'], channel=channel)
+get_response = stub.GetUsersAll(user_pb2.Empty(), metadata=[("authorization", f"Bearer {token}")])
+for usr in get_response.users:
+    usr.ClearField("document_pngs")
+    usr.ClearField("avatar_png")
 
-    print("GetUser Response:\n", get_response)
+print("Bulk users response: \n", get_response.users)
+pass

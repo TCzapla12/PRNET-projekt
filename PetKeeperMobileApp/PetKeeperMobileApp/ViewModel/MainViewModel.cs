@@ -39,9 +39,9 @@ public partial class MainViewModel(IGrpcClient grpcClient) : ObservableObject
                 HashPassword = Security.HashMD5(this.Password)
             };
 
-            var token = await grpcClient.Login(dto);
+            var credentials = await grpcClient.Login(dto);
 
-            await Storage.SaveToken(token);
+            await Storage.SaveCredentials(Email, credentials.Token);
 
             await Shell.Current.GoToAsync($"//{RouteType.Main}/{nameof(DashboardPage)}");
         }

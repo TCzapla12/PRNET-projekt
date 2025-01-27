@@ -200,7 +200,7 @@ namespace grpc_hello_world.Services
             var request_type = request.GetType();
 
             var userContext = context.GetHttpContext().User;
-            var authorId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
 
             Announcement? announcement;
@@ -209,23 +209,69 @@ namespace grpc_hello_world.Services
                 announcement = await _context.Announcements.FirstOrDefaultAsync(
                     a => a.Id.ToString() == request.Id);
                 // To evaluate - is getting authorId from retrieved announcement, or requiring it in the request better??
-                authorId = announcement?.AuthorId.ToString() ?? null;
+                userId = announcement?.AuthorId.ToString() ?? null;
+            }
+            // When status is updated, the changes possible to be done are only keeperId and Status
+            else if (request.HasStatus)
+            {
+                announcement = await _context.Announcements.FirstOrDefaultAsync(
+                    a => a.Id.ToString() == request.Id);
+                // Allow foreign updates if KeeperId is null or the same as requester
+                if (announcement.KeeperId != null && announcement.KeeperId.ToString() != userId && announcement.AuthorId.ToString() != userId)
+                {
+                    throw new RpcException(new Status(StatusCode.Unauthenticated, "Announcement already assigned!"));
+                }
+                // Discard other data
+                request = new AnnouncementUpdate {
+                    Status = request.HasStatus ? request.Status : "",
+                    KeeperId = userId
+                };
+                // Counts as cancellation of current keeper, can only be done by announcement author or current keeper
+                if (request.Status == "created" && userId == announcement.AuthorId.ToString() || request.KeeperId == announcement.KeeperId.ToString())
+                {
+                    request.KeeperId = "";
+                }
+                // Counts as Keeper wanting to take the announcement, can be done by anyone other than the announcement author
+                else if (request.Status == "pending" && request.KeeperId != announcement.AuthorId.ToString()) { }
+                else if (announcement.AuthorId.ToString() == userId)    // Author changing themself is ok
+                {
+                    request.KeeperId = announcement.KeeperId.ToString();
+                }
+                else
+                {
+                    throw new RpcException(new Status(StatusCode.Unauthenticated, "Changing into other state than created or pending by non-owner not allowed!"));
+                }
             }
             else
             {
                 announcement = await _context.Announcements.FirstOrDefaultAsync(
-                    a => a.Id.ToString() == request.Id && a.AuthorId.ToString() == authorId);
+                    a => a.Id.ToString() == request.Id && a.AuthorId.ToString() == userId);
             }
+
             if (announcement == null)
             {
                 throw new RpcException(new Status(StatusCode.NotFound, "Announcement not found!"));
             }
-
+            // Prevent author itself assigning keepers
+            if (announcement.AuthorId.ToString() == userId && request.HasKeeperId && (request.KeeperId != announcement.KeeperId.ToString() && request.KeeperId != ""))
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Assigning keepers by the owner is not allowed!"));
+            }
+            // Prevent setting keeperId when in invalid state
+            if (announcement.Status == "created" && request.HasStatus && request.Status == "Created" && request.HasKeeperId && request.KeeperId != "")
+            {
+                // request.HasStatus is checked earlier
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Can't set keeper for a announcement with created state!"));
+            }
+            if (userRole != "Admin" && announcement.Status == "finished" || announcement.Status == "canceled")
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Announcement is no longer available"));
+            }
             /* Even in case of Admin operation, Animal and Address should belong to the Announcement author */
             if (request.HasAnimalId)
             {
                 Animal? animal = await _context.Animals.SingleOrDefaultAsync(
-                    a => a.Id.ToString() == request.AnimalId && a.OwnerId == Guid.Parse(authorId));
+                    a => a.Id.ToString() == request.AnimalId && a.OwnerId == Guid.Parse(userId));
                 if (animal == null)
                 {
                     throw new RpcException(new Status(StatusCode.NotFound,
@@ -235,7 +281,7 @@ namespace grpc_hello_world.Services
             if (request.HasAddressId)
             {
                 Address? address = await _context.Addresses.SingleOrDefaultAsync(
-                    a => a.Id.ToString() == request.AddressId && a.OwnerId == Guid.Parse(authorId));
+                    a => a.Id.ToString() == request.AddressId && a.OwnerId == Guid.Parse(userId));
                 if (address == null)
                 {
                     throw new RpcException(new Status(StatusCode.NotFound,
@@ -256,7 +302,13 @@ namespace grpc_hello_world.Services
                 if (newValue == null)  // Skip if value is not available in the request (this guard might be optional, since this should not occur)
                     continue;
                 if (property.Name.Contains("Id"))
-                    newValue = Guid.Parse(newValue as string);
+                {
+                    if (property.Name == "KeeperId" && newValue as string == "")
+                        newValue = null;
+                    else
+                        newValue = Guid.Parse(newValue as string);
+                }
+                    
                     
                 var currentValue = typeof(Announcement).GetProperty(property.Name)?.GetValue(announcement, null);
 
@@ -289,7 +341,7 @@ namespace grpc_hello_world.Services
                 {
                     var value = typeof(Announcement).GetProperty(propertyName)?.GetValue(announcement, null);
                     if (propertyName.Contains("Id"))
-                        value = value.ToString();
+                        value = value?.ToString() ?? "";
                     property.SetValue(response, value);
                 }
             }

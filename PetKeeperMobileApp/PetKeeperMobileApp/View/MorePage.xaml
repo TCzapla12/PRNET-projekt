@@ -9,12 +9,12 @@
         RowDefinitions="Auto, *"
         Padding="20">
         <Label 
-            Text="Więcej"
+            Text="WIĘCEJ"
             Style="{StaticResource Headline}" />
         <Button
             Grid.Row="1"
             VerticalOptions="End"
-            Style="{StaticResource SecondaryButton}"
+            Style="{StaticResource OutlineButton}"
             Text="Wyloguj się" 
             Command="{Binding LogoutCommand}" />  
     </Grid>

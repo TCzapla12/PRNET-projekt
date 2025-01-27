@@ -2,13 +2,34 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PetKeeperMobileApp.View.DashboardPage"
-             xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"     
+             xmlns:templates="clr-namespace:PetKeeperMobileApp.Templates"
              x:DataType="viewmodel:DashboardViewModel"
              Title="DashboardPage">
+
     <VerticalStackLayout>
-        <Label 
-            Text="Dashboard"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+        <templates:ErrorItem
+            IsVisible="{Binding IsErrorVisible}"
+            ButtonCommand="{Binding RefreshData}"
+            ErrorException="{Binding Exception}" />
+        <Grid
+            RowDefinitions="Auto, Auto"
+            Padding="20"
+            RowSpacing="20">
+
+            <HorizontalStackLayout>
+
+                <Label 
+                    Text="Witaj, "
+                    Style="{StaticResource Headline}"/>
+                <Label
+                    Text="{Binding FirstName}"
+                    Style="{StaticResource Headline}"
+                    FontAttributes="Bold"/>
+                <Label
+                    Text="!"
+                    Style="{StaticResource Headline}"/>
+            </HorizontalStackLayout>
+        </Grid>
     </VerticalStackLayout>
 </ContentPage>

@@ -53,6 +53,7 @@ namespace grpc_hello_world.Models
         public required string[] DocumentUrl { get; set; }
 
         [Column("created_date")]
-        public long CreatedDate { get; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public long? CreatedDate { get; private set; }
     }
 }

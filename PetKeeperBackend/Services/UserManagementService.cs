@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Google.Protobuf.WellKnownTypes;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
+using Microsoft.Extensions.Options;
 
 namespace grpc_hello_world.Services
 {
@@ -14,6 +17,8 @@ namespace grpc_hello_world.Services
         private readonly ILogger<UserManagementService> _logger;
         public static readonly string _fileDir = "/home/app/uploads/";
         public static readonly byte[] PngSignature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+        public static readonly byte[] JpgSignature = [ 0xFF, 0xD8, 0xFF ];
+
 
         public UserManagementService(AppDbContext context, ILogger<UserManagementService> logger)
         {
@@ -36,13 +41,20 @@ namespace grpc_hello_world.Services
             string? avatarFilePath = null;
             if (request.HasAvatarPng)
             {
-                avatarFilePath = Path.Combine(userFileDir, "avatar.png");
+                avatarFilePath = Path.Combine(userFileDir, "avatar");
             }
             
             string[] documentFilePath = [
-                Path.Combine(userFileDir, "documentFront.png"),
-                Path.Combine(userFileDir, "documentBack.png")
+                Path.Combine(userFileDir, "documentFront"),
+                Path.Combine(userFileDir, "documentBack")
             ];
+
+            if (!IsPngOrJpg(request.DocumentPngs[0].ToByteArray()) ||
+                !IsPngOrJpg(request.DocumentPngs[1].ToByteArray()) ||
+                request.HasAvatarPng && !IsPngOrJpg(request.AvatarPng.ToByteArray()))
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "One or more of supplied images are not PNG or JPG!"));
+            }
 
             var user = new User
             {
@@ -71,12 +83,6 @@ namespace grpc_hello_world.Services
             catch (DbUpdateException e)
             {
                 throw new RpcException(new Status(StatusCode.AlreadyExists, e.Message));
-            }
-            if (!IsPng(request.DocumentPngs[0].ToByteArray()) ||
-                !IsPng(request.DocumentPngs[1].ToByteArray()) ||
-                request.HasAvatarPng && !IsPng(request.AvatarPng.ToByteArray()))
-            {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "One or more of supplied files are not PNG!"));
             }
 
             await File.WriteAllBytesAsync(documentFilePath[0], request.DocumentPngs[0].ToByteArray());
@@ -147,7 +153,7 @@ namespace grpc_hello_world.Services
             {                
                 if (user.AvatarUrl != null)
                 {
-                    var avatarFilePath = Path.Combine(userFileDir, "avatar.png");
+                    var avatarFilePath = Path.Combine(userFileDir, "avatar");
                     avatarBytes = await File.ReadAllBytesAsync(avatarFilePath);
                 }
                 
@@ -159,8 +165,8 @@ namespace grpc_hello_world.Services
             byte[][] documentBytes = new byte[2][];
             try
             {
-                var documentFrontFilePath = Path.Combine(userFileDir, "documentFront.png");
-                var documentBackFilePath = Path.Combine(userFileDir, "documentBack.png");
+                var documentFrontFilePath = Path.Combine(userFileDir, "documentFront");
+                var documentBackFilePath = Path.Combine(userFileDir, "documentBack");
                 documentBytes[0] = await File.ReadAllBytesAsync(documentFrontFilePath);
                 documentBytes[1] = await File.ReadAllBytesAsync(documentBackFilePath);
             }
@@ -240,7 +246,7 @@ namespace grpc_hello_world.Services
                 if (property.Name == "AvatarPng")
                 {
                     var userFileDir = Path.Combine(_fileDir, user.Id.ToString());
-                    var avatarFilePath = Path.Combine(userFileDir, "avatar.png");
+                    var avatarFilePath = Path.Combine(userFileDir, "avatar");
                     byte[] currentValueBytes = PngSignature;
                     try
                     {
@@ -252,8 +258,8 @@ namespace grpc_hello_world.Services
                     }
                     
                     byte[] newValueBytes = request.AvatarPng.ToByteArray();
-                    if (!IsPng(newValueBytes))
-                        throw new RpcException(new Status(StatusCode.InvalidArgument, "Supplied avatar is not a PNG"));
+                    if (!IsPngOrJpg(newValueBytes))
+                        throw new RpcException(new Status(StatusCode.InvalidArgument, "Supplied avatar is not a PNG or JPG"));
 
                     condition = !currentValueBytes.SequenceEqual(newValueBytes);
                     if (condition)
@@ -265,8 +271,8 @@ namespace grpc_hello_world.Services
                 {
                     var userFileDir = Path.Combine(_fileDir, user.Id.ToString());
 
-                    var documentFrontFilePath = Path.Combine(userFileDir, "documentFront.png");
-                    var documentBackFilePath = Path.Combine(userFileDir, "documentBack.png");
+                    var documentFrontFilePath = Path.Combine(userFileDir, "documentFront");
+                    var documentBackFilePath = Path.Combine(userFileDir, "documentBack");
                     byte[] currentDocumentFront = PngSignature;
                     byte[] currentDocumentBack = PngSignature;
                     try
@@ -288,8 +294,8 @@ namespace grpc_hello_world.Services
 
                     var newDocumentFront = request.DocumentPngs[0].ToByteArray();
                     var newDocumentBack = request.DocumentPngs[1].ToByteArray();
-                    if (!IsPng(newDocumentBack) || !IsPng(newDocumentFront))
-                        throw new RpcException(new Status(StatusCode.InvalidArgument, "Supplied document picture(s) are not a PNG"));
+                    if (!IsPngOrJpg(newDocumentBack) || !IsPngOrJpg(newDocumentFront))
+                        throw new RpcException(new Status(StatusCode.InvalidArgument, "Supplied document picture(s) are not a PNG or JPG"));
 
                     condition = !(currentDocumentFront.SequenceEqual(newDocumentFront) && currentDocumentBack.SequenceEqual(newDocumentBack));
                     if (condition)
@@ -416,6 +422,38 @@ namespace grpc_hello_world.Services
             return new UserIdentifier { Id = user.Id.ToString() };
         }
 
+        [Authorize]
+        public override async Task<UserListAdmin> GetUsersAll(Empty request, ServerCallContext context)
+        {
+            var userContext = context.GetHttpContext().User;
+            var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (userRole != "Admin")
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Only admins can access this endpoint!"));
+            }
+
+            var allUsers = await _context.Users.ToListAsync();
+
+            var userList = new UserListAdmin();
+            foreach (var user in allUsers)
+            {
+                // Use the existing DbContext instance, but ensure each async call finishes before starting the next
+                var userGetRequest = new UserGet
+                {
+                    UserId = new UserIdentifier { Id = user.Id.ToString() }
+                };
+
+                var userFull = await GetUser(userGetRequest, context);
+
+                userList.Users.Add(userFull);
+            }
+            return userList;
+
+        }
+
+
         public static string HashPassword(string password)
         {
             var passwordHasher = new PasswordHasher<User>();
@@ -429,18 +467,39 @@ namespace grpc_hello_world.Services
             return result == PasswordVerificationResult.Success;
         }
 
-        public static bool IsPng(byte[] fileBytes)
+        public static bool IsPngOrJpg(byte[] fileBytes)
         {
-            if (fileBytes.Length < PngSignature.Length)
+            if (fileBytes == null || fileBytes.Length == 0)
                 return false;
 
-            for (uint i = 0; i < PngSignature.Length; i++)
+            if (fileBytes.Length >= PngSignature.Length)
             {
-                if (fileBytes[i] != PngSignature[i])
-                    return false;
+                bool isPng = true;
+                for (int i = 0; i < PngSignature.Length; i++)
+                {
+                    if (fileBytes[i] != PngSignature[i])
+                    {
+                        isPng = false;
+                        break;
+                    }
+                }
+                if (isPng) return true;
             }
 
-            return true;
+            if (fileBytes.Length >= JpgSignature.Length)
+            {
+                bool isJpg = true;
+                for (int i = 0; i < JpgSignature.Length; i++)
+                {
+                    if (fileBytes[i] != JpgSignature[i])
+                    {
+                        isJpg = false;
+                        break;
+                    }
+                }
+                if (isJpg) return true;
+            }
+            return false;
         }
 
         public static async Task<User> GetUserAsync(
