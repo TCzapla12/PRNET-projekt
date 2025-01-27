@@ -24,10 +24,12 @@ message AuthResponse {
   string token = 1;
 }
 
+message Empty {}
 
 service UserService {
     rpc CreateUser (UserCreate) returns (UserIdentifier);
     rpc GetUser (UserGet) returns (UserFull);
+    rpc GetUsersAll (Empty) returns (UserListAdmin);
     rpc UpdateUser (UserUpdate) returns (UserUpdate);  // Only updated fields are returned
     rpc UpdateUserCredentials (UserUpdateCredentials) returns  (UserUpdate);
     rpc DeleteUser (UserIdentifier) returns (UserIdentifier);
@@ -105,6 +107,10 @@ message UserFull {
     bool is_verified = 12;
     bool is_banned = 13;
     bool is_admin = 14;
+}
+
+message UserListAdmin {
+    repeated UserFull users = 1;
 }
 
 
