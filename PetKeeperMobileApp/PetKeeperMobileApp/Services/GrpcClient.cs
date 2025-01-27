@@ -9,6 +9,7 @@ namespace PetKeeperMobileApp.Services;
 
 public class GrpcClient : IGrpcClient
 {
+    //private readonly static string host = "192.168.1.19";
     private readonly static string host = "10.0.2.2";
     private readonly static string port = "8080";
 
