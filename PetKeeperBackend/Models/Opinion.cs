@@ -36,6 +36,7 @@ namespace grpc_hello_world.Models
         public string Description { get; set; }
 
         [Column("created_date")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public ulong CreatedDate { get; private set; }
     }
 }
