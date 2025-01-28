@@ -9,6 +9,9 @@
              Title="SearchPage">
 
     <ContentPage.Resources>
+        <converters:InvertedBoolToVisibilityConverter 
+            x:Key="InvertedBoolToVisibilityConverter"
+            xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />
         <x:String x:Key="arrow-left">&#xf060;</x:String>
         <x:String x:Key="pen">&#xf304;</x:String>
         <x:String x:Key="trash">&#xf1f8;</x:String>
@@ -114,7 +117,7 @@
                 <Label
                     Style="{StaticResource SubHeadline}"
                     VerticalTextAlignment="Center"
-                    Text="Realizacja:" />
+                    Text="Data:" />
                 <Frame
                         WidthRequest="100"
                         CornerRadius="8"
@@ -148,6 +151,7 @@
         <CollectionView
             Grid.Row="3"
             Grid.ColumnSpan="4"
+            IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolToVisibilityConverter}}"
             ItemsSource="{Binding AnnouncementList}">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="{x:Type models:AnnouncementInfo}">

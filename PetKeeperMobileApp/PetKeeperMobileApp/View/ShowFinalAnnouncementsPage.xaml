@@ -10,6 +10,9 @@
              x:Name="ShowFinalAnn">
 
     <ContentPage.Resources>
+        <converters:InvertedBoolToVisibilityConverter 
+            x:Key="InvertedBoolToVisibilityConverter"
+            xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />
         <x:String x:Key="arrow-left">&#xf060;</x:String>
     </ContentPage.Resources>
     
@@ -50,7 +53,8 @@
 
             <VerticalStackLayout
                 Grid.Row="1"
-                Grid.ColumnSpan="2">
+                Grid.ColumnSpan="2"
+                IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolToVisibilityConverter}}">
                 <templates:ErrorItem
                     IsVisible="{Binding IsErrorVisible}"
                     ButtonCommand="{Binding RefreshData}"

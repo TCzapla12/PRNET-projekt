@@ -12,15 +12,13 @@
         <converters:ListToVisibilityConverter 
             x:Key="ListToVisibilityConverter"
             xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />
+        <converters:InvertedBoolToVisibilityConverter 
+            x:Key="InvertedBoolToVisibilityConverter"
+            xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />   
     </ContentPage.Resources>
     
     <ScrollView>
         <VerticalStackLayout>
-            <templates:ErrorItem
-                IsVisible="{Binding IsErrorVisible}"
-                ButtonCommand="{Binding RefreshData}"
-                ErrorException="{Binding Exception}" 
-                Margin="20, 20, 20, 0"/>
             <Grid
                 RowDefinitions="Auto, Auto, Auto"
                 Padding="20"
@@ -68,7 +66,12 @@
                     Margin="0, 20, 0, 20" />    
 
                 <VerticalStackLayout
-                    Grid.Row="2">
+                    Grid.Row="2"
+                    IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolToVisibilityConverter}}">
+                    <templates:ErrorItem
+                        IsVisible="{Binding IsErrorVisible}"
+                        ButtonCommand="{Binding RefreshData}"
+                        ErrorException="{Binding Exception}"/>
                     <CollectionView
                         IsVisible="{Binding OwnerAnnouncementList, Converter={StaticResource ListToVisibilityConverter}}"
                         ItemsSource="{Binding OwnerAnnouncementList}">
