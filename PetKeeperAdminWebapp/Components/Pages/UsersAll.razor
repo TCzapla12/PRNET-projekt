@@ -56,11 +56,11 @@
     }
 </style>
 
-<h3>Users List</h3>
+<h3>Lista Użytkowników</h3>
 
 @if (loading)
 {
-    <p>Loading users...</p>
+    <p>Ładowanie...</p>
 }
 else if (error != null)
 {
@@ -68,7 +68,7 @@ else if (error != null)
 }
 else if (users.Count == 0)
 {
-    <p>No users found.</p>
+    <p>Nie znaleziono użytkowników.</p>
 }
 else
 {
@@ -78,8 +78,8 @@ else
             <li>
                 <a href="#" @onclick="() => NavigateToUser(user.Id)">@user.Email</a>
                 <span class="status">
-                    Verified: <strong>@(user.IsVerified ? "Yes" : "No")</strong>,
-                    Banned: <strong>@(user.IsBanned ? "Yes" : "No")</strong>
+                    Zweryfikowany: <strong>@(user.IsVerified ? "Tak" : "Nie")</strong>,
+                    Zablokowany: <strong>@(user.IsBanned ? "Tak" : "Nie")</strong>
                 </span>
             </li>
         }

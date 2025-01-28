@@ -64,18 +64,18 @@
     }
 </style>
 
-<h3>Login</h3>
+<h3>Logowanie</h3>
 
 <div class="form-container">
-    <label for="username">Username:</label>
+    <label for="username">Nazwa użytkownika:</label>
     <input id="username" @bind="Username" />
 
-    <label for="password">Password:</label>
+    <label for="password">Hasło:</label>
     <input id="password" type="password" @bind="Password" />
 </div>
 
 <div class="button-container">
-    <button @onclick="HandleLogin">Login</button>
+    <button @onclick="HandleLogin">Zaloguj się</button>
 </div>
 
 @if (!string.IsNullOrEmpty(ErrorMessage))
@@ -114,7 +114,7 @@
                     if (role != "Admin")
                     {
                         Token = string.Empty;
-                        ErrorMessage = "Login failed: User is not an Admin";
+                        ErrorMessage = "Logowanie nie powiodło się: użytkownik nie jest administratorem.";
                         return;
                     }
                     await LocalStorage.SetItemAsync("auth_token", Token);
@@ -124,11 +124,11 @@
         }
         catch (Grpc.Core.RpcException ex)
         {
-            ErrorMessage = $"Login failed: {ex.Status.Detail}";
+            ErrorMessage = $"Logowanie nie powiodło się.";
         }
         catch (Exception ex)
         {
-            ErrorMessage = "Unexpected error occurred";
+            ErrorMessage = "Wystąpił błąd.";
         }
     }
 }
