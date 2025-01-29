@@ -9,7 +9,8 @@ namespace PetKeeperMobileApp.Services;
 
 public class GrpcClient : IGrpcClient
 {
-    private readonly static string host = "10.0.2.2";
+    private readonly static string host = "192.168.1.19";
+    //private readonly static string host = "10.0.2.2";
     private readonly static string port = "8080";
 
     #region Auth
@@ -17,7 +18,7 @@ public class GrpcClient : IGrpcClient
     {
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AuthService.AuthServiceClient(channel);
-        var reply = await client.AuthenticateAsync(new AuthRequest { UserId = new UserIdentifier() { Email = authDto.Email }, Password = authDto.HashPassword });
+        var reply = await client.AuthenticateAsync(new AuthRequest { UserId = new UserIdentifier() { Email = authDto.Email }, Password = authDto.Password });
         return new CredentialsDto 
         { 
             Token = reply.Token,
@@ -54,7 +55,7 @@ public class GrpcClient : IGrpcClient
         {
             Email = registerDto.Email,
             Username = registerDto.Username,
-            Password = registerDto.HashPassword,
+            Password = registerDto.Password,
             FirstName = registerDto.FirstName,
             LastName = registerDto.LastName,
             Phone = registerDto.Phone,
@@ -68,15 +69,17 @@ public class GrpcClient : IGrpcClient
         return Wordings.REGISTER_SUCCESS;
     }
 
-    public async Task<UserDto> GetUser()
+    public async Task<UserDto> GetUser(string? id = null)
     {
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}", new GrpcChannelOptions
         {
             MaxReceiveMessageSize = 10 * 1024 * 1024
         });
+        var userIdentifier = new UserIdentifier();
+        if (id == null) userIdentifier.Email = await Storage.GetUserEmail();
+        else userIdentifier.Id = id;
         var client = new UserService.UserServiceClient(channel);
-        var reply = await client.GetUserAsync(new UserGet
-        { UserId = new UserIdentifier { Email = await Storage.GetUserEmail() } }, await Storage.GetMetadata());
+        var reply = await client.GetUserAsync(new UserGet { UserId = userIdentifier }, await Storage.GetMetadata());
         UserDto user = new()
         {
             Id = reply.Id,
@@ -270,12 +273,17 @@ public class GrpcClient : IGrpcClient
     #endregion
 
     #region Announcement
-    public async Task<List<AnnouncementDto>> GetAnnouncements()
+    public async Task<List<AnnouncementDto>> GetUserAnnouncements(StatusType? status = null)
     {
         var announcements = new List<AnnouncementDto>();
+        var announcementParams = new AnnouncementGet()
+        {
+            AuthorId = await Storage.GetUserId()
+        };
+        if (status != null) announcementParams.Status = status.ToString()!.ToLower();
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AnnouncementService.AnnouncementServiceClient(channel);
-        var reply = await client.GetAnnouncementsAsync(new AnnouncementGet { }, await Storage.GetMetadata());
+        var reply = await client.GetAnnouncementsAsync(announcementParams, await Storage.GetMetadata());
         foreach (var announcement in reply.Announcements)
         {
             announcements.Add(new AnnouncementDto()
@@ -288,7 +296,43 @@ public class GrpcClient : IGrpcClient
                 StartTerm = announcement.StartTerm,
                 EndTerm = announcement.EndTerm,
                 Status = Enum.TryParse<StatusType>(announcement.Status, true, out var parsedStatus) ? parsedStatus : StatusType.Canceled,
-                AddressId = announcement.AddressId
+                AddressId = announcement.AddressId,
+                OwnerId = announcement.AuthorId,
+                KeeperId = announcement.KeeperId
+            });
+        }
+        return announcements;
+    }
+
+    public async Task<List<AnnouncementDto>> GetAnnouncements(int? minValue = null, int? maxValue = null, 
+        DateTime? startTerm = null, DateTime? endTerm = null, string? keeperId = null, StatusType? status = null)
+    {
+        var announcements = new List<AnnouncementDto>();
+        var announcementParams = new AnnouncementGet();
+        if (minValue != null) announcementParams.KeeperProfitLess = (uint)minValue;
+        if (maxValue != null) announcementParams.KeeperProfitMore = (uint)maxValue;
+        if (startTerm != null) announcementParams.StartTermAfter = (ulong)new DateTimeOffset((DateTime)startTerm).ToUnixTimeSeconds();
+        if (endTerm != null) announcementParams.EndTermBefore = (ulong)new DateTimeOffset((DateTime)endTerm).ToUnixTimeSeconds();
+        if (keeperId != null) announcementParams.KeeperId = keeperId;
+        if (status != null) announcementParams.Status = status.ToString()!.ToLower();
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new AnnouncementService.AnnouncementServiceClient(channel);
+        var reply = await client.GetAnnouncementsAsync(announcementParams, await Storage.GetMetadata());
+        foreach (var announcement in reply.Announcements)
+        {
+            announcements.Add(new AnnouncementDto()
+            {
+                Id = announcement.Id,
+                AnimalId = announcement.AnimalId,
+                Profit = announcement.KeeperProfit,
+                IsNegotiable = announcement.IsNegotiable,
+                Description = announcement.Description,
+                StartTerm = announcement.StartTerm,
+                EndTerm = announcement.EndTerm,
+                Status = Enum.TryParse<StatusType>(announcement.Status, true, out var parsedStatus) ? parsedStatus : StatusType.Canceled,
+                AddressId = announcement.AddressId,
+                OwnerId = announcement.AuthorId,
+                KeeperId = announcement.KeeperId
             });
         }
         return announcements;
@@ -326,9 +370,23 @@ public class GrpcClient : IGrpcClient
             Description = announcementDto.Description,
             StartTerm = announcementDto.StartTerm,
             EndTerm = announcementDto.EndTerm,
-            Status = announcementDto.Status.ToString().ToLower(),
             AddressId = announcementDto.AddressId
         };
+        var reply = await client.UpdateAnnouncementAsync(announcement, await Storage.GetMetadata());
+        return Wordings.SUCCESS;
+    }
+
+    public async Task<string> UpdateAnnouncementStatus(UpdateAnnouncementDto announcementUpdateDto)
+    {
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new AnnouncementService.AnnouncementServiceClient(channel);
+        AnnouncementUpdate announcement = new()
+        {
+            Id = announcementUpdateDto.Id,
+            Status = announcementUpdateDto.Status.ToString().ToLower(),
+        };
+        if (announcementUpdateDto.KeeperId != null)
+            announcement.KeeperId = announcementUpdateDto.KeeperId;
         var reply = await client.UpdateAnnouncementAsync(announcement, await Storage.GetMetadata());
         return Wordings.SUCCESS;
     }
@@ -338,6 +396,76 @@ public class GrpcClient : IGrpcClient
         using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
         var client = new AnnouncementService.AnnouncementServiceClient(channel);
         var reply = await client.DeleteAnnouncementAsync(new AnnouncementMinimal { Id = id }, await Storage.GetMetadata());
+        return Wordings.SUCCESS;
+    }
+    #endregion
+
+    #region Opinions
+    public async Task<List<OpinionDto>> GetOpinions(string? authorId = null, string? keeperId = null)
+    {
+        var opinions = new List<OpinionDto>();
+        var opinionParams = new OpinionGet();
+        if (authorId != null) opinionParams.AuthorId = authorId;
+        if (keeperId != null) opinionParams.KeeperId = keeperId;
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new OpinionService.OpinionServiceClient(channel);
+        var reply = await client.GetOpinionsAsync(opinionParams, await Storage.GetMetadata());
+        foreach (var opinion in reply.Opinions)
+        {
+            opinions.Add(new OpinionDto()
+            {
+                Id = opinion.Id,
+                AuthorId = opinion.AuthorId,
+                KeeperId = opinion.KeeperId,
+                Description = opinion.Description,
+                CreatedDate = opinion.CreatedDate,
+                Rating = opinion.Rating,
+                AnnouncementId = opinion.AnnouncementId
+            });
+        }
+        return opinions;
+    }
+
+    public async Task<string> CreateOpinion(OpinionDto opinionDto)
+    {
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new OpinionService.OpinionServiceClient(channel);
+        OpinionCreate opinion = new()
+        {
+            AuthorId = opinionDto.AuthorId,
+            KeeperId = opinionDto.KeeperId,
+            Description = opinionDto.Description ?? string.Empty,
+            CreatedDate = opinionDto.CreatedDate,
+            Rating = opinionDto.Rating,
+            AnnouncementId = opinionDto.AnnouncementId
+        };
+        var reply = await client.CreateOpinionAsync(opinion, await Storage.GetMetadata());
+        return Wordings.SUCCESS;
+    }
+
+    public async Task<string> UpdateOpinion(OpinionDto opinionDto)
+    {
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new OpinionService.OpinionServiceClient(channel);
+        OpinionUpdate opinion = new()
+        {
+            Id = opinionDto.Id,
+            AuthorId = opinionDto.AuthorId,
+            KeeperId = opinionDto.KeeperId,
+            Description = opinionDto.Description ?? string.Empty,
+            CreatedDate = opinionDto.CreatedDate,
+            Rating = opinionDto.Rating,
+            AnnouncementId = opinionDto.AnnouncementId
+        };
+        var reply = await client.UpdateOpinionAsync(opinion, await Storage.GetMetadata());
+        return Wordings.SUCCESS;
+    }
+
+    public async Task<string> DeleteOpinion(string id)
+    {
+        using var channel = GrpcChannel.ForAddress($"http://{host}:{port}");
+        var client = new OpinionService.OpinionServiceClient(channel);
+        var reply = await client.DeleteOpinionAsync(new OpinionMinimal { Id = id }, await Storage.GetMetadata());
         return Wordings.SUCCESS;
     }
     #endregion

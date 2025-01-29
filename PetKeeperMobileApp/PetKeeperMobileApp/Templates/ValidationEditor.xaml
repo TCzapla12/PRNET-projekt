@@ -16,7 +16,7 @@
             AutoSize="TextChanges" 
             Placeholder="{Binding Placeholder, Mode=OneWay, Source={x:Reference ValEditor}}" 
             Text="{Binding Text, Mode=TwoWay, Source={x:Reference ValEditor}}"
-            PlaceholderColor="Black" />
+            PlaceholderColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Gray500}}" />
         <Label
             Margin="4, 0, 0, -10"
             IsVisible="{Binding ErrorText, Converter={StaticResource StringToVisibilityConverter}, Mode=OneWay, Source={x:Reference ValEditor}}"

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PetKeeperMobileApp.View.AddOpinionPage"
+             xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             x:DataType="viewmodel:AddOpinionViewModel"
+             Title="AddOpinionPage">
+
+    <ContentPage.Resources>
+        <x:String x:Key="xmark">&#xf00d;</x:String>
+        <x:String x:Key="star">&#xf005;</x:String>
+    </ContentPage.Resources>
+    
+    <Grid
+        RowDefinitions="40, Auto, *"
+        ColumnDefinitions="Auto, *"
+        Padding="20"
+        RowSpacing="20">
+
+        <ImageButton
+            HeightRequest="30"
+            Command="{Binding ButtonActionCommand}">
+            <ImageButton.Source>
+                <FontImageSource
+            FontFamily="FAS"
+            Glyph="{StaticResource xmark}"
+            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
+            </ImageButton.Source>
+        </ImageButton>
+
+        <Label 
+            Grid.ColumnSpan="2"
+            Text="Nowa opinia"
+            Style="{StaticResource Headline}" />
+
+        <StackLayout
+            Margin="0, 20, 0, 0"  
+            Grid.Row="1"
+            Grid.ColumnSpan="2">
+            <Editor 
+                HeightRequest="300"
+                VerticalTextAlignment="Start"
+                BackgroundColor="{StaticResource Primary100}"
+                MaxLength="300"
+                AutoSize="TextChanges" 
+                Placeholder="Opis (opcjonalny)" 
+                Text="{Binding Description}"
+                PlaceholderColor="Black"
+                Margin="0, 0, 0, 50"/>
+            <HorizontalStackLayout 
+                Spacing="10"
+                HorizontalOptions="Center">
+                <ImageButton 
+                    HeightRequest="30"
+                    Command="{Binding StarClickedCommand}"
+                    CommandParameter="1">
+                    <ImageButton.Source>
+                        <FontImageSource 
+                            FontFamily="FAS"
+                            Glyph="{StaticResource star}"
+                            Color="{Binding Star1Color}"/>
+                    </ImageButton.Source>
+                </ImageButton>
+                <ImageButton 
+                    HeightRequest="30"
+                    Command="{Binding StarClickedCommand}"
+                    CommandParameter="2">
+                    <ImageButton.Source>
+                        <FontImageSource 
+                            FontFamily="FAS"
+                            Glyph="{StaticResource star}"
+                            Color="{Binding Star2Color}"/>
+                    </ImageButton.Source>
+                </ImageButton>
+                <ImageButton 
+                    HeightRequest="30"
+                    Command="{Binding StarClickedCommand}"
+                    CommandParameter="3">
+                    <ImageButton.Source>
+                        <FontImageSource 
+                            FontFamily="FAS"
+                            Glyph="{StaticResource star}"
+                            Color="{Binding Star3Color}"/>
+                    </ImageButton.Source>
+                </ImageButton>
+                <ImageButton 
+                    HeightRequest="30"
+                    Command="{Binding StarClickedCommand}"
+                    CommandParameter="4">
+                    <ImageButton.Source>
+                        <FontImageSource 
+                            FontFamily="FAS"
+                            Glyph="{StaticResource star}"
+                            Color="{Binding Star4Color}"/>
+                    </ImageButton.Source>
+                </ImageButton>
+                <ImageButton 
+                    HeightRequest="30"
+                    Command="{Binding StarClickedCommand}"
+                    CommandParameter="5">
+                    <ImageButton.Source>
+                        <FontImageSource 
+                            FontFamily="FAS"
+                            Glyph="{StaticResource star}"
+                            Color="{Binding Star5Color}"/>
+                    </ImageButton.Source>
+                </ImageButton>
+            </HorizontalStackLayout>
+        </StackLayout>
+        <Grid
+            RowDefinitions="*, *"
+            ColumnDefinitions="*, *"
+            ColumnSpacing="10"
+            VerticalOptions="End"
+            Grid.Row="2"
+            Grid.ColumnSpan="2">
+            <HorizontalStackLayout 
+                Grid.ColumnSpan="2"
+                    Margin="0, 0, 0, 20"
+                    HorizontalOptions="Center">
+                <Label Text="Czy chcesz dodać opinię użytkownikowi: " />
+                <Label 
+                    Text="{Binding Username}" 
+                    FontAttributes="Bold" 
+                    TextColor="{StaticResource PrimaryDarkText}"/>
+            </HorizontalStackLayout>
+            <Button
+                Grid.Row="1"
+                Style="{StaticResource PrimaryButton}"
+                Text="Tak"
+                Command="{Binding AddOpinionCommand}" />
+            <Button
+                Grid.Row="1"
+                Grid.Column="1"
+                Style="{StaticResource OutlineButton}"
+                FontSize="20"
+                Text="Nie"
+                Command="{Binding ButtonActionCommand}" />
+        </Grid>
+    </Grid>
+</ContentPage>

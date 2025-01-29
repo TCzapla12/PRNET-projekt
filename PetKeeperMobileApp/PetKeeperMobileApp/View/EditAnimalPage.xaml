@@ -24,7 +24,7 @@
                 <FontImageSource
                     FontFamily="FAS"
                     Glyph="{StaticResource xmark}"
-                    Color="{StaticResource PrimaryDark}" />
+                    Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
             </ImageButton.Source>
         </ImageButton>
 

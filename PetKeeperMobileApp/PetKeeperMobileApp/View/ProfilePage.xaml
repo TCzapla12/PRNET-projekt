@@ -14,7 +14,7 @@
             Style="{StaticResource Headline}" />
         <Grid
             Grid.Row="1"
-            RowDefinitions="Auto, *"
+            RowDefinitions="Auto, Auto, Auto, *"
             RowSpacing="10">
             <Button
                 Style="{StaticResource OutlineButton}"
@@ -25,6 +25,16 @@
                 Style="{StaticResource OutlineButton}"
                 Text="Moje zwierzęta"
                 Command="{Binding ShowMyPetsCommand}" />
+            <Button 
+                Grid.Row="2"
+                Style="{StaticResource OutlineButton}"
+                Text="Otrzymane opinie"
+                Command="{Binding ShowMyOpinionsCommand}" />
+            <Button 
+                Grid.Row="3"
+                Style="{StaticResource OutlineButton}"
+                Text="Wystawione opinie"
+                Command="{Binding ShowGivenOpinionsCommand}" />
         </Grid>
     </Grid>
 </ContentPage>

@@ -24,4 +24,9 @@ public class AddressDto
         text += "\n" + addressDto.ZipCode + ", " + addressDto.City;
         return text;
     }
+
+    public static string AddressMinimalToString(AddressDto addressDto)
+    {
+        return addressDto.ZipCode + ", " + addressDto.City;
+    }
 }

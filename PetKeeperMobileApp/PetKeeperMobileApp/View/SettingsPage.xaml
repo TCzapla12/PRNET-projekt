@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PetKeeperMobileApp.View.SettingsPage"
+             xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             x:DataType="viewmodel:SettingsViewModel"
+             Title="SettingsPage">
+
+    <ContentPage.Resources>
+        <converters:StringToBoolConverter 
+            x:Key="StringToBoolConverter"
+            xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />
+        <x:String x:Key="arrow-left">&#xf060;</x:String>
+    </ContentPage.Resources>
+    
+    <VerticalStackLayout>
+        <Grid
+            RowDefinitions="40, *"
+            ColumnDefinitions="Auto, *"
+            Padding="20"
+            RowSpacing="20">
+
+            <ImageButton
+                HeightRequest="30"
+                Command="{Binding GoBackCommand}">
+                <ImageButton.Source>
+                    <FontImageSource
+                        FontFamily="FAS"
+                        Glyph="{StaticResource arrow-left}"
+                        Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
+                </ImageButton.Source>
+            </ImageButton>
+
+            <Label 
+                Grid.ColumnSpan="2"
+                Text="USTAWIENIA"
+                Style="{StaticResource Headline}" />
+
+            <VerticalStackLayout
+                Grid.Row="1"
+                Grid.ColumnSpan="2">
+
+                <Label 
+                    Text="Motyw"
+                    Style="{StaticResource SubHeadline}"
+                    HorizontalOptions="Start"/>
+
+                <RadioButton
+                    Content="Systemowy"
+                    GroupName="Theme"
+                    IsChecked="{Binding SelectedTheme, Converter={StaticResource StringToBoolConverter}, ConverterParameter='Default'}">
+                </RadioButton>
+
+                <RadioButton 
+                    Content="Jasny"
+                    GroupName="Theme"
+                    IsChecked="{Binding SelectedTheme, Converter={StaticResource StringToBoolConverter}, ConverterParameter='Light'}">
+                </RadioButton>
+                <RadioButton 
+                    Content="Ciemny"
+                    GroupName="Theme"
+                    IsChecked="{Binding SelectedTheme, Converter={StaticResource StringToBoolConverter}, ConverterParameter='Dark'}">
+                </RadioButton>
+            </VerticalStackLayout>
+        </Grid>
+    </VerticalStackLayout>
+</ContentPage>
