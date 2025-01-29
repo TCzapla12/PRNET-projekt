@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Google.Protobuf.WellKnownTypes;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
+using Microsoft.Extensions.Options;
 
 namespace grpc_hello_world.Services
 {
@@ -418,6 +421,38 @@ namespace grpc_hello_world.Services
             await _context.SaveChangesAsync();
             return new UserIdentifier { Id = user.Id.ToString() };
         }
+
+        [Authorize]
+        public override async Task<UserListAdmin> GetUsersAll(Empty request, ServerCallContext context)
+        {
+            var userContext = context.GetHttpContext().User;
+            var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (userRole != "Admin")
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Only admins can access this endpoint!"));
+            }
+
+            var allUsers = await _context.Users.ToListAsync();
+
+            var userList = new UserListAdmin();
+            foreach (var user in allUsers)
+            {
+                // Use the existing DbContext instance, but ensure each async call finishes before starting the next
+                var userGetRequest = new UserGet
+                {
+                    UserId = new UserIdentifier { Id = user.Id.ToString() }
+                };
+
+                var userFull = await GetUser(userGetRequest, context);
+
+                userList.Users.Add(userFull);
+            }
+            return userList;
+
+        }
+
 
         public static string HashPassword(string password)
         {

@@ -111,22 +111,22 @@
     }
 </style>
 
-<h3>Search User</h3>
+<h3>Wyszukaj Użytkownika</h3>
 
 <div class="search-container">
     <div class="form-group">
-        <label for="id">User ID:</label>
-        <input id="id" @bind="UserId" placeholder="Enter User ID" />
+        <label for="id">ID:</label>
+        <input id="id" @bind="UserId" placeholder="Wpisz ID" />
     </div>
 
     <div class="form-group">
         <label for="email">Email:</label>
-        <input id="email" @bind="Email" placeholder="Enter Email" />
+        <input id="email" @bind="Email" placeholder="Wpisz Email" />
     </div>
 
     <div class="form-group">
-        <label for="username">Username:</label>
-        <input id="username" @bind="Username" placeholder="Enter Username" />
+        <label for="username">Nazwa Użytkownika:</label>
+        <input id="username" @bind="Username" placeholder="Enter Nazwę Użytkownika" />
     </div>
 
     <button @onclick="GetUser">Get User</button>
@@ -134,34 +134,33 @@
 
 @if (User != null)
 {
-    <h3>User Details</h3>
+    <h3>Informacje o Użytkowniku</h3>
     <div class="user-details">
         <p><strong>ID:</strong> @User.Id</p>
         <p><strong>Email:</strong> @User.Email</p>
-        <p><strong>Username:</strong> @User.Username</p>
-        <p><strong>First Name:</strong> @User.FirstName</p>
-        <p><strong>Last Name:</strong> @User.LastName</p>
-        <p><strong>Phone:</strong> @User.Phone</p>
+        <p><strong>Nazwa Użytkownika:</strong> @User.Username</p>
+        <p><strong>Imię:</strong> @User.FirstName</p>
+        <p><strong>Nazwisko:</strong> @User.LastName</p>
+        <p><strong>Numer telefonu:</strong> @User.Phone</p>
         <p><strong>PESEL:</strong> @User.Pesel</p>
-        <p><strong>Activated:</strong> @User.IsActivated</p>
-        <p><strong>Verified:</strong> @User.IsVerified</p>
+        <p><strong>Zweryfikowany:</strong> @(User.IsVerified ? "Tak" : "Nie")</p>
 
         @if (!User.IsVerified)
         {
             <div class="user-actions">
-                <button @onclick="VerifyUser">Verify User</button>
+                <button @onclick="VerifyUser">Zweryfikuj użytkownika</button>
             </div>
         }
 
-        <p><strong>Banned:</strong> @User.IsBanned</p>
+        <p><strong>Zablokowany:</strong> @(User.IsBanned ? "Tak" : "Nie")</p>
         @if (!User.IsBanned)
         {
             <div class="user-actions">
-                <button @onclick="BanUser">Ban User</button>
+                <button @onclick="BanUser">Zablokuj użytkownika</button>
             </div>
         }
 
-        <p><strong>Admin:</strong> @User.IsAdmin</p>
+        <p><strong>Status Administratora:</strong> @(User.IsAdmin ? "Tak" : "Nie")</p>
 
         @if (!User.AvatarPng.IsEmpty)
         {
@@ -171,12 +170,12 @@
         else
         {
             <h4>Avatar</h4>
-            <p>User does not have an avatar</p>
+            <p>Brak avatara</p>
         }
 
         @if (User.DocumentPngs.Count != 0 && User.DocumentPngs.Any())
         {
-            <h4>Documents</h4>
+            <h4>Dokument toższamości</h4>
             @foreach (var doc in User.DocumentPngs)
             {
                 <img src="@GetBase64Image(doc)" alt="Document Image" />
@@ -256,7 +255,7 @@
         }
         else
         {
-            ErrorMessage = "Please enter at least one search criteria (ID, Email, or Username)";
+            ErrorMessage = "Proszę podać przynajmniej jedno kryterium wyszukiwania";
             return;
         }
 
@@ -272,7 +271,7 @@
         }
         catch (Grpc.Core.RpcException ex)
         {
-            ErrorMessage = $"Error retrieving user. Please check provided data and try again";
+            ErrorMessage = $"Błąd podczas uzyskiwania informacji o użytkowniku. Sprawdź podane informacje i spróbuj ponownie";
         }
     }
 
@@ -285,7 +284,7 @@
     {
         if (User == null)
         {
-            ErrorMessage = "No user selected.";
+            ErrorMessage = "Użytkownik nie jest wybrany";
             return;
         }
 
@@ -307,17 +306,17 @@
 
             if (response.IsVerified)
             {
-                SuccessMessage = "User verified successfully!";
+                SuccessMessage = "Użytkownik zweryfikowany pomyślnie!";
                 User.IsVerified = true;
             }
             else
             {
-                ErrorMessage = "Failed to verify the user.";
+                ErrorMessage = "Nie udało się zweryfikować użytkownika.";
             }
         }
         catch (Grpc.Core.RpcException ex)
         {
-            ErrorMessage = $"Error verifying user: {ex.Status.Detail}";
+            ErrorMessage = $"Błąd podczas weryfikacji użytkownika";
         }
     }
 
@@ -325,7 +324,7 @@
     {
         if (User == null)
         {
-            ErrorMessage = "No user selected.";
+            ErrorMessage = "Użytkownik nie jest wybrany";
             return;
         }
 
@@ -347,17 +346,17 @@
 
             if (response.IsBanned)
             {
-                SuccessMessage = "User banned successfully!";
+                SuccessMessage = "Użytkownik zablokowany pomyślnie!";
                 User.IsBanned = true;
             }
             else
             {
-                ErrorMessage = "Failed to ban the user.";
+                ErrorMessage = "Nie udało się zablokować użytkownika";
             }
         }
         catch (Grpc.Core.RpcException ex)
         {
-            ErrorMessage = $"Error banning user: {ex.Status.Detail}";
+            ErrorMessage = $"Błąd podczas blokowania użytkownika";
         }
     }
 
@@ -376,7 +375,7 @@
         }
         else
         {
-            throw new ArgumentException("Unsupported image format");
+            throw new ArgumentException("Niewspierany format obrazu");
         }
 
         return $"data:{mimeType};base64,{Convert.ToBase64String(byteArray)}";

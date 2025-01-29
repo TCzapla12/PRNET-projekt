@@ -40,12 +40,13 @@
     }
 </style>
 
-<h2>Welcome to PetKeeper admin dashboard!</h2>
+<h2>Witaj na stronie głównej aplikacji administora PetKeeper!</h2>
 
 <div class="button-container">
-    <button @onclick="NavigateToUsers">Users</button>
-    <button @onclick="NavigateToOpinions">Opinions</button>
-    <button @onclick="NavigateToAnnouncements">Announcements</button>
+    <button @onclick="NavigateToUsersAll">Użytkownicy</button>
+    <button @onclick="NavigateToUsers">Wyszukaj użytkownika</button>
+    <button @onclick="NavigateToOpinions">Opinie</button>
+    <button @onclick="NavigateToAnnouncements">Ogłoszenia</button>
 </div>
 
 
@@ -82,5 +83,10 @@
     private void NavigateToAnnouncements()
     {
         NavigationManager.NavigateTo("/announcements");
+    }
+
+    private void NavigateToUsersAll()
+    {
+        NavigationManager.NavigateTo("/users_all");
     }
 }

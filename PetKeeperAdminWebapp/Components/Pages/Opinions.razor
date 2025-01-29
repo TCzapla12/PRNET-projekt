@@ -98,7 +98,7 @@
     }
 </style>
 
-<h3>Opinions</h3>
+<h3>Opinie</h3>
 
 @if (OpinionList != null && OpinionList.Any())
 {
@@ -106,29 +106,29 @@
         @foreach (var opinion in OpinionList)
         {
             <li>
-                <strong>Keeper:</strong>
+                <strong>Opiekun:</strong>
                 <a href="#" @onclick="() => RedirectToUserView(opinion.KeeperId)">
-                    User Info
+                    Użytkownik
                 </a>
                 <br />
 
-                <strong>Owner:</strong>
+                <strong>Autor:</strong>
                 <a href="#" @onclick="() => RedirectToUserView(opinion.AuthorId)">
-                    User Info
+                    Użytkownik
                 </a>
                 <br />
 
-                <strong>Related Announcement:</strong>
+                <strong>Powiązane ogłoszenie:</strong>
                 <a href="#" @onclick="() => RedirectToAnnouncementView(opinion.AnnouncementId)">
-                    Announcement Info
+                    Ogłoszenie
                 </a>
                 <br />
 
-                <strong>Description:</strong>
+                <strong>Opis:</strong>
                 <p>@opinion.Description</p>
                 <br />
 
-                <strong>Rating:</strong>
+                <strong>Ocena:</strong>
                 <span>@opinion.Rating</span>
                 <br />
                 <hr />
@@ -138,7 +138,7 @@
 }
 else
 {
-    <p>No opinions found.</p>
+    <p>Nie znaleziono opinii.</p>
 }
 
 @if (!string.IsNullOrEmpty(ErrorMessage))
@@ -199,7 +199,7 @@ else
         }
         catch (Grpc.Core.RpcException ex)
         {
-            ErrorMessage = $"Error retrieving opinions: {ex.Status.Detail}";
+            ErrorMessage = $"Błąd podczas uzyskiwania opinii";
         }
     }
 
