@@ -130,6 +130,15 @@ namespace grpc_hello_world.Services
             var userContext = context.GetHttpContext().User;
             var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+            bool isBanned = await _context.Users
+                .Where(u => u.Id.ToString() == userId)
+                .Select(u => u.IsBanned) // Only fetch IsBanned column
+                .FirstOrDefaultAsync();
+            if (isBanned)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User banned!"));
+            }
+
 
             /* admin-like call to allow requesting other user's data. The result is truncated of sensitive data later on */
             User? user = await GetUserAsync(request.UserId, context, _context, true);
@@ -220,6 +229,14 @@ namespace grpc_hello_world.Services
             var userContext = context.GetHttpContext().User;
             var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+            bool isBanned = await _context.Users
+                .Where(u => u.Id.ToString() == userId)
+                .Select(u => u.IsBanned) // Only fetch IsBanned column
+                .FirstOrDefaultAsync();
+            if (isBanned)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User banned!"));
+            }
 
             User? user = await GetUserAsync(request.UserId, context, _context);
 
@@ -428,6 +445,14 @@ namespace grpc_hello_world.Services
             var userContext = context.GetHttpContext().User;
             var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+            bool isBanned = await _context.Users
+                .Where(u => u.Id.ToString() == userId)
+                .Select(u => u.IsBanned) // Only fetch IsBanned column
+                .FirstOrDefaultAsync();
+            if (isBanned)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User banned!"));
+            }
 
             if (userRole != "Admin")
             {

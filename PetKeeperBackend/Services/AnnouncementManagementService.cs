@@ -30,6 +30,15 @@ namespace grpc_hello_world.Services
             var userContext = context.GetHttpContext().User;
             var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+            bool isBanned = await _context.Users
+                .Where(u => u.Id.ToString() == userId)
+                .Select(u => u.IsBanned) // Only fetch IsBanned column
+                .FirstOrDefaultAsync();
+            if (isBanned)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User banned!"));
+            }
+
 
             if (userRole == "Admin")  // If user is Admin
             {
@@ -94,6 +103,15 @@ namespace grpc_hello_world.Services
             var userContext = context.GetHttpContext().User;
             var authorId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+            bool isBanned = await _context.Users
+                .Where(u => u.Id.ToString() == authorId)
+                .Select(u => u.IsBanned) // Only fetch IsBanned column
+                .FirstOrDefaultAsync();
+            if (isBanned)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User banned!"));
+            }
+
 
             var query = _context.Announcements.AsQueryable();
 
@@ -195,6 +213,7 @@ namespace grpc_hello_world.Services
             return announcementList;
         }
 
+        [Authorize]
         public override async Task<AnnouncementUpdate> UpdateAnnouncement(AnnouncementUpdate request, ServerCallContext context)
         {
             var request_type = request.GetType();
@@ -202,6 +221,15 @@ namespace grpc_hello_world.Services
             var userContext = context.GetHttpContext().User;
             var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+            bool isBanned = await _context.Users
+                .Where(u => u.Id.ToString() == userId)
+                .Select(u => u.IsBanned) // Only fetch IsBanned column
+                .FirstOrDefaultAsync();
+            if (isBanned)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User banned!"));
+            }
+
 
             Announcement? announcement;
             if (userRole == "Admin")
@@ -349,11 +377,21 @@ namespace grpc_hello_world.Services
             return response;
         }
 
+        [Authorize]
         public override async Task<AnnouncementMinimal> DeleteAnnouncement(AnnouncementMinimal request, ServerCallContext context)
         {
             var userContext = context.GetHttpContext().User;
             var authorId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+            bool isBanned = await _context.Users
+                .Where(u => u.Id.ToString() == authorId)
+                .Select(u => u.IsBanned) // Only fetch IsBanned column
+                .FirstOrDefaultAsync();
+            if (isBanned)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User banned!"));
+            }
+
 
 
             Announcement? announcement;

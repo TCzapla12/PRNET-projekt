@@ -23,6 +23,15 @@ namespace grpc_hello_world.Services
             var userContext = context.GetHttpContext().User;
             var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+            bool isBanned = await _context.Users
+                .Where(u => u.Id.ToString() == userId)
+                .Select(u => u.IsBanned) // Only fetch IsBanned column
+                .FirstOrDefaultAsync();
+            if (isBanned)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User banned!"));
+            }
+
 
             if (request.HasOwnerId && userRole == "Admin")
                 userId = request.OwnerId;
@@ -66,6 +75,16 @@ namespace grpc_hello_world.Services
         {
             var userContext = context.GetHttpContext().User;
             var ownerId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+            bool isBanned = await _context.Users
+                .Where(u => u.Id.ToString() == ownerId)
+                .Select(u => u.IsBanned) // Only fetch IsBanned column
+                .FirstOrDefaultAsync();
+            if (isBanned)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User banned!"));
+            }
+
             // For now only id and owner_id supported
             List<Address> addresses = await _context.Addresses
                 .Where(a => a.OwnerId == Guid.Parse(ownerId))
@@ -92,6 +111,15 @@ namespace grpc_hello_world.Services
             var userContext = context.GetHttpContext().User;
             var ownerId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+            bool isBanned = await _context.Users
+                .Where(u => u.Id.ToString() == ownerId)
+                .Select(u => u.IsBanned) // Only fetch IsBanned column
+                .FirstOrDefaultAsync();
+            if (isBanned)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User banned!"));
+            }
+
 
             try
             {
@@ -134,6 +162,15 @@ namespace grpc_hello_world.Services
             var userContext = context.GetHttpContext().User;
             var userId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+            bool isBanned = await _context.Users
+                .Where(u => u.Id.ToString() == userId)
+                .Select(u => u.IsBanned) // Only fetch IsBanned column
+                .FirstOrDefaultAsync();
+            if (isBanned)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User banned!"));
+            }
+
 
             var query = _context.Addresses.AsQueryable();
 
@@ -188,6 +225,15 @@ namespace grpc_hello_world.Services
             var userContext = context.GetHttpContext().User;
             var ownerId = userContext.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userRole = userContext.FindFirst(ClaimTypes.Role)?.Value;
+            bool isBanned = await _context.Users
+                .Where(u => u.Id.ToString() == ownerId)
+                .Select(u => u.IsBanned) // Only fetch IsBanned column
+                .FirstOrDefaultAsync();
+            if (isBanned)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User banned!"));
+            }
+
 
             Address? address;
             if (userRole == "Admin")
