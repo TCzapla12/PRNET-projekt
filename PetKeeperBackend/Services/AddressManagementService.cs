@@ -169,6 +169,7 @@ namespace grpc_hello_world.Services
                 Id = a.Id.ToString(),
                 Street = a.Street,
                 HouseNumber = a.HouseNumber,
+                ApartmentNumber = a.ApartmentNumber ?? "",
                 City = a.City,
                 IsPrimary = a.IsPrimary,
                 PostCode = a.PostCode,
