@@ -45,7 +45,7 @@
                     Style="{StaticResource SubHeadline}"
                     HorizontalOptions="Start"/>
 
-                <RadioButton 
+                <RadioButton
                     Content="Systemowy"
                     GroupName="Theme"
                     IsChecked="{Binding SelectedTheme, Converter={StaticResource StringToBoolConverter}, ConverterParameter='Default'}">

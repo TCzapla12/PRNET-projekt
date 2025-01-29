@@ -16,8 +16,8 @@
                 Title="{Binding Title, Mode=OneWay, Source={x:Reference ValPicker}}"
                 ItemsSource="{Binding ItemsSource, Mode=OneWay, Source={x:Reference ValPicker}}"
                 SelectedItem="{Binding SelectedItem, Mode=TwoWay, Source={x:Reference ValPicker}}"
-                TextColor="Black"
-                TitleColor="Black" />
+                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
+                TitleColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
             <Label
                 Margin="4, 0, 0, -10"
                 IsVisible="{Binding ErrorText, Converter={StaticResource StringToVisibilityConverter}, Mode=OneWay, Source={x:Reference ValPicker}}"
