@@ -26,6 +26,9 @@ public partial class OwnerViewModel : ObservableObject
     private bool isLoading;
 
     [ObservableProperty]
+    private bool isEmpty;
+
+    [ObservableProperty]
     private ObservableCollection<AnnouncementInfo> announcementList;
 
     [ObservableProperty]
@@ -157,6 +160,7 @@ public partial class OwnerViewModel : ObservableObject
 
     public async Task LoadDataAsync()
     {
+        IsEmpty = false;
         IsLoading = true;
         var announcements = new List<AnnouncementInfo>();
         try
@@ -207,6 +211,8 @@ public partial class OwnerViewModel : ObservableObject
             Exception = ex;
         }
         AnnouncementList = new ObservableCollection<AnnouncementInfo>(announcements);
+        if (AnnouncementList.Count == 0 && IsErrorVisible == false)
+            IsEmpty = true;
         IsLoading = false;
     }
 }

@@ -53,7 +53,7 @@
                 IsVisible="{Binding IsLoading}"
                 HorizontalOptions="Center"
                 VerticalOptions="Center"
-                HeightRequest="50"
+                HeightRequest="200"
                 Color="{StaticResource PrimaryDark}"
                 Margin="0, 20, 0, 20" />    
 

@@ -46,7 +46,7 @@
                 IsVisible="{Binding IsLoading}"
                 HorizontalOptions="Center"
                 VerticalOptions="Center"
-                HeightRequest="50"
+                HeightRequest="200"
                 Color="{StaticResource PrimaryDark}"
                 Margin="0, 20, 0, 20" />
 
@@ -59,6 +59,8 @@
                     ButtonCommand="{Binding RefreshData}"
                     ErrorException="{Binding Exception}"
                     Margin="0, 0, 0, 20" />
+                <templates:EmptyItem
+                    IsVisible="{Binding IsEmpty}" />
                 <CollectionView
                     ItemsSource="{Binding OpinionList}">
                     <CollectionView.ItemTemplate>

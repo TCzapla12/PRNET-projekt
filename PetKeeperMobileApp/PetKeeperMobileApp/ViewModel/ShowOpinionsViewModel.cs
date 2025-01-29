@@ -36,6 +36,9 @@ public partial class ShowOpinionsViewModel : ObservableObject, IQueryAttributabl
     private bool isLoading;
 
     [ObservableProperty]
+    private bool isEmpty;
+
+    [ObservableProperty]
     private string title;
 
     [ObservableProperty]
@@ -58,6 +61,7 @@ public partial class ShowOpinionsViewModel : ObservableObject, IQueryAttributabl
 
     public async Task LoadDataAsync()
     {
+        IsEmpty = false;
         IsLoading = true;
         var opinions = new List<OpinionInfo>();
         try
@@ -112,6 +116,8 @@ public partial class ShowOpinionsViewModel : ObservableObject, IQueryAttributabl
             Exception = ex;
         }
         OpinionList = new ObservableCollection<OpinionInfo>(opinions);
+        if (OpinionList.Count == 0 && IsErrorVisible == false)
+            IsEmpty = true;
         IsLoading = false;
     }
 }

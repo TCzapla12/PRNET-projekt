@@ -27,6 +27,9 @@ public partial class DashboardViewModel : ObservableObject
     private bool isLoading;
 
     [ObservableProperty]
+    private bool isEmpty;
+
+    [ObservableProperty]
     private string firstName;
 
     [ObservableProperty]
@@ -112,6 +115,7 @@ public partial class DashboardViewModel : ObservableObject
     {
         FirstName = "...";
         Photo = "user.jpg";
+        IsEmpty = false;
         IsLoading = true;
         var ownerAnnouncements = new List<AnnouncementInfo>();
         var keeperAnnouncements = new List<AnnouncementInfo>();
@@ -187,6 +191,8 @@ public partial class DashboardViewModel : ObservableObject
         }
         OwnerAnnouncementList = new ObservableCollection<AnnouncementInfo>(ownerAnnouncements);
         KeeperAnnouncementList = new ObservableCollection<AnnouncementInfo>(keeperAnnouncements);
+        if (OwnerAnnouncementList.Count == 0 && KeeperAnnouncementList.Count == 0 && IsErrorVisible == false)
+            IsEmpty = true;
         IsLoading = false;
     }
 }

@@ -61,9 +61,9 @@
                     IsVisible="{Binding IsLoading}"
                     HorizontalOptions="Center"
                     VerticalOptions="Center"
-                    HeightRequest="50"
+                    HeightRequest="200"
                     Color="{StaticResource PrimaryDark}"
-                    Margin="0, 20, 0, 20" />    
+                    Margin="0, 20, 0, 20" />
 
                 <VerticalStackLayout
                     Grid.Row="2"
@@ -73,6 +73,8 @@
                         ButtonCommand="{Binding RefreshData}"
                         ErrorException="{Binding Exception}"
                         Margin="0, 0, 0, 20" />
+                    <templates:EmptyItem
+                        IsVisible="{Binding IsEmpty}" />
                     <CollectionView
                         IsVisible="{Binding OwnerAnnouncementList, Converter={StaticResource ListToVisibilityConverter}}"
                         ItemsSource="{Binding OwnerAnnouncementList}">
