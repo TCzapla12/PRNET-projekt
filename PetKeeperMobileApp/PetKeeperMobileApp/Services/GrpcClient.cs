@@ -9,7 +9,7 @@ namespace PetKeeperMobileApp.Services;
 
 public class GrpcClient : IGrpcClient
 {
-    private readonly static string host = "192.168.1.19";
+    private readonly static string host = "192.168.183.218";
     //private readonly static string host = "10.0.2.2";
     private readonly static string port = "8080";
 
@@ -309,8 +309,8 @@ public class GrpcClient : IGrpcClient
     {
         var announcements = new List<AnnouncementDto>();
         var announcementParams = new AnnouncementGet();
-        if (minValue != null) announcementParams.KeeperProfitLess = (uint)minValue;
-        if (maxValue != null) announcementParams.KeeperProfitMore = (uint)maxValue;
+        if (minValue != null) announcementParams.KeeperProfitMore = (uint)minValue;
+        if (maxValue != null) announcementParams.KeeperProfitLess = (uint)maxValue;
         if (startTerm != null) announcementParams.StartTermAfter = (ulong)new DateTimeOffset((DateTime)startTerm).ToUnixTimeSeconds();
         if (endTerm != null) announcementParams.EndTermBefore = (ulong)new DateTimeOffset((DateTime)endTerm).ToUnixTimeSeconds();
         if (keeperId != null) announcementParams.KeeperId = keeperId;
