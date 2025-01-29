@@ -35,7 +35,7 @@
                 HorizontalOptions="Center"
                 VerticalOptions="Center"
                 HeightRequest="200"
-                Color="{StaticResource PrimaryDark}"
+                Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}"
                 Margin="0, 20, 0, 20" />    
 
             <VerticalStackLayout

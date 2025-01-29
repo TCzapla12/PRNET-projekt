@@ -29,7 +29,7 @@
                     <FontImageSource
                         FontFamily="FAS"
                         Glyph="{StaticResource folder}"
-                        Color="{StaticResource PrimaryDark}" />
+                        Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
                 </Image.Source>
             </Image>
         </Grid>

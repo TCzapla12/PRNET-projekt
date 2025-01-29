@@ -94,7 +94,7 @@
                         <FontImageSource
                             FontFamily="FAS"
                             Glyph="{StaticResource pen}"
-                            Color="{StaticResource PrimaryDark}" />
+                            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
                     </ImageButton.Source>
                 </ImageButton>
                 <ImageButton
@@ -123,7 +123,7 @@
                         <FontImageSource
                             FontFamily="FAS"
                             Glyph="{StaticResource start}"
-                            Color="{StaticResource PrimaryDark}" />
+                            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
                     </ImageButton.Source>
                 </ImageButton>
                 <ImageButton
@@ -152,7 +152,7 @@
                         <FontImageSource
                             FontFamily="FAS"
                             Glyph="{StaticResource finish}"
-                            Color="{StaticResource PrimaryDark}" />
+                            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
                     </ImageButton.Source>
                 </ImageButton>
                 <ImageButton

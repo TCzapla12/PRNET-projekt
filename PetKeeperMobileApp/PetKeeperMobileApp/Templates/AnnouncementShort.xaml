@@ -65,7 +65,7 @@
                         <FontImageSource
                             FontFamily="FAS"
                             Glyph="{StaticResource finish}"
-                            Color="{StaticResource PrimaryDark}" />
+                            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
                     </ImageButton.Source>
                 </ImageButton>
                 <ImageButton

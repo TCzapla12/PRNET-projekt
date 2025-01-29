@@ -31,7 +31,7 @@
                 <FontImageSource
                         FontFamily="FAS"
                         Glyph="{StaticResource arrow-left}"
-                        Color="{StaticResource PrimaryDark}" />
+                        Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
             </ImageButton.Source>
         </ImageButton>
         <Label 
@@ -62,7 +62,7 @@
                         <FontImageSource
                             FontFamily="FAS"
                             Glyph="{StaticResource location}"
-                            Color="{StaticResource PrimaryDark}" />
+                            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
                     </ImageButton.Source>
                 </ImageButton>
             </Frame>
@@ -79,7 +79,7 @@
                     <FontImageSource
                             FontFamily="FAS"
                             Glyph="{StaticResource search}"
-                            Color="{StaticResource PrimaryDark}" />
+                            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
                 </ImageButton.Source>
             </ImageButton>
         </Frame>
@@ -145,7 +145,7 @@
             HorizontalOptions="Center"
             VerticalOptions="Center"
             HeightRequest="50"
-            Color="{StaticResource PrimaryDark}"
+            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}"
             Margin="0, 20, 0, 20" />
 
         <CollectionView

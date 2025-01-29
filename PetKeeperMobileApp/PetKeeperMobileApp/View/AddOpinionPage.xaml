@@ -24,7 +24,7 @@
                 <FontImageSource
             FontFamily="FAS"
             Glyph="{StaticResource xmark}"
-            Color="{StaticResource PrimaryDark}" />
+            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
             </ImageButton.Source>
         </ImageButton>
 
@@ -119,7 +119,10 @@
                     Margin="0, 0, 0, 20"
                     HorizontalOptions="Center">
                 <Label Text="Czy chcesz dodać opinię użytkownikowi: " />
-                <Label Text="{Binding Username}" FontAttributes="Bold" TextColor="{StaticResource PrimaryDarkText}"/>
+                <Label 
+                    Text="{Binding Username}" 
+                    FontAttributes="Bold" 
+                    TextColor="{StaticResource PrimaryDarkText}"/>
             </HorizontalStackLayout>
             <Button
                 Grid.Row="1"

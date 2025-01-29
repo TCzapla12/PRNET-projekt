@@ -21,6 +21,7 @@ namespace PetKeeperMobileApp
             Routing.RegisterRoute(nameof(ShowFinalAnnouncementsPage), typeof(ShowFinalAnnouncementsPage));
             Routing.RegisterRoute(nameof(AddOpinionPage), typeof(AddOpinionPage));
             Routing.RegisterRoute(nameof(ShowOpinionsPage), typeof(ShowOpinionsPage));
+            Routing.RegisterRoute(nameof(SettingsPage), typeof(SettingsPage));
         }
 
         protected override void OnNavigating(ShellNavigatingEventArgs args)

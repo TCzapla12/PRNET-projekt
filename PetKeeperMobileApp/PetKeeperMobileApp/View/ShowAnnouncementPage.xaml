@@ -24,7 +24,7 @@
                     <FontImageSource
                         FontFamily="FAS"
                         Glyph="{StaticResource xmark}"
-                        Color="{StaticResource PrimaryDark}" />
+                        Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
                 </ImageButton.Source>
             </ImageButton>
 
@@ -167,7 +167,7 @@
                 IsVisible="{Binding IsOwnerCreatedButtonVisible}">
                 <Button
                     Style="{StaticResource PrimaryButton}"
-                    BackgroundColor="{StaticResource PrimaryDark}"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}"
                     Text="Edytuj"
                     Command="{Binding EditAnnouncementCommand}" />
                 <Button
@@ -187,7 +187,7 @@
                 IsVisible="{Binding IsOwnerPendingButtonVisible}">
                 <Button
                     Style="{StaticResource PrimaryButton}"
-                    BackgroundColor="{StaticResource PrimaryDark}"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}"
                     Text="Rozpocznij"
                     Command="{Binding StartAnnouncementCommand}" />
                 <Button
@@ -207,7 +207,7 @@
                 IsVisible="{Binding IsOwnerOngoingButtonVisible}">
                 <Button
                     Style="{StaticResource PrimaryButton}"
-                    BackgroundColor="{StaticResource PrimaryDark}"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}"
                     Text="Zakończ"
                     Command="{Binding FinishAnnouncementCommand}" />
                 <Button

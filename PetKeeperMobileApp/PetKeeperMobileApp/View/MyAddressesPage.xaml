@@ -37,7 +37,7 @@
                     <FontImageSource
                             FontFamily="FAS"
                             Glyph="{StaticResource arrow-left}"
-                            Color="{StaticResource PrimaryDark}" />
+                            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
                 </ImageButton.Source>
             </ImageButton>
 
@@ -54,7 +54,7 @@
                 HorizontalOptions="Center"
                 VerticalOptions="Center"
                 HeightRequest="200"
-                Color="{StaticResource PrimaryDark}"
+                Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}"
                 Margin="0, 20, 0, 20" />    
 
             <VerticalStackLayout
@@ -103,7 +103,7 @@
                                                 <FontImageSource
                                                     FontFamily="FAS"
                                                     Glyph="{StaticResource pen}"
-                                                    Color="{StaticResource PrimaryDark}" />
+                                                    Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
                                             </ImageButton.Source>
                                         </ImageButton>
                                         <ImageButton
