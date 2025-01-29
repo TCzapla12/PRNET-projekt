@@ -1,0 +1,134 @@
+﻿@page "/login"
+@using grpc_hello_world
+@using System;
+@using Blazored.LocalStorage;
+@using Microsoft.IdentityModel.Tokens;
+@inject NavigationManager Navigation
+@using System.IdentityModel.Tokens.Jwt;
+@using System.Security.Claims;
+@using System.Text;
+@inject grpc_hello_world.AuthService.AuthServiceClient AuthClient
+@inject ILocalStorageService LocalStorage
+@rendermode InteractiveServer
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #e0f7fa;
+        color: #00796b;
+        margin: 0;
+        padding: 20px;
+    }
+
+    h3 {
+        color: #00796b;
+        margin-bottom: 10px;
+    }
+
+    label {
+        display: block;
+        margin-top: 10px;
+        font-size: 1.1em;
+        color: #00796b;
+    }
+
+    input {
+        width: 300px;
+        padding: 8px;
+        margin-top: 5px;
+        margin-bottom: 15px;
+        border: 1px solid #00796b;
+        border-radius: 4px;
+    }
+
+    button {
+        width: 300px;
+        padding: 10px;
+        background-color: #00796b;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1.1em;
+        margin-top: 10px;
+    }
+
+    button:hover {
+        background-color: #004d40;
+    }
+
+    p {
+        color: red;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+</style>
+
+<h3>Logowanie</h3>
+
+<div class="form-container">
+    <label for="username">Nazwa użytkownika:</label>
+    <input id="username" @bind="Username" />
+
+    <label for="password">Hasło:</label>
+    <input id="password" type="password" @bind="Password" />
+</div>
+
+<div class="button-container">
+    <button @onclick="HandleLogin">Zaloguj się</button>
+</div>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p style="color: red;">@ErrorMessage</p>
+}
+
+@code {
+    private string Username { get; set; } = string.Empty;
+    private string Password { get; set; } = string.Empty;
+    private string Token { get; set; } = string.Empty;
+    private string ErrorMessage { get; set; } = string.Empty;
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var request = new grpc_hello_world.AuthRequest
+                {
+                    UserId = new grpc_hello_world.UserIdentifier { Username = Username },
+                    Password = Password
+                };
+            var response = await AuthClient.AuthenticateAsync(request);
+            Token = response.Token;
+            ErrorMessage = string.Empty;
+
+            var jwtHandler = new JwtSecurityTokenHandler();
+            if (jwtHandler.CanReadToken(Token))
+            {
+                var jwtToken = jwtHandler.ReadToken(Token) as JwtSecurityToken;
+                if (jwtToken != null)
+                {
+                    var claims = jwtToken.Claims;
+                    var role = claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+                    var id = claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
+                    if (role != "Admin")
+                    {
+                        Token = string.Empty;
+                        ErrorMessage = "Logowanie nie powiodło się: użytkownik nie jest administratorem.";
+                        return;
+                    }
+                    await LocalStorage.SetItemAsync("auth_token", Token);
+                    Navigation.NavigateTo("/dashboard");
+                }
+            }
+        }
+        catch (Grpc.Core.RpcException ex)
+        {
+            ErrorMessage = $"Logowanie nie powiodło się.";
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Wystąpił błąd.";
+        }
+    }
+}

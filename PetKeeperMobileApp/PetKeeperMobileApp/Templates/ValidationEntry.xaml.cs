@@ -91,6 +91,7 @@ public partial class ValidationEntry : ContentView
             EntryType.Telephone => Validate.IsValidPhoneNumber(Text),
             EntryType.BuildingApartment => Validate.IsValidBuildingApartmentNumber(Text),
             EntryType.ZipCode => Validate.IsValidZipCode(Text),
+            EntryType.Price => Validate.IsValidPrice(Text),
             _ => string.Empty,
         };
 

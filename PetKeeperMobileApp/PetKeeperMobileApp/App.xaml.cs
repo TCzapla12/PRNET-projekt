@@ -10,8 +10,12 @@ namespace PetKeeperMobileApp
         {
             InitializeComponent();
 
-            //wymuszenie jasnego motywu
-            Application.Current!.UserAppTheme = AppTheme.Light;
+            Application.Current!.UserAppTheme = Preferences.Get("AppTheme", "Default") switch
+            {
+                "Light" => AppTheme.Light,
+                "Dark" => AppTheme.Dark,
+                _ => AppTheme.Unspecified
+            };
 
             MainPage = new AppShell();
             CheckCredentials();
@@ -19,7 +23,7 @@ namespace PetKeeperMobileApp
 
         private async void CheckCredentials()
         {
-            var token = await Storage.LoadToken();
+            var token = await Storage.GetToken();
 
             if (!string.IsNullOrEmpty(token))
             {

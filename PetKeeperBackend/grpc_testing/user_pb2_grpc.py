@@ -116,9 +116,19 @@ class UserServiceStub(object):
                 request_serializer=user__pb2.UserGet.SerializeToString,
                 response_deserializer=user__pb2.UserFull.FromString,
                 _registered_method=True)
+        self.GetUsersAll = channel.unary_unary(
+                '/UserService/GetUsersAll',
+                request_serializer=user__pb2.Empty.SerializeToString,
+                response_deserializer=user__pb2.UserListAdmin.FromString,
+                _registered_method=True)
         self.UpdateUser = channel.unary_unary(
                 '/UserService/UpdateUser',
                 request_serializer=user__pb2.UserUpdate.SerializeToString,
+                response_deserializer=user__pb2.UserUpdate.FromString,
+                _registered_method=True)
+        self.UpdateUserCredentials = channel.unary_unary(
+                '/UserService/UpdateUserCredentials',
+                request_serializer=user__pb2.UserUpdateCredentials.SerializeToString,
                 response_deserializer=user__pb2.UserUpdate.FromString,
                 _registered_method=True)
         self.DeleteUser = channel.unary_unary(
@@ -143,9 +153,21 @@ class UserServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetUsersAll(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def UpdateUser(self, request, context):
         """Only updated fields are returned
         """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateUserCredentials(self, request, context):
+        """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -169,9 +191,19 @@ def add_UserServiceServicer_to_server(servicer, server):
                     request_deserializer=user__pb2.UserGet.FromString,
                     response_serializer=user__pb2.UserFull.SerializeToString,
             ),
+            'GetUsersAll': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetUsersAll,
+                    request_deserializer=user__pb2.Empty.FromString,
+                    response_serializer=user__pb2.UserListAdmin.SerializeToString,
+            ),
             'UpdateUser': grpc.unary_unary_rpc_method_handler(
                     servicer.UpdateUser,
                     request_deserializer=user__pb2.UserUpdate.FromString,
+                    response_serializer=user__pb2.UserUpdate.SerializeToString,
+            ),
+            'UpdateUserCredentials': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateUserCredentials,
+                    request_deserializer=user__pb2.UserUpdateCredentials.FromString,
                     response_serializer=user__pb2.UserUpdate.SerializeToString,
             ),
             'DeleteUser': grpc.unary_unary_rpc_method_handler(
@@ -245,6 +277,33 @@ class UserService(object):
             _registered_method=True)
 
     @staticmethod
+    def GetUsersAll(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/UserService/GetUsersAll',
+            user__pb2.Empty.SerializeToString,
+            user__pb2.UserListAdmin.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
     def UpdateUser(request,
             target,
             options=(),
@@ -260,6 +319,33 @@ class UserService(object):
             target,
             '/UserService/UpdateUser',
             user__pb2.UserUpdate.SerializeToString,
+            user__pb2.UserUpdate.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UpdateUserCredentials(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/UserService/UpdateUserCredentials',
+            user__pb2.UserUpdateCredentials.SerializeToString,
             user__pb2.UserUpdate.FromString,
             options,
             channel_credentials,
@@ -318,8 +404,8 @@ class AddressServiceStub(object):
                 request_serializer=user__pb2.AddressGet.SerializeToString,
                 response_deserializer=user__pb2.AddressList.FromString,
                 _registered_method=True)
-        self.GetAddress = channel.unary_unary(
-                '/AddressService/GetAddress',
+        self.GetAddresses = channel.unary_unary(
+                '/AddressService/GetAddresses',
                 request_serializer=user__pb2.AddressGet.SerializeToString,
                 response_deserializer=user__pb2.AddressList.FromString,
                 _registered_method=True)
@@ -330,7 +416,7 @@ class AddressServiceStub(object):
                 _registered_method=True)
         self.DeleteAddress = channel.unary_unary(
                 '/AddressService/DeleteAddress',
-                request_serializer=user__pb2.AddressUpdate.SerializeToString,
+                request_serializer=user__pb2.AddressMinimal.SerializeToString,
                 response_deserializer=user__pb2.AddressMinimal.FromString,
                 _registered_method=True)
 
@@ -350,7 +436,7 @@ class AddressServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetAddress(self, request, context):
+    def GetAddresses(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -381,8 +467,8 @@ def add_AddressServiceServicer_to_server(servicer, server):
                     request_deserializer=user__pb2.AddressGet.FromString,
                     response_serializer=user__pb2.AddressList.SerializeToString,
             ),
-            'GetAddress': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetAddress,
+            'GetAddresses': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetAddresses,
                     request_deserializer=user__pb2.AddressGet.FromString,
                     response_serializer=user__pb2.AddressList.SerializeToString,
             ),
@@ -393,7 +479,7 @@ def add_AddressServiceServicer_to_server(servicer, server):
             ),
             'DeleteAddress': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteAddress,
-                    request_deserializer=user__pb2.AddressUpdate.FromString,
+                    request_deserializer=user__pb2.AddressMinimal.FromString,
                     response_serializer=user__pb2.AddressMinimal.SerializeToString,
             ),
     }
@@ -462,7 +548,7 @@ class AddressService(object):
             _registered_method=True)
 
     @staticmethod
-    def GetAddress(request,
+    def GetAddresses(request,
             target,
             options=(),
             channel_credentials=None,
@@ -475,7 +561,7 @@ class AddressService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/AddressService/GetAddress',
+            '/AddressService/GetAddresses',
             user__pb2.AddressGet.SerializeToString,
             user__pb2.AddressList.FromString,
             options,
@@ -530,8 +616,209 @@ class AddressService(object):
             request,
             target,
             '/AddressService/DeleteAddress',
-            user__pb2.AddressUpdate.SerializeToString,
+            user__pb2.AddressMinimal.SerializeToString,
             user__pb2.AddressMinimal.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+
+class AnimalServiceStub(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.CreateAnimal = channel.unary_unary(
+                '/AnimalService/CreateAnimal',
+                request_serializer=user__pb2.AnimalCreate.SerializeToString,
+                response_deserializer=user__pb2.AnimalMinimal.FromString,
+                _registered_method=True)
+        self.GetAnimals = channel.unary_unary(
+                '/AnimalService/GetAnimals',
+                request_serializer=user__pb2.AnimalGet.SerializeToString,
+                response_deserializer=user__pb2.AnimalList.FromString,
+                _registered_method=True)
+        self.DeleteAnimal = channel.unary_unary(
+                '/AnimalService/DeleteAnimal',
+                request_serializer=user__pb2.AnimalMinimal.SerializeToString,
+                response_deserializer=user__pb2.AnimalMinimal.FromString,
+                _registered_method=True)
+        self.UpdateAnimal = channel.unary_unary(
+                '/AnimalService/UpdateAnimal',
+                request_serializer=user__pb2.AnimalUpdate.SerializeToString,
+                response_deserializer=user__pb2.AnimalUpdate.FromString,
+                _registered_method=True)
+
+
+class AnimalServiceServicer(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def CreateAnimal(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetAnimals(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeleteAnimal(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateAnimal(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_AnimalServiceServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'CreateAnimal': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateAnimal,
+                    request_deserializer=user__pb2.AnimalCreate.FromString,
+                    response_serializer=user__pb2.AnimalMinimal.SerializeToString,
+            ),
+            'GetAnimals': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetAnimals,
+                    request_deserializer=user__pb2.AnimalGet.FromString,
+                    response_serializer=user__pb2.AnimalList.SerializeToString,
+            ),
+            'DeleteAnimal': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteAnimal,
+                    request_deserializer=user__pb2.AnimalMinimal.FromString,
+                    response_serializer=user__pb2.AnimalMinimal.SerializeToString,
+            ),
+            'UpdateAnimal': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateAnimal,
+                    request_deserializer=user__pb2.AnimalUpdate.FromString,
+                    response_serializer=user__pb2.AnimalUpdate.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'AnimalService', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+    server.add_registered_method_handlers('AnimalService', rpc_method_handlers)
+
+
+ # This class is part of an EXPERIMENTAL API.
+class AnimalService(object):
+    """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def CreateAnimal(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/AnimalService/CreateAnimal',
+            user__pb2.AnimalCreate.SerializeToString,
+            user__pb2.AnimalMinimal.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetAnimals(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/AnimalService/GetAnimals',
+            user__pb2.AnimalGet.SerializeToString,
+            user__pb2.AnimalList.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DeleteAnimal(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/AnimalService/DeleteAnimal',
+            user__pb2.AnimalMinimal.SerializeToString,
+            user__pb2.AnimalMinimal.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UpdateAnimal(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/AnimalService/UpdateAnimal',
+            user__pb2.AnimalUpdate.SerializeToString,
+            user__pb2.AnimalUpdate.FromString,
             options,
             channel_credentials,
             insecure,
@@ -552,17 +839,50 @@ class AnnouncementServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetAnnouncement = channel.unary_unary(
-                '/AnnouncementService/GetAnnouncement',
-                request_serializer=user__pb2.AnnouncementFull.SerializeToString,
-                response_deserializer=user__pb2.CreateAnnouncementResponse.FromString,
+        self.CreateAnnouncement = channel.unary_unary(
+                '/AnnouncementService/CreateAnnouncement',
+                request_serializer=user__pb2.AnnouncementCreate.SerializeToString,
+                response_deserializer=user__pb2.AnnouncementMinimal.FromString,
+                _registered_method=True)
+        self.GetAnnouncements = channel.unary_unary(
+                '/AnnouncementService/GetAnnouncements',
+                request_serializer=user__pb2.AnnouncementGet.SerializeToString,
+                response_deserializer=user__pb2.AnnouncementList.FromString,
+                _registered_method=True)
+        self.UpdateAnnouncement = channel.unary_unary(
+                '/AnnouncementService/UpdateAnnouncement',
+                request_serializer=user__pb2.AnnouncementUpdate.SerializeToString,
+                response_deserializer=user__pb2.AnnouncementUpdate.FromString,
+                _registered_method=True)
+        self.DeleteAnnouncement = channel.unary_unary(
+                '/AnnouncementService/DeleteAnnouncement',
+                request_serializer=user__pb2.AnnouncementMinimal.SerializeToString,
+                response_deserializer=user__pb2.AnnouncementMinimal.FromString,
                 _registered_method=True)
 
 
 class AnnouncementServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def GetAnnouncement(self, request, context):
+    def CreateAnnouncement(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetAnnouncements(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateAnnouncement(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeleteAnnouncement(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -571,10 +891,25 @@ class AnnouncementServiceServicer(object):
 
 def add_AnnouncementServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GetAnnouncement': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetAnnouncement,
-                    request_deserializer=user__pb2.AnnouncementFull.FromString,
-                    response_serializer=user__pb2.CreateAnnouncementResponse.SerializeToString,
+            'CreateAnnouncement': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateAnnouncement,
+                    request_deserializer=user__pb2.AnnouncementCreate.FromString,
+                    response_serializer=user__pb2.AnnouncementMinimal.SerializeToString,
+            ),
+            'GetAnnouncements': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetAnnouncements,
+                    request_deserializer=user__pb2.AnnouncementGet.FromString,
+                    response_serializer=user__pb2.AnnouncementList.SerializeToString,
+            ),
+            'UpdateAnnouncement': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateAnnouncement,
+                    request_deserializer=user__pb2.AnnouncementUpdate.FromString,
+                    response_serializer=user__pb2.AnnouncementUpdate.SerializeToString,
+            ),
+            'DeleteAnnouncement': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteAnnouncement,
+                    request_deserializer=user__pb2.AnnouncementMinimal.FromString,
+                    response_serializer=user__pb2.AnnouncementMinimal.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -588,7 +923,7 @@ class AnnouncementService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def GetAnnouncement(request,
+    def CreateAnnouncement(request,
             target,
             options=(),
             channel_credentials=None,
@@ -601,9 +936,291 @@ class AnnouncementService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/AnnouncementService/GetAnnouncement',
-            user__pb2.AnnouncementFull.SerializeToString,
-            user__pb2.CreateAnnouncementResponse.FromString,
+            '/AnnouncementService/CreateAnnouncement',
+            user__pb2.AnnouncementCreate.SerializeToString,
+            user__pb2.AnnouncementMinimal.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetAnnouncements(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/AnnouncementService/GetAnnouncements',
+            user__pb2.AnnouncementGet.SerializeToString,
+            user__pb2.AnnouncementList.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UpdateAnnouncement(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/AnnouncementService/UpdateAnnouncement',
+            user__pb2.AnnouncementUpdate.SerializeToString,
+            user__pb2.AnnouncementUpdate.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DeleteAnnouncement(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/AnnouncementService/DeleteAnnouncement',
+            user__pb2.AnnouncementMinimal.SerializeToString,
+            user__pb2.AnnouncementMinimal.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+
+class OpinionServiceStub(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.CreateOpinion = channel.unary_unary(
+                '/OpinionService/CreateOpinion',
+                request_serializer=user__pb2.OpinionCreate.SerializeToString,
+                response_deserializer=user__pb2.OpinionMinimal.FromString,
+                _registered_method=True)
+        self.GetOpinions = channel.unary_unary(
+                '/OpinionService/GetOpinions',
+                request_serializer=user__pb2.OpinionGet.SerializeToString,
+                response_deserializer=user__pb2.OpinionList.FromString,
+                _registered_method=True)
+        self.UpdateOpinion = channel.unary_unary(
+                '/OpinionService/UpdateOpinion',
+                request_serializer=user__pb2.OpinionUpdate.SerializeToString,
+                response_deserializer=user__pb2.OpinionUpdate.FromString,
+                _registered_method=True)
+        self.DeleteOpinion = channel.unary_unary(
+                '/OpinionService/DeleteOpinion',
+                request_serializer=user__pb2.OpinionMinimal.SerializeToString,
+                response_deserializer=user__pb2.OpinionMinimal.FromString,
+                _registered_method=True)
+
+
+class OpinionServiceServicer(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def CreateOpinion(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetOpinions(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateOpinion(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeleteOpinion(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_OpinionServiceServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'CreateOpinion': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateOpinion,
+                    request_deserializer=user__pb2.OpinionCreate.FromString,
+                    response_serializer=user__pb2.OpinionMinimal.SerializeToString,
+            ),
+            'GetOpinions': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetOpinions,
+                    request_deserializer=user__pb2.OpinionGet.FromString,
+                    response_serializer=user__pb2.OpinionList.SerializeToString,
+            ),
+            'UpdateOpinion': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateOpinion,
+                    request_deserializer=user__pb2.OpinionUpdate.FromString,
+                    response_serializer=user__pb2.OpinionUpdate.SerializeToString,
+            ),
+            'DeleteOpinion': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteOpinion,
+                    request_deserializer=user__pb2.OpinionMinimal.FromString,
+                    response_serializer=user__pb2.OpinionMinimal.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'OpinionService', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+    server.add_registered_method_handlers('OpinionService', rpc_method_handlers)
+
+
+ # This class is part of an EXPERIMENTAL API.
+class OpinionService(object):
+    """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def CreateOpinion(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/OpinionService/CreateOpinion',
+            user__pb2.OpinionCreate.SerializeToString,
+            user__pb2.OpinionMinimal.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetOpinions(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/OpinionService/GetOpinions',
+            user__pb2.OpinionGet.SerializeToString,
+            user__pb2.OpinionList.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UpdateOpinion(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/OpinionService/UpdateOpinion',
+            user__pb2.OpinionUpdate.SerializeToString,
+            user__pb2.OpinionUpdate.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DeleteOpinion(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/OpinionService/DeleteOpinion',
+            user__pb2.OpinionMinimal.SerializeToString,
+            user__pb2.OpinionMinimal.FromString,
             options,
             channel_credentials,
             insecure,

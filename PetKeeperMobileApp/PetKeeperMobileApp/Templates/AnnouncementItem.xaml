@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PetKeeperMobileApp.Templates.AnnouncementItem"
+             xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             x:Name="AnnItem">
+
+    <ContentView.Resources>
+        <x:String x:Key="pen">&#xf304;</x:String>
+        <x:String x:Key="trash">&#xf1f8;</x:String>
+        <x:String x:Key="start">&#xf04b;</x:String>
+        <x:String x:Key="reject">&#xf00d;</x:String>
+        <x:String x:Key="finish">&#xf04d;</x:String>
+        <x:String x:Key="cancel">&#xf05e;</x:String>
+    </ContentView.Resources>
+
+    <Frame
+        Padding="10"
+        Margin="1, 0, 1, 20"
+        CornerRadius="8">
+        <Grid
+            ColumnDefinitions="*, Auto">
+            <StackLayout>
+                <HorizontalStackLayout>
+                    <Label
+                        x:Name="ProfitLabel"
+                        Style="{StaticResource SubHeadline}"
+                        FontAttributes="Bold"/>
+                    <Label
+                        Text=" zł"
+                        Style="{StaticResource SubHeadline}"
+                        FontAttributes="Bold"/>
+                    <Label
+                        x:Name="NegotiableLabel"
+                        Text=" (do negocjacji)"
+                        Style="{StaticResource SubHeadline}"/>
+                </HorizontalStackLayout>
+                <Label
+                    Text="Status: "
+                    FontAttributes="Bold" />
+                <HorizontalStackLayout>
+                    <Label 
+                        x:Name="StatusIconLabel"
+                        FontFamily="FAS"
+                        Margin="0, 3, 0, 0" />
+                    <Label Text=" (" />
+                    <Label x:Name="StatusLabel" />
+                    <Label Text=")" />
+                </HorizontalStackLayout>
+                <VerticalStackLayout x:Name="OwnerStack" IsVisible="False">
+                    <Label
+                        Text="Właściciel: "
+                        FontAttributes="Bold" />
+                    <Label x:Name="OwnerLabel" />
+                </VerticalStackLayout>
+                <VerticalStackLayout x:Name="KeeperStack" IsVisible="False">
+                    <Label
+                        Text="Opiekun: "
+                        FontAttributes="Bold" />
+                    <Label x:Name="KeeperLabel" />
+                </VerticalStackLayout>
+                <Label
+                    Text="Realizacja: "
+                    FontAttributes="Bold" />
+                <HorizontalStackLayout>
+                    <Label x:Name="StartTermLabel"/>
+                    <Label Text=" - " />
+                    <Label x:Name="EndTermLabel"/>
+                </HorizontalStackLayout>
+                <Label
+                    Text="Opis:"
+                    FontAttributes="Bold" />
+                <Label x:Name="DescriptionLabel" />
+                <Label
+                    Text="Zwierzę: "
+                    FontAttributes="Bold" />
+                <Label x:Name="AnimalLabel"/>
+                <Label
+                    Text="Adres: "
+                    FontAttributes="Bold" />
+                <Label x:Name="AddressLabel"/>
+            </StackLayout>
+            <StackLayout
+                x:Name="EditStack"
+                IsVisible="False"
+                Grid.Column="1"
+                Margin="0, 5, -5, 0">
+                <ImageButton
+                    Margin="0, 0, 0, 25"
+                    HeightRequest="20"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:OwnerViewModel}}, Path=EditAnnouncementCommand}"
+                    CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}">
+                    <ImageButton.Source>
+                        <FontImageSource
+                            FontFamily="FAS"
+                            Glyph="{StaticResource pen}"
+                            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
+                    </ImageButton.Source>
+                </ImageButton>
+                <ImageButton
+                    HeightRequest="20"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:OwnerViewModel}}, Path=DeleteAnnouncementCommand}"
+                    CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}">
+                    <ImageButton.Source>
+                        <FontImageSource
+                            FontFamily="FAS"
+                            Glyph="{StaticResource trash}"
+                            Color="{StaticResource Tertiary}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </StackLayout>
+            <StackLayout
+                x:Name="PendingStack"
+                IsVisible="False"
+                Grid.Column="1"
+                Margin="0, 5, -5, 0">
+                <ImageButton
+                    Margin="0, 0, 0, 20"
+                    HeightRequest="25"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:OwnerViewModel}}, Path=StartAnnouncementCommand}"
+                    CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}">
+                    <ImageButton.Source>
+                        <FontImageSource
+                            FontFamily="FAS"
+                            Glyph="{StaticResource start}"
+                            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
+                    </ImageButton.Source>
+                </ImageButton>
+                <ImageButton
+                    HeightRequest="30"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:OwnerViewModel}}, Path=RejectAnnouncementCommand}"
+                    CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}">
+                    <ImageButton.Source>
+                        <FontImageSource
+                            FontFamily="FAS"
+                            Glyph="{StaticResource reject}"
+                            Color="{StaticResource Tertiary}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </StackLayout>
+            <StackLayout
+                x:Name="OngoingStack"
+                IsVisible="False"
+                Grid.Column="1"
+                Margin="0, 5, -5, 0">
+                <ImageButton
+                    Margin="0, 0, 0, 20"
+                    HeightRequest="25"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:OwnerViewModel}}, Path=FinishAnnouncementCommand}"
+                    CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}">
+                    <ImageButton.Source>
+                        <FontImageSource
+                            FontFamily="FAS"
+                            Glyph="{StaticResource finish}"
+                            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
+                    </ImageButton.Source>
+                </ImageButton>
+                <ImageButton
+                        HeightRequest="20"
+                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:OwnerViewModel}}, Path=CancelAnnouncementCommand}"
+                        CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}">
+                    <ImageButton.Source>
+                        <FontImageSource
+                            FontFamily="FAS"
+                            Glyph="{StaticResource cancel}"
+                            Color="{StaticResource Tertiary}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </StackLayout>
+        </Grid>
+        
+        <Frame.GestureRecognizers>
+            <TapGestureRecognizer
+                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:SearchViewModel}}, Path=ShowAnnouncementCommand}"
+                CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}"/>
+            <TapGestureRecognizer
+                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:KeeperViewModel}}, Path=ShowAnnouncementCommand}"
+                CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}"/>
+            <TapGestureRecognizer
+                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:ShowFinalAnnouncementsViewModel}}, Path=ShowAnnouncementCommand}"
+                CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}"/>
+            <TapGestureRecognizer
+                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:OwnerViewModel}}, Path=ShowAnnouncementCommand}"
+                CommandParameter="{Binding AnnId, Source={x:Reference AnnItem }}"/>
+        </Frame.GestureRecognizers>
+    </Frame>
+</ContentView>

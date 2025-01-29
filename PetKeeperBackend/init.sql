@@ -29,27 +29,26 @@ CREATE TABLE IF NOT EXISTS addresses (
     post_code TEXT NOT NULL,
     description TEXT,
     is_primary BOOLEAN,
-	owner_id UUID NOT NULL REFERENCES users(id) ON DELETE NO ACTION
+	owner_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS animals (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255),
-    owner_id UUID NOT NULL REFERENCES users(id) ON DELETE NO ACTION,
+    owner_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     type VARCHAR(50) CHECK (type IN ('dog', 'cat', 'other')),
-    photos TEXT[], -- URL do zdjec zwierzaka
+    photo TEXT, -- sciezka do zdjecia zwierzaka
     description TEXT
 );
 
 CREATE TABLE IF NOT EXISTS announcements (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     -- Ogloszenia zachowywane nawet przy usunieciu usera dla archiwizacji
-    author_id UUID NOT NULL REFERENCES users(id) ON DELETE NO ACTION,
-    keeper_id UUID NOT NULL REFERENCES users(id) ON DELETE NO ACTION,
-    animal_id UUID NOT NULL REFERENCES animals(id) ON DELETE NO ACTION,
+    author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    keeper_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    animal_id UUID NOT NULL REFERENCES animals(id) ON DELETE CASCADE,
     keeper_profit INT NOT NULL CHECK (keeper_profit > 0), -- Zysk musi byc wiekszy niz 0. Mozna tez to po prostu sprawdzac na front/back
     is_negotiable BOOLEAN NOT NULL DEFAULT FALSE,
-    long_term BOOLEAN NOT NULL DEFAULT FALSE,
     
     description TEXT,
 	-- Wszystkie timestampy jako UNIX 
@@ -59,19 +58,19 @@ CREATE TABLE IF NOT EXISTS announcements (
     started_date BIGINT, -- Timestamp kiedy rzeczywiscie zwierze zostanie oddane
     finished_date BIGINT, -- Timestamp kiedy rzeczywiscie zwierze zostanie zwrocone
     
-    status TEXT NOT NULL CHECK (status IN ('created', 'pending', 'accepted', 'ongoing', 'finished', 'canceled')),
+    status TEXT NOT NULL CHECK (status IN ('created', 'pending', 'ongoing', 'finished', 'canceled')),
 
-    address_id UUID REFERENCES addresses(id) ON DELETE NO ACTION  -- 
+    address_id UUID REFERENCES addresses(id) ON DELETE CASCADE  -- 
 );
 
 CREATE TABLE IF NOT EXISTS opinions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    keeper_id UUID NOT NULL REFERENCES users(id) ON DELETE NO ACTION,
-    author_id UUID NOT NULL REFERENCES users(id) ON DELETE NO ACTION,
+    keeper_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     rating INT CHECK (rating >= 0 AND rating <= 10),
     description TEXT,
-    announcement_id UUID REFERENCES announcements(id) ON DELETE NO ACTION UNIQUE,
-    date BIGINT DEFAULT EXTRACT(EPOCH FROM NOW())
+    announcement_id UUID REFERENCES announcements(id) ON DELETE CASCADE UNIQUE,
+    created_date BIGINT NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())
 );
 
 

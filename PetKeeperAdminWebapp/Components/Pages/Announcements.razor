@@ -1,0 +1,231 @@
+﻿@page "/announcements"
+@using grpc_hello_world
+@using Grpc.Core
+@using System.Threading.Tasks
+@using Microsoft.AspNetCore.WebUtilities
+@inject grpc_hello_world.AnnouncementService.AnnouncementServiceClient AnnouncementServiceClient
+@inject NavigationManager NavigationManager
+@using Blazored.LocalStorage
+@inject ILocalStorageService LocalStorage
+@rendermode InteractiveServer
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #e0f7fa;
+        color: #00796b;
+        margin: 0;
+        padding: 20px;
+    }
+
+    h3 {
+        color: #00796b;
+        font-size: 1.3em;
+        margin-bottom: 1em;
+        text-align: left;
+    }
+
+    .search-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        max-width: 600px;
+        margin: 0;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        margin-bottom: 0.5rem;
+        color: #00796b;
+    }
+
+    input {
+        padding: 10px;
+        font-size: 1em;
+        border: 1px solid #00796b;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+    }
+
+    button {
+        padding: 10px 20px;
+        background-color: #00796b;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1.1em;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #004d40;
+    }
+
+    .announcement-list {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .announcement-list li {
+        padding: 1rem;
+        background-color: #ffffff;
+        border: 1px solid #00796b;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+    }
+
+    .error-message {
+        color: red;
+    }
+</style>
+
+<h3>Wyszukaj Ogłoszenia</h3>
+
+<div class="search-container">
+    <div class="form-group">
+        <label for="id">ID Ogłoszenia:</label>
+        <input id="id" @bind="AnnouncementId" placeholder="Wpisz ID Ogłoszenia" />
+    </div>
+
+    <div class="form-group">
+        <label for="authorId">ID Autora:</label>
+        <input id="authorId" @bind="AuthorId" placeholder="Wpisz ID Autora" />
+    </div>
+
+    <div class="form-group">
+        <label for="keeperId">ID Opiekuna:</label>
+        <input id="keeperId" @bind="KeeperId" placeholder="Wpisz ID Opiekuna" />
+    </div>
+
+    <div class="form-group">
+        <button @onclick="GetAnnouncements">Wyszukaj ogłoszenia</button>
+    </div>
+</div>
+
+@if (AnnouncementList != null && AnnouncementList.Any())
+{
+    <ul class="announcement-list">
+        @foreach (var announcement in AnnouncementList)
+        {
+            <li>
+                <strong>ID:</strong> @announcement.Id <br />
+                <strong>Autor:</strong>
+                <a href="#" @onclick="() => RedirectToUserView(announcement.AuthorId)">
+                    Użytkownik
+                </a>
+                <br />
+                <strong>Opiekun:</strong>
+                <a href="#" @onclick="() => RedirectToUserView(announcement.KeeperId)">
+                    Użytkownik
+                </a>
+                <br />
+                <strong>Opis:</strong> @announcement.Description <br />
+                <strong>Status:</strong> @announcement.Status <br />
+                <hr />
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>Nie znaleziono ogłoszeń.</p>
+}
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="error-message">@ErrorMessage</p>
+}
+
+@code {
+    private string AnnouncementId { get; set; }
+    private string AuthorId { get; set; }
+    private string KeeperId { get; set; }
+    private List<AnnouncementUpdate> AnnouncementList { get; set; }
+    private string ErrorMessage { get; set; }
+
+    private bool IsFirstRender { get; set; } = true;
+    private bool IsAuthorized { get; set; } = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // After the first render, access the LocalStorage
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            IsAuthorized = !string.IsNullOrEmpty(token);
+
+            if (!IsAuthorized)
+            {
+                NavigationManager.NavigateTo("/login");
+            }
+
+            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+            var queryParams = QueryHelpers.ParseQuery(uri.Query);
+            if (queryParams.TryGetValue("announcementId", out var announcementIdValue))
+            {
+                AnnouncementId = announcementIdValue;
+                await GetAnnouncements();
+            }
+
+            // Set the first render flag to false
+            IsFirstRender = false;
+
+            // Trigger a re-render
+            StateHasChanged();
+        }
+    }
+
+    private async Task GetAnnouncements()
+    {
+        ErrorMessage = string.Empty;
+        AnnouncementList = null;
+        AnnouncementGet request = new AnnouncementGet();
+
+        // Set the appropriate search criteria based on user input
+        if (!string.IsNullOrEmpty(AnnouncementId))
+        {
+            request.Id = AnnouncementId;
+        }
+        else if (!string.IsNullOrEmpty(AuthorId))
+        {
+            request.AuthorId = AuthorId;
+        }
+        else if (!string.IsNullOrEmpty(KeeperId))
+        {
+            request.KeeperId = KeeperId;
+        }
+        else
+        {
+            ErrorMessage = "Proszę podać przynajmniej jedno kryterium.";
+            return;
+        }
+
+        try
+        {
+            // Retrieve token from localStorage
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            var metadata = new Metadata
+            {
+                { "Authorization", $"Bearer {token}" }
+            };
+            // Send request to server
+            var response = await AnnouncementServiceClient.GetAnnouncementsAsync(request, metadata);
+            AnnouncementList = response.Announcements.ToList();
+        }
+        catch (Grpc.Core.RpcException ex)
+        {
+            ErrorMessage = $"Błąd podczas uzyskiwania ogłoszeń";
+        }
+    }
+
+    private void RedirectToUserView(string userId)
+    {
+        // Redirect to the Users page with the provided user ID in the search field
+        NavigationManager.NavigateTo($"/users?userId={userId}");
+    }
+}

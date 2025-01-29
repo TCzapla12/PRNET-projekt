@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PetKeeperMobileApp.Templates.EmptyItem"
+             xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel">
+
+    <ContentView.Resources>
+        <x:String x:Key="folder">&#xf07c;</x:String>
+    </ContentView.Resources>
+    
+    <Frame
+        Padding="10"
+        HeightRequest="250"
+        Margin="1, 0, 1, 20"
+        CornerRadius="8"
+        BorderColor="Transparent"
+        BackgroundColor="{StaticResource Primary100}">
+        <Grid>
+            <Label 
+                Text="Nic tu nie ma… jeszcze!"
+                FontSize="18"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center" />   
+            <Image
+                Grid.ColumnSpan="2"
+                Opacity="0.15"
+                HeightRequest="100">
+                <Image.Source>
+                    <FontImageSource
+                        FontFamily="FAS"
+                        Glyph="{StaticResource folder}"
+                        Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
+                </Image.Source>
+            </Image>
+        </Grid>
+        
+    </Frame>
+</ContentView>

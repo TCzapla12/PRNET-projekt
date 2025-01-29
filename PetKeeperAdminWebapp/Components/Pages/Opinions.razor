@@ -1,0 +1,216 @@
+﻿@page "/opinions"
+@using grpc_hello_world
+@using Grpc.Core
+@using System.Threading.Tasks
+@inject grpc_hello_world.OpinionService.OpinionServiceClient OpinionServiceClient
+@inject NavigationManager NavigationManager
+@using Blazored.LocalStorage
+@inject ILocalStorageService LocalStorage
+@rendermode InteractiveServer
+
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        background-color: #e0f7fa;
+        color: #333;
+        padding: 1rem;
+        margin: 0;
+    }
+
+    h3 {
+        font-size: 1.75rem;
+        color: #00796b;
+        margin-bottom: 1rem;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    li {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background-color: #ffffff;
+        border-radius: 5px;
+        border: 1px solid #00796b;
+    }
+
+    li a:hover {
+        text-decoration: underline;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+        color: #00796b;
+    }
+
+    input {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 1rem;
+        border: 1px solid #00796b;
+        border-radius: 5px;
+        margin-bottom: 1rem;
+    }
+
+    button {
+        background-color: #00796b;
+        color: white;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    button:hover {
+        background-color: #004d40;
+    }
+
+    button:disabled {
+        background-color: #cccccc;
+    }
+
+    p {
+        margin-top: 1rem;
+        color: #333;
+    }
+
+    .error-message {
+        color: red;
+        font-weight: bold;
+        margin-top: 1rem;
+    }
+
+    .success-message {
+        color: green;
+        font-weight: bold;
+        margin-top: 1rem;
+    }
+
+    strong {
+        color: #008080;
+    }
+</style>
+
+<h3>Opinie</h3>
+
+@if (OpinionList != null && OpinionList.Any())
+{
+    <ul>
+        @foreach (var opinion in OpinionList)
+        {
+            <li>
+                <strong>Opiekun:</strong>
+                <a href="#" @onclick="() => RedirectToUserView(opinion.KeeperId)">
+                    Użytkownik
+                </a>
+                <br />
+
+                <strong>Autor:</strong>
+                <a href="#" @onclick="() => RedirectToUserView(opinion.AuthorId)">
+                    Użytkownik
+                </a>
+                <br />
+
+                <strong>Powiązane ogłoszenie:</strong>
+                <a href="#" @onclick="() => RedirectToAnnouncementView(opinion.AnnouncementId)">
+                    Ogłoszenie
+                </a>
+                <br />
+
+                <strong>Opis:</strong>
+                <p>@opinion.Description</p>
+                <br />
+
+                <strong>Ocena:</strong>
+                <span>@opinion.Rating</span>
+                <br />
+                <hr />
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>Nie znaleziono opinii.</p>
+}
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="error-message">@ErrorMessage</p>
+}
+
+
+
+@code {
+    private List<OpinionUpdate> OpinionList { get; set; }
+    private string ErrorMessage { get; set; }
+
+    // Flag to check if the component has been fully rendered on the client-side
+    private bool IsFirstRender { get; set; } = true;
+    private bool IsAuthorized { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // We will handle fetching opinions in OnAfterRenderAsync to ensure it's done after page load
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // After the first render, access the LocalStorage
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            IsAuthorized = !string.IsNullOrEmpty(token);
+
+            if (!IsAuthorized)
+            {
+                NavigationManager.NavigateTo("/login");
+            }
+            var metadata = new Metadata
+            {
+                { "Authorization", $"Bearer {token}" }
+            };
+
+            // Now fetch the opinions
+            await GetOpinions(metadata);
+
+            // Set the first render flag to false
+            IsFirstRender = false;
+
+            // Trigger a re-render
+            StateHasChanged();
+        }
+    }
+
+    private async Task GetOpinions(Metadata metadata)
+    {
+        try
+        {
+            var request = new OpinionGet();  // Empty request to get all opinions
+            var response = await OpinionServiceClient.GetOpinionsAsync(request, metadata);
+            OpinionList = response.Opinions.ToList();
+        }
+        catch (Grpc.Core.RpcException ex)
+        {
+            ErrorMessage = $"Błąd podczas uzyskiwania opinii";
+        }
+    }
+
+    private void RedirectToUserView(string userId)
+    {
+        // Redirect to the Users page with the provided user ID in the search field
+        NavigationManager.NavigateTo($"/users?userId={userId}");
+    }
+
+    private void RedirectToAnnouncementView(string announcementId)
+    {
+        NavigationManager.NavigateTo($"/announcements?announcementId={announcementId}");
+    }
+}

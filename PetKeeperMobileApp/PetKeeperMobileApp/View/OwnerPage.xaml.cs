@@ -9,4 +9,11 @@ public partial class OwnerPage : ContentPage
 		InitializeComponent();
 		BindingContext = vm;
 	}
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        if (BindingContext is OwnerViewModel vm)
+            _ = vm.LoadDataAsync();
+    }
 }

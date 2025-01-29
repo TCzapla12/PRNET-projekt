@@ -1,28 +1,116 @@
 import grpc
 import user_pb2
 import user_pb2_grpc
-# Create a channel to connect to the .NET server
-channel = grpc.insecure_channel('localhost:8080')  # Update with your server's address if needed
-stub = user_pb2_grpc.UserServiceStub(channel)  # Replace Greeter with your service name
+import os
+import psycopg2
+from read_image import read_image
 
-address = user_pb2.AddressCreate(
-    street='Przykladowa',
-    house_number='2',
-    city='Warszawa',
-    post_code='02-285',
-    owner_id='0'
-)
-# 1. Create a new user
-create_request = user_pb2.UserCreate(
-    username="new_user2222",
-    email="new_user22222@example.com",
-    password="securepassword123",
-    first_name='Jan',
-    last_name='Kowalski',
-    primary_address=address,
-    phone='123456789',
-    pesel='00112233445',
-    document_url=['foo', 'baz']
-)
-create_response = stub.CreateUser(create_request)
-print("CreateUser Response:", create_response)
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+addresses = [
+    {
+        'street': 'Przykladowa',
+        'house_number': '2',
+        'city': 'Warszawa',
+        'post_code': '02-356'
+    },
+    {
+        'street': 'Wyjazdowa',
+        'house_number': '5',
+        'city': 'Zielona Góra',
+        'post_code': '37-123'
+    },
+    {
+        'street': 'Porzucona',
+        'house_number': '1',
+        'apartment_number': '22',
+        'city': 'Słupsk',
+        'post_code': '07-754'
+    }
+]
+
+users = [
+    {
+        'username': 'kocham_psy123',
+        'email': 'psy56123@gmail.com',
+        'password': 'p13s-l0ve',
+        'first_name': 'Anna',
+        'last_name': 'Kowalska',
+        'primary_address': addresses[0],
+        'phone': '123789456',
+        'pesel': '00301309034',
+        'avatar_png': read_image('../images/avatar1.jpg'),
+        'document_pngs': [read_image('../images/dowod_front.jpg'),
+                          read_image('../images/dowod_tyl.jpg')]
+    },
+    {
+        'username': 'jurek57621',
+        'email': 'jurek57621@o2.pl',
+        'password': 'wanda14071987',
+        'first_name': 'Jerzy',
+        'last_name': 'Nowak',
+        'primary_address': addresses[1],
+        'phone': '503000001',
+        'pesel': '63071609033',
+        'avatar_png': read_image('../images/avatar2.webp'),
+        'document_pngs': [read_image("../images/dowod_USA_front.jpg"),
+                          read_image("../images/dowod_USA_tyl.jpg")]
+    },
+    {
+        'username': 'cheepoi',
+        'email': '783aaa3@hotmail.com',
+        'password': '734HuMZxx@690',
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'primary_address': addresses[2],
+        'phone': '976304999',
+        'pesel': '78112345678',
+        'document_pngs': [read_image("../images/dowod_USA_fake_front.jpg"),
+                          read_image("../images/dowod_USA_fake_tyl.webp")]
+    }
+]
+
+
+def get_user_ids():
+    with open(os.path.join(script_dir, 'uids.txt'), 'r') as f:
+        return [line.strip() for line in f.readlines()]
+
+
+###
+if __name__ == "__main__":
+    ids, addr_ids = [], []
+    channel = grpc.insecure_channel('localhost:8080')
+    stub = user_pb2_grpc.UserServiceStub(channel)
+    for usr, addr in zip(users, addresses):
+        address_proto = user_pb2.AddressCreate(**addr)
+        user_proto = user_pb2.UserCreate(**usr)
+
+        create_response = stub.CreateUser(user_proto)
+        print("CreateUser Response\n", create_response)
+        ids.append(create_response.id)
+        addr_ids.append(create_response.primary_address_id)
+
+    with open('uids.txt', 'w') as f:
+        f.writelines(i + '\n' for i in ids)
+
+    with open('../address/primary_addr_ids.txt', 'w') as f:
+        f.writelines(i + '\n' for i in addr_ids)
+
+    # Set last user as admin using raw db query
+    conn = psycopg2.connect(
+        dbname='testdb',
+        user='user',
+        password='pass',
+        host='localhost'
+    )
+    cursor = conn.cursor()
+    query = "UPDATE users SET is_admin = TRUE WHERE id = %s"
+    try:
+        cursor.execute(query, (ids[-1],))
+        conn.commit()
+        print(f"Success setting user {users[-1]['username']} with id {ids[-1]} as Admin")
+    except Exception as e:
+        print(f"Error when executing UPDATE query: {e}")
+    finally:
+        cursor.close()
+        conn.close()

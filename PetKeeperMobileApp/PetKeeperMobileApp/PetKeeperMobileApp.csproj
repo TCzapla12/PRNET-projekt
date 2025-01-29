@@ -45,6 +45,9 @@
     <MauiImage Update="Resources\Icons\house.svg" Resize="True" BaseSize="576,512" TintColor="#064849" />
     <MauiImage Update="Resources\Icons\paw.svg" Resize="True" BaseSize="512,512" TintColor="#064849" />
     <MauiImage Update="Resources\Icons\user.svg" Resize="True" BaseSize="448,512" TintColor="#064849" />
+    <MauiImage Update="Resources\Icons\cat.svg" Resize="True" BaseSize="576,512" TintColor="#064849" />
+    <MauiImage Update="Resources\Icons\dog.svg" Resize="True" BaseSize="576,512" TintColor="#064849" />
+    <MauiImage Update="Resources\Icons\question.svg" Resize="True" BaseSize="320,512" TintColor="#064849" />
 
     <!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />    
@@ -66,16 +69,50 @@
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
 		<PackageReference Include="SkiaSharp" Version="3.116.1" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.1" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Templates\AnnouncementItem.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Templates\AnnouncementShort.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Templates\EmptyItem.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Templates\ErrorItem.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Templates\OpinionItem.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Templates\ValidationEditor.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Templates\ValidationEntry.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Templates\ValidationPicker.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\AddOpinionPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="View\ConfirmationPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="View\CreateAnnouncementPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="View\DashboardPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\EditAddressPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\EditAnimalPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="View\ForgotPasswordPage.xaml">
@@ -87,6 +124,12 @@
 	  <MauiXaml Update="View\MorePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="View\MyAddressesPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\MyPetsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="View\OwnerPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -96,9 +139,33 @@
 	  <MauiXaml Update="View\RegistrationPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="View\SearchPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\SettingsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\ShowAnnouncementPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\ShowFinalAnnouncementsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\ShowOpinionsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\ShowUserOpinionsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
   
   <ItemGroup>
     <Protobuf Include="Protos\user.proto" GrpcServices="Client" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="Templates\ValidationEditor.xaml.cs">
+      <DependentUpon>ValidationEditor.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

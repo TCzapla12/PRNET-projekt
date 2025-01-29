@@ -33,7 +33,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
-
+builder.Services.AddGrpc(options =>
+{
+    options.MaxReceiveMessageSize = 50 * 1024 * 1024;  // 50 MB
+    options.MaxSendMessageSize = 50 * 1024 * 1024;     // 50 MB
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -42,6 +46,9 @@ app.UseAuthorization();
 app.MapGrpcService<UserManagementService>();
 app.MapGrpcService<AuthManagementService>();
 app.MapGrpcService<AddressManagementService>();
+app.MapGrpcService<AnimalManagementService>();
+app.MapGrpcService<AnnouncementManagementService>();
+app.MapGrpcService<OpinionManagementService>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 // Configure db connection
 

@@ -3,12 +3,82 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PetKeeperMobileApp.View.OwnerPage"
              xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             xmlns:models="clr-namespace:PetKeeperMobileApp.Models"
              x:DataType="viewmodel:OwnerViewModel"
+             xmlns:templates="clr-namespace:PetKeeperMobileApp.Templates"
              Title="OwnerPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Owner"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+
+    <ContentPage.Resources>
+        <converters:InvertedBoolToVisibilityConverter 
+            x:Key="InvertedBoolToVisibilityConverter"
+            xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <Grid
+            RowDefinitions="Auto, Auto, Auto, Auto"
+            Padding="20"
+            RowSpacing="20">
+            <Label 
+                Text="WŁAŚCICIEL"
+                Style="{StaticResource Headline}" />
+            <Label
+                Grid.Row="1"
+                Text="Moje ogłoszenia"
+                Style="{StaticResource SubHeadline}"
+                HorizontalOptions="Start" />
+
+            <ActivityIndicator
+                Grid.Row="2"
+                IsRunning="{Binding IsLoading}"
+                IsVisible="{Binding IsLoading}"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                HeightRequest="200"
+                Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}"
+                Margin="0, 20, 0, 20" />    
+
+            <VerticalStackLayout
+                Grid.Row="2"
+                 IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolToVisibilityConverter}}">
+                <templates:ErrorItem
+                    IsVisible="{Binding IsErrorVisible}"
+                    ButtonCommand="{Binding RefreshData}"
+                    ErrorException="{Binding Exception}"
+                    Margin="0, 0, 0, 20" />
+                <templates:EmptyItem
+                    IsVisible="{Binding IsEmpty}" />
+                <CollectionView
+                     ItemsSource="{Binding AnnouncementList}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="{x:Type models:AnnouncementInfo}">
+                            <templates:AnnouncementItem
+                                IsOwnerView="True"
+                                Announcement="{Binding .}"/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+            <Grid
+                Grid.Row="3"
+                RowDefinitions="Auto, Auto, *"
+                RowSpacing="10">
+                <Button
+                    Style="{StaticResource OutlineButton}"
+                    Text="Dodaj ogłoszenie"
+                    Command="{Binding CreateAnnouncementCommand}" />
+                <Button
+                    Grid.Row="1"
+                    Style="{StaticResource OutlineButton}"
+                    Text="Zakończone"
+                    Command="{Binding GoToFinishedAnnouncementsCommand}" />
+                <Button
+                    Grid.Row="2"
+                    Style="{StaticResource OutlineButton}"
+                    Text="Anulowane"
+                    Command="{Binding GoToCanceledAnnouncementsCommand}" />
+            </Grid>
+            
+        </Grid>
+    </ScrollView>
 </ContentPage>

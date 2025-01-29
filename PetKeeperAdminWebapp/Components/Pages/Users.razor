@@ -1,0 +1,383 @@
+﻿@page "/users"
+@using grpc_hello_world
+@using Grpc.Core;
+@using System.Threading.Tasks
+@inject grpc_hello_world.UserService.UserServiceClient UserServiceClient
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.WebUtilities
+@using Blazored.LocalStorage;
+@inject ILocalStorageService LocalStorage
+@rendermode InteractiveServer
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #e0f7fa;
+        color: #00796b;
+        margin: 0;
+        padding: 20px;
+    }
+
+    h3 {
+        color: #00796b;
+        font-size: 1.3em;
+        margin-bottom: 1em;
+        text-align: left;
+    }
+
+    .search-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        max-width: 600px;
+        margin: 0;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        margin-bottom: 0.5rem;
+        color: #00796b;
+    }
+
+    input {
+        padding: 10px;
+        font-size: 1em;
+        border: 1px solid #00796b;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+    }
+
+    button {
+        padding: 10px 20px;
+        background-color: #00796b;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1.1em;
+        transition: background-color 0.3s ease;
+        margin-bottom: 1rem;
+    }
+
+    button:hover {
+        background-color: #004d40;
+    }
+
+    .user-details p {
+        font-size: 1.1em;
+        margin-bottom: 1rem;
+    }
+
+    .user-details h4 {
+        color: #00796b;
+        margin-bottom: 1rem;
+    }
+
+    img {
+        max-width: 200px;
+        max-height: 200px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+
+    .error-message {
+        color: red;
+        font-weight: bold;
+    }
+
+    .success-message {
+        color: green;
+        font-weight: bold;
+    }
+
+    .user-actions button {
+        margin-top: 1rem;
+        padding: 10px 20px;
+        background-color: #00796b;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1.1em;
+        transition: background-color 0.3s ease;
+    }
+
+    .user-actions button:hover {
+        background-color: #004d40;
+    }
+</style>
+
+<h3>Wyszukaj Użytkownika</h3>
+
+<div class="search-container">
+    <div class="form-group">
+        <label for="id">ID:</label>
+        <input id="id" @bind="UserId" placeholder="Wpisz ID" />
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input id="email" @bind="Email" placeholder="Wpisz Email" />
+    </div>
+
+    <div class="form-group">
+        <label for="username">Nazwa Użytkownika:</label>
+        <input id="username" @bind="Username" placeholder="Enter Nazwę Użytkownika" />
+    </div>
+
+    <button @onclick="GetUser">Get User</button>
+</div>
+
+@if (User != null)
+{
+    <h3>Informacje o Użytkowniku</h3>
+    <div class="user-details">
+        <p><strong>ID:</strong> @User.Id</p>
+        <p><strong>Email:</strong> @User.Email</p>
+        <p><strong>Nazwa Użytkownika:</strong> @User.Username</p>
+        <p><strong>Imię:</strong> @User.FirstName</p>
+        <p><strong>Nazwisko:</strong> @User.LastName</p>
+        <p><strong>Numer telefonu:</strong> @User.Phone</p>
+        <p><strong>PESEL:</strong> @User.Pesel</p>
+        <p><strong>Zweryfikowany:</strong> @(User.IsVerified ? "Tak" : "Nie")</p>
+
+        @if (!User.IsVerified)
+        {
+            <div class="user-actions">
+                <button @onclick="VerifyUser">Zweryfikuj użytkownika</button>
+            </div>
+        }
+
+        <p><strong>Zablokowany:</strong> @(User.IsBanned ? "Tak" : "Nie")</p>
+        @if (!User.IsBanned)
+        {
+            <div class="user-actions">
+                <button @onclick="BanUser">Zablokuj użytkownika</button>
+            </div>
+        }
+
+        <p><strong>Status Administratora:</strong> @(User.IsAdmin ? "Tak" : "Nie")</p>
+
+        @if (!User.AvatarPng.IsEmpty)
+        {
+            <h4>Avatar</h4>
+            <img src="@GetBase64Image(User.AvatarPng)" alt="User Avatar" />
+        }
+        else
+        {
+            <h4>Avatar</h4>
+            <p>Brak avatara</p>
+        }
+
+        @if (User.DocumentPngs.Count != 0 && User.DocumentPngs.Any())
+        {
+            <h4>Dokument toższamości</h4>
+            @foreach (var doc in User.DocumentPngs)
+            {
+                <img src="@GetBase64Image(doc)" alt="Document Image" />
+            }
+        }
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="error-message">@ErrorMessage</p>
+}
+
+@if (SuccessMessage != null)
+{
+    <p class="success-message">@SuccessMessage</p>
+}
+
+
+@code {
+    private string UserId { get; set; }
+    private string Email { get; set; }
+    private string Username { get; set; }
+    private UserFull User { get; set; }
+    private string ErrorMessage { get; set; }
+    private string SuccessMessage { get; set; }
+    private bool IsInitialized { get; set; } = false;
+    private bool IsAuthorized { get; set; } = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            IsAuthorized = !string.IsNullOrEmpty(token);
+
+            if (!IsAuthorized)
+            {
+                NavigationManager.NavigateTo("/login");
+            }
+            // Extract query parameters after the page has fully loaded
+            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+            var queryParams = QueryHelpers.ParseQuery(uri.Query);
+
+            if (queryParams.TryGetValue("userId", out var userIdValue))
+            {
+                UserId = userIdValue;
+                await LoadUserData();
+            }
+
+            IsInitialized = true;
+            StateHasChanged(); // Re-render the component to show the updated state
+        }
+    }
+
+    private async Task LoadUserData()
+    {
+        ErrorMessage = string.Empty;
+        SuccessMessage = string.Empty;
+        User = null;
+
+        var request = new UserGet
+        {
+            UserId = new UserIdentifier { }
+        };
+        if (!string.IsNullOrEmpty(UserId))
+        {
+            request.UserId.Id = UserId;
+        }
+        else if (!string.IsNullOrEmpty(Email))
+        {
+            request.UserId.Email = Email;
+        }
+        else if (!string.IsNullOrEmpty(Username))
+        {
+            request.UserId.Username = Username;
+        }
+        else
+        {
+            ErrorMessage = "Proszę podać przynajmniej jedno kryterium wyszukiwania";
+            return;
+        }
+
+        try
+        {
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            var metadata = new Metadata
+            {
+                { "Authorization", $"Bearer {token}" }
+            };
+            var response = await UserServiceClient.GetUserAsync(request, metadata);
+            User = response;
+        }
+        catch (Grpc.Core.RpcException ex)
+        {
+            ErrorMessage = $"Błąd podczas uzyskiwania informacji o użytkowniku. Sprawdź podane informacje i spróbuj ponownie";
+        }
+    }
+
+    private async Task GetUser()
+    {
+        await LoadUserData();
+    }
+
+    private async Task VerifyUser()
+    {
+        if (User == null)
+        {
+            ErrorMessage = "Użytkownik nie jest wybrany";
+            return;
+        }
+
+        try
+        {
+            var request = new UserUpdate
+                {
+                    UserId = new UserIdentifier { Id = User.Id },
+                    IsVerified = true
+                };
+
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            var metadata = new Metadata
+            {
+                { "Authorization", $"Bearer {token}" }
+            };
+
+            var response = await UserServiceClient.UpdateUserAsync(request, metadata);
+
+            if (response.IsVerified)
+            {
+                SuccessMessage = "Użytkownik zweryfikowany pomyślnie!";
+                User.IsVerified = true;
+            }
+            else
+            {
+                ErrorMessage = "Nie udało się zweryfikować użytkownika.";
+            }
+        }
+        catch (Grpc.Core.RpcException ex)
+        {
+            ErrorMessage = $"Błąd podczas weryfikacji użytkownika";
+        }
+    }
+
+    private async Task BanUser()
+    {
+        if (User == null)
+        {
+            ErrorMessage = "Użytkownik nie jest wybrany";
+            return;
+        }
+
+        try
+        {
+            var request = new UserUpdate
+            {
+                UserId = new UserIdentifier { Id = User.Id },
+                IsBanned = true
+            };
+
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            var metadata = new Metadata
+            {
+                { "Authorization", $"Bearer {token}" }
+            };
+
+            var response = await UserServiceClient.UpdateUserAsync(request, metadata);
+
+            if (response.IsBanned)
+            {
+                SuccessMessage = "Użytkownik zablokowany pomyślnie!";
+                User.IsBanned = true;
+            }
+            else
+            {
+                ErrorMessage = "Nie udało się zablokować użytkownika";
+            }
+        }
+        catch (Grpc.Core.RpcException ex)
+        {
+            ErrorMessage = $"Błąd podczas blokowania użytkownika";
+        }
+    }
+
+    private string GetBase64Image(Google.Protobuf.ByteString imageBytes)
+    {
+        var byteArray = imageBytes.ToByteArray();
+
+        string mimeType;
+        if (byteArray.Length >= 4 && byteArray[0] == 0x89 && byteArray[1] == 0x50 && byteArray[2] == 0x4E && byteArray[3] == 0x47)
+        {
+            mimeType = "image/png"; // PNG magic number: 89 50 4E 47
+        }
+        else if (byteArray.Length >= 3 && byteArray[0] == 0xFF && byteArray[1] == 0xD8 && byteArray[2] == 0xFF)
+        {
+            mimeType = "image/jpeg"; // JPEG magic number: FF D8 FF
+        }
+        else
+        {
+            throw new ArgumentException("Niewspierany format obrazu");
+        }
+
+        return $"data:{mimeType};base64,{Convert.ToBase64String(byteArray)}";
+    }
+}

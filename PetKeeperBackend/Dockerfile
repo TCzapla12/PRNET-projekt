@@ -27,4 +27,8 @@ RUN dotnet publish "./grpc_hello_world.csproj" -c $BUILD_CONFIGURATION -o /app/p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+USER root
+RUN mkdir /home/app/uploads
+RUN chown -R app:app /home/app/uploads
+USER app
 ENTRYPOINT ["dotnet", "grpc_hello_world.dll"]

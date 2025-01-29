@@ -26,8 +26,8 @@ namespace PetKeeperMobileApp
 
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<MainViewModel>();
-            builder.Services.AddSingleton<DashboardPage>();
-            builder.Services.AddSingleton<DashboardViewModel>();
+            builder.Services.AddTransient<DashboardPage>();
+            builder.Services.AddTransient<DashboardViewModel>();
 
             builder.Services.AddTransient<OwnerPage>();
             builder.Services.AddTransient<OwnerViewModel>();
@@ -37,6 +37,19 @@ namespace PetKeeperMobileApp
             builder.Services.AddTransient<ProfileViewModel>();
             builder.Services.AddTransient<MorePage>();
             builder.Services.AddTransient<MoreViewModel>();
+
+            builder.Services.AddTransient<MyPetsPage>();
+            builder.Services.AddTransient<MyPetsViewModel>();
+            builder.Services.AddTransient<MyAddressesPage>();
+            builder.Services.AddTransient<MyAddressesViewModel>();
+            builder.Services.AddTransient<SearchPage>();
+            builder.Services.AddTransient<SearchViewModel>();
+            builder.Services.AddTransient<ShowFinalAnnouncementsPage>();
+            builder.Services.AddTransient<ShowFinalAnnouncementsViewModel>();
+            builder.Services.AddTransient<ShowOpinionsPage>();
+            builder.Services.AddTransient<ShowOpinionsViewModel>();
+            builder.Services.AddTransient<SettingsPage>();
+            builder.Services.AddTransient<SettingsViewModel>();
 
             builder.Services.AddTransient<ForgotPasswordPage>();
             builder.Services.AddTransient<ForgotPasswordViewModel>();

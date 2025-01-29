@@ -1,0 +1,146 @@
+﻿@page "/users_all"
+@using grpc_hello_world
+@using Grpc.Core;
+@using System.Threading.Tasks
+@inject grpc_hello_world.UserService.UserServiceClient UserServiceClient
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.WebUtilities
+@using Blazored.LocalStorage;
+@inject ILocalStorageService LocalStorage
+@rendermode InteractiveServer
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #e0f7fa;
+        color: #00796b;
+        margin: 0;
+        padding: 20px;
+    }
+
+    h3 {
+        color: #00796b;
+        margin-bottom: 20px;
+        font-size: 1.5em;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    li {
+        background-color: #ffffff;
+        border: 1px solid #00796b;
+        border-radius: 4px;
+        padding: 10px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    li a {
+        color: #00796b;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    li a:hover {
+        text-decoration: underline;
+    }
+
+    .status {
+        font-size: 0.9em;
+        color: #004d40;
+    }
+</style>
+
+<h3>Lista Użytkowników</h3>
+
+@if (loading)
+{
+    <p>Ładowanie...</p>
+}
+else if (error != null)
+{
+    <p class="text-red-500">Error: @error</p>
+}
+else if (users.Count == 0)
+{
+    <p>Nie znaleziono użytkowników.</p>
+}
+else
+{
+    <ul>
+        @foreach (var user in users)
+        {
+            <li>
+                <a href="#" @onclick="() => NavigateToUser(user.Id)">@user.Email</a>
+                <span class="status">
+                    Zweryfikowany: <strong>@(user.IsVerified ? "Tak" : "Nie")</strong>,
+                    Zablokowany: <strong>@(user.IsBanned ? "Tak" : "Nie")</strong>
+                </span>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private bool loading = true;
+    private string? error;
+    private List<UserFull> users = new();
+    private bool IsAuthorized { get; set; } = false;
+    private bool IsInitialized { get; set; } = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            IsAuthorized = !string.IsNullOrEmpty(token);
+
+            if (!IsAuthorized)
+            {
+                NavigationManager.NavigateTo("/login");
+            }
+
+            await GetAllUsers();
+            IsInitialized = true;
+            StateHasChanged(); // Re-render the component to show the updated state
+        }
+    }
+
+    protected async Task GetAllUsers()
+    {
+        var token = await LocalStorage.GetItemAsync<string>("auth_token");
+        IsAuthorized = !string.IsNullOrEmpty(token);
+
+        if (!IsAuthorized)
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+        try
+        {
+            var metadata = new Metadata
+            {
+                { "Authorization", $"Bearer {token}" }
+            };
+            var response = await UserServiceClient.GetUsersAllAsync(new Empty(), metadata);
+            users = response.Users.ToList();
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private void NavigateToUser(string userId)
+    {
+        NavigationManager.NavigateTo($"/users?userId={userId}");
+    }
+}

@@ -6,15 +6,21 @@
              x:DataType="viewmodel:MoreViewModel"
              Title="MorePage">
     <Grid 
-        RowDefinitions="Auto, *"
+        RowDefinitions="Auto, Auto, *"
+        RowSpacing="20"
         Padding="20">
         <Label 
-            Text="Więcej"
+            Text="WIĘCEJ"
             Style="{StaticResource Headline}" />
         <Button
             Grid.Row="1"
+            Style="{StaticResource OutlineButton}"
+            Text="Ustawienia" 
+            Command="{Binding ShowSettingsCommand}" />
+        <Button
+            Grid.Row="2"
             VerticalOptions="End"
-            Style="{StaticResource SecondaryButton}"
+            Style="{StaticResource OutlineButton}"
             Text="Wyloguj się" 
             Command="{Binding LogoutCommand}" />  
     </Grid>
