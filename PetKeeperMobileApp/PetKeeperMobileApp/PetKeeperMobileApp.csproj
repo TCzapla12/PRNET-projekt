@@ -148,6 +148,9 @@
 	  <MauiXaml Update="View\ShowOpinionsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="View\ShowUserOpinionsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
   
   <ItemGroup>
