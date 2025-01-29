@@ -44,7 +44,8 @@
                 <templates:ErrorItem
                     IsVisible="{Binding IsErrorVisible}"
                     ButtonCommand="{Binding RefreshData}"
-                    ErrorException="{Binding Exception}" />
+                    ErrorException="{Binding Exception}"
+                    Margin="0, 0, 0, 20" />
                 <CollectionView
                      ItemsSource="{Binding AnnouncementList}">
                     <CollectionView.ItemTemplate>

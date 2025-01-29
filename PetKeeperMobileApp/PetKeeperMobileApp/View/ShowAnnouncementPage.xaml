@@ -133,7 +133,8 @@
                     <ImageButton
                          WidthRequest="100"
                          HeightRequest="100"
-                         Source="{Binding UserPhoto}" />
+                         Source="{Binding UserPhoto}"
+                         Command="{Binding ShowUserOpinionsCommand}"/>
                 </Frame>
                 <Label 
                     Text="{Binding UserText}" HorizontalTextAlignment="Center"/>

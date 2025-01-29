@@ -159,6 +159,16 @@ public partial class ShowAnnouncementViewModel : ObservableObject
         }
     }
 
+    [RelayCommand]
+    async Task ShowUserOpinions()
+    {
+        if(_announcementInfo.KeeperInfo != null)
+        {
+            var showUsersOpinionsViewModel = new ShowUserOpinionsViewModel(_grpcClient, _announcementInfo.KeeperInfo!.Id, _announcementInfo.KeeperInfo!.Username);
+            await Application.Current!.MainPage!.Navigation.PushModalAsync(new ShowUserOpinionsPage(showUsersOpinionsViewModel));
+        }
+    }
+
     private async Task ChangeAnnouncement(StatusType status, bool addKeeperId = false)
     {
         try
