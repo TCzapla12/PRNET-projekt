@@ -27,7 +27,7 @@ public class MockGrpcClient : IGrpcClient
         return Wordings.REGISTER_SUCCESS;
     }
 
-    public async Task<UserDto> GetUser()
+    public async Task<UserDto> GetUser(string? id = null)
     {
         ImageSource imageSource = "/data/data/com.prnet.petkeepermobileapp/cache/2203693cc04e0be7f4f024d5f9499e13/821da731fa9143d2b6e7cfe4f7c954ee/1000000034.png";
         var bytes = await Helpers.ImageToBytes(imageSource);
@@ -167,7 +167,7 @@ public class MockGrpcClient : IGrpcClient
     #endregion
 
     #region Announcement
-    public async Task<List<AnnouncementDto>> GetAnnouncements()
+    public async Task<List<AnnouncementDto>> GetUserAnnouncements(StatusType? status = null)
     {
         return [
             new AnnouncementDto() {
@@ -180,6 +180,7 @@ public class MockGrpcClient : IGrpcClient
                 EndTerm = (ulong)new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
                 Status = StatusType.Created,
                 AddressId = "1",
+                OwnerId = "1",
             },
             new AnnouncementDto() {
                 Id = "2",
@@ -190,6 +191,7 @@ public class MockGrpcClient : IGrpcClient
                 EndTerm = (ulong)new DateTimeOffset(DateTime.Today).ToUnixTimeSeconds(),
                 Status = StatusType.Ongoing,
                 AddressId = "2",
+                OwnerId = "1",
             },
             new AnnouncementDto() {
                 Id = "3",
@@ -201,6 +203,52 @@ public class MockGrpcClient : IGrpcClient
                 EndTerm = (ulong)new DateTimeOffset(DateTime.MaxValue).ToUnixTimeSeconds(),
                 Status = StatusType.Finished,
                 AddressId = "3",
+                OwnerId = "1",
+            }
+            ];
+    }
+
+    public async Task<List<AnnouncementDto>> GetAnnouncements(int? minValue = null, int? maxValue = null, 
+        DateTime? startTerm = null, DateTime? endTerm = null, string? keeperId = null, StatusType? status = null)
+    {
+        return [
+            new AnnouncementDto() {
+                Id = "1",
+                AnimalId = "1",
+                Profit = 100,
+                IsNegotiable = true,
+                Description = "Bardzo dobre ogłoszenie",
+                StartTerm = (ulong)new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(),
+                EndTerm = (ulong)new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                Status = StatusType.Created,
+                AddressId = "1",
+                OwnerId = "1",
+                KeeperId = "1",
+            },
+            new AnnouncementDto() {
+                Id = "2",
+                AnimalId = "2",
+                Profit = 200,
+                IsNegotiable = false,
+                StartTerm = (ulong)new DateTimeOffset(DateTime.Today).ToUnixTimeSeconds(),
+                EndTerm = (ulong)new DateTimeOffset(DateTime.Today).ToUnixTimeSeconds(),
+                Status = StatusType.Ongoing,
+                AddressId = "2",
+                OwnerId = "1",
+                KeeperId = "2",
+            },
+            new AnnouncementDto() {
+                Id = "3",
+                AnimalId = "3",
+                Profit = 300,
+                IsNegotiable = false,
+                Description = "Legia Warszawa to najlepszy klub - Mistrz Polski!!! Polska GUUUUROM",
+                StartTerm = (ulong)new DateTimeOffset(DateTime.MinValue).ToUnixTimeSeconds(),
+                EndTerm = (ulong)new DateTimeOffset(DateTime.MaxValue).ToUnixTimeSeconds(),
+                Status = StatusType.Finished,
+                AddressId = "3",
+                OwnerId = "1",
+                KeeperId = "3",
             },
             new AnnouncementDto() {
                 Id = "4",
@@ -212,6 +260,8 @@ public class MockGrpcClient : IGrpcClient
                 EndTerm = (ulong)new DateTimeOffset(DateTime.MaxValue).ToUnixTimeSeconds(),
                 Status = StatusType.Pending,
                 AddressId = "4",
+                OwnerId = "2",
+                KeeperId = "4",
             },
             new AnnouncementDto() {
                 Id = "5",
@@ -223,6 +273,8 @@ public class MockGrpcClient : IGrpcClient
                 EndTerm = (ulong)new DateTimeOffset(DateTime.MaxValue).ToUnixTimeSeconds(),
                 Status = StatusType.Canceled,
                 AddressId = "4",
+                OwnerId = "2",
+                KeeperId = "5",
             },
             new AnnouncementDto() {
                 Id = "6",
@@ -234,6 +286,8 @@ public class MockGrpcClient : IGrpcClient
                 EndTerm = (ulong)new DateTimeOffset(DateTime.MaxValue).ToUnixTimeSeconds(),
                 Status = StatusType.Accepted,
                 AddressId = "4",
+                OwnerId = "2",
+                KeeperId = "6",
             }
             ];
     }
@@ -248,7 +302,52 @@ public class MockGrpcClient : IGrpcClient
         return Wordings.SUCCESS;
     }
 
+    public async Task<string> UpdateAnnouncementStatus(UpdateAnnouncementDto announcementUpdateDto)
+    {
+        return Wordings.SUCCESS;
+    }
+
     public async Task<string> DeleteAnnouncement(string id)
+    {
+        return Wordings.SUCCESS;
+    }
+    #endregion
+
+    #region Opinions
+    public async  Task<List<OpinionDto>> GetOpinions(string? authorId = null, string? keeperId = null)
+    {
+        return [
+            new OpinionDto{
+                Id = "1",
+                AuthorId = "1",
+                KeeperId = "2",
+                Description = "Nie dobrze",
+                CreatedDate = (ulong)new DateTimeOffset(DateTime.Today).ToUnixTimeSeconds(),
+                Rating = 2,
+                AnnouncementId = "1"
+            },
+            new OpinionDto{
+                Id = "2",
+                AuthorId = "2",
+                KeeperId = "1",
+                Description = "Dobrze",
+                CreatedDate = (ulong)new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(),
+                Rating = 5,
+                AnnouncementId = "2"
+            }];
+    }
+
+    public async Task<string> CreateOpinion(OpinionDto opinionDto)
+    {
+        return Wordings.SUCCESS;
+    }
+
+    public async Task<string> UpdateOpinion(OpinionDto opinionDto)
+    {
+        return Wordings.SUCCESS;
+    }
+
+    public async Task<string> DeleteOpinion(string id)
     {
         return Wordings.SUCCESS;
     }

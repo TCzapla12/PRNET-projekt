@@ -28,13 +28,13 @@
                     <FontImageSource
                         FontFamily="FAS"
                         Glyph="{StaticResource xmark}"
-                        Color="{StaticResource PrimaryDark}" />
+                        Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
                 </ImageButton.Source>
             </ImageButton>
 
             <Label
                 Grid.ColumnSpan="2"
-                Text="Nowe ogłoszenie"
+                Text="{Binding Title}"
                 Style="{StaticResource Headline}" />
 
             <StackLayout
@@ -44,7 +44,7 @@
 
                 <Grid
                     RowDefinitions="Auto, Auto, Auto, Auto, Auto"
-                    ColumnDefinitions=".7*, Auto, *, Auto"
+                    ColumnDefinitions=".75*, Auto, *, Auto"
                     RowSpacing="20">
 
                     <templates:ValidationEntry
@@ -66,7 +66,7 @@
                         Grid.Column="3"
                         IsChecked="{Binding IsNegotiable}"
                         HorizontalOptions="End"
-                        Color="{StaticResource PrimaryDark}"/>
+                        Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}"/>
                     <templates:ValidationPicker
                         Grid.Row="1"
                         Grid.ColumnSpan="4"
@@ -122,8 +122,8 @@
                 Grid.Row="2"
                 Grid.ColumnSpan="2"
                 Style="{StaticResource PrimaryButton}"
-                Text="Dodaj"
-                Command="{Binding CreateAnnouncementCommand}"
+                Text="{Binding ButtonText}"
+                Command="{Binding CreateEditAnnouncementCommand}"
                 CommandParameter="{x:Reference ValidationEntryStack}" />
         </Grid>
     </ScrollView>

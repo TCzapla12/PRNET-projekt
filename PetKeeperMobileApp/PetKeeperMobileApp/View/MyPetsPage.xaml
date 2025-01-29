@@ -15,6 +15,9 @@
         <converters:StringToVisibilityConverter
             x:Key="StringToVisibilityConverter"
             xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />
+        <converters:InvertedBoolToVisibilityConverter 
+            x:Key="InvertedBoolToVisibilityConverter"
+            xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />
         <x:String x:Key="arrow-left">&#xf060;</x:String>
         <x:String x:Key="pen">&#xf304;</x:String>
         <x:String x:Key="trash">&#xf1f8;</x:String>
@@ -34,7 +37,7 @@
                     <FontImageSource
                             FontFamily="FAS"
                             Glyph="{StaticResource arrow-left}"
-                            Color="{StaticResource PrimaryDark}" />
+                            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
                 </ImageButton.Source>
             </ImageButton>
 
@@ -42,13 +45,29 @@
                     Grid.ColumnSpan="2"
                     Text="MOJE ZWIERZĘTA"
                     Style="{StaticResource Headline}" />
+
+            <ActivityIndicator
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                IsRunning="{Binding IsLoading}"
+                IsVisible="{Binding IsLoading}"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                HeightRequest="200"
+                Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}"
+                Margin="0, 20, 0, 20" />
+
             <VerticalStackLayout
                 Grid.Row="1"
-                Grid.ColumnSpan="2">
+                Grid.ColumnSpan="2"
+                IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolToVisibilityConverter}}">
                 <templates:ErrorItem
                     IsVisible="{Binding IsErrorVisible}"
                     ButtonCommand="{Binding RefreshData}"
-                    ErrorException="{Binding Exception}" />
+                    ErrorException="{Binding Exception}"
+                    Margin="0, 0, 0, 20" />
+                <templates:EmptyItem
+                    IsVisible="{Binding IsEmpty}" />
                 <CollectionView
                     ItemsSource="{Binding Animals}">
                     <CollectionView.ItemTemplate>
@@ -83,7 +102,7 @@
                                                 <FontImageSource
                                                     FontFamily="FAS"
                                                     Glyph="{StaticResource pen}"
-                                                    Color="{StaticResource PrimaryDark}" />
+                                                    Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
                                             </ImageButton.Source>
                                         </ImageButton>
                                         <ImageButton

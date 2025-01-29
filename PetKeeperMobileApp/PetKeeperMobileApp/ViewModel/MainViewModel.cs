@@ -36,7 +36,7 @@ public partial class MainViewModel(IGrpcClient grpcClient) : ObservableObject
             AuthDto dto = new()
             {
                 Email = this.Email,
-                HashPassword = Security.HashMD5(this.Password)
+                Password = this.Password
             };
 
             var credentials = await grpcClient.Login(dto);

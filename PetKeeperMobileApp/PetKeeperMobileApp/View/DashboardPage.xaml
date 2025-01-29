@@ -4,32 +4,100 @@
              x:Class="PetKeeperMobileApp.View.DashboardPage"
              xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"     
              xmlns:templates="clr-namespace:PetKeeperMobileApp.Templates"
+             xmlns:models="clr-namespace:PetKeeperMobileApp.Models"
              x:DataType="viewmodel:DashboardViewModel"
              Title="DashboardPage">
 
-    <VerticalStackLayout>
-        <templates:ErrorItem
-            IsVisible="{Binding IsErrorVisible}"
-            ButtonCommand="{Binding RefreshData}"
-            ErrorException="{Binding Exception}" />
-        <Grid
-            RowDefinitions="Auto, Auto"
-            Padding="20"
-            RowSpacing="20">
+    <ContentPage.Resources>
+        <converters:ListToVisibilityConverter 
+            x:Key="ListToVisibilityConverter"
+            xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />
+        <converters:InvertedBoolToVisibilityConverter 
+            x:Key="InvertedBoolToVisibilityConverter"
+            xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />   
+    </ContentPage.Resources>
+    
+    <ScrollView>
+        <VerticalStackLayout>
+            <Grid
+                RowDefinitions="Auto, Auto, Auto"
+                Padding="20"
+                RowSpacing="20">
 
-            <HorizontalStackLayout>
+                <HorizontalStackLayout>
+                    <Label 
+                        Text="Witaj, "
+                        Style="{StaticResource Headline}"/>
+                    <Label
+                        Text="{Binding FirstName}"
+                        Style="{StaticResource Headline}"
+                        FontAttributes="Bold"/>
+                    <Label
+                        Text="!"
+                        Style="{StaticResource Headline}"/>
+                </HorizontalStackLayout>
 
-                <Label 
-                    Text="Witaj, "
-                    Style="{StaticResource Headline}"/>
+                <Frame
+                    HorizontalOptions="End"
+                     CornerRadius="25"
+                     WidthRequest="50"
+                     HeightRequest="50">
+                    <ImageButton
+                         WidthRequest="50"
+                         HeightRequest="50"
+                         Source="{Binding Photo}" />
+                </Frame>
+
                 <Label
-                    Text="{Binding FirstName}"
-                    Style="{StaticResource Headline}"
-                    FontAttributes="Bold"/>
-                <Label
-                    Text="!"
-                    Style="{StaticResource Headline}"/>
-            </HorizontalStackLayout>
-        </Grid>
-    </VerticalStackLayout>
+                    Grid.Row="1"
+                    Text="Moje aktywne ogłoszenia"
+                    Style="{StaticResource SubHeadline}"
+                    HorizontalOptions="Start">
+                </Label>
+
+                <ActivityIndicator
+                    Grid.Row="2"
+                    IsRunning="{Binding IsLoading}"
+                    IsVisible="{Binding IsLoading}"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    HeightRequest="200"
+                    Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}"
+                    Margin="0, 20, 0, 20" />
+
+                <VerticalStackLayout
+                    Grid.Row="2"
+                    IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolToVisibilityConverter}}">
+                    <templates:ErrorItem
+                        IsVisible="{Binding IsErrorVisible}"
+                        ButtonCommand="{Binding RefreshData}"
+                        ErrorException="{Binding Exception}"
+                        Margin="0, 0, 0, 20" />
+                    <templates:EmptyItem
+                        IsVisible="{Binding IsEmpty}" />
+                    <CollectionView
+                        IsVisible="{Binding OwnerAnnouncementList, Converter={StaticResource ListToVisibilityConverter}}"
+                        ItemsSource="{Binding OwnerAnnouncementList}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="{x:Type models:AnnouncementInfo}">
+                                <templates:AnnouncementShort
+                                    IsOwnerView="True"
+                                    Announcement="{Binding .}"/>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <CollectionView
+                        IsVisible="{Binding KeeperAnnouncementList, Converter={StaticResource ListToVisibilityConverter}}"
+                        ItemsSource="{Binding KeeperAnnouncementList}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="{x:Type models:AnnouncementInfo}">
+                                <templates:AnnouncementShort
+                                    Announcement="{Binding .}"/>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

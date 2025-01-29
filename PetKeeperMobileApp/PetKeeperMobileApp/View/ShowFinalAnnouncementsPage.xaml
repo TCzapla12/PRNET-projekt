@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PetKeeperMobileApp.View.ShowFinalAnnouncementsPage"
+             xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             xmlns:templates="clr-namespace:PetKeeperMobileApp.Templates"
+             xmlns:models="clr-namespace:PetKeeperMobileApp.Models"
+             x:DataType="viewmodel:ShowFinalAnnouncementsViewModel"
+             Title="ShowFinalAnnouncementsPage"
+             x:Name="ShowFinalAnn">
+
+    <ContentPage.Resources>
+        <converters:InvertedBoolToVisibilityConverter 
+            x:Key="InvertedBoolToVisibilityConverter"
+            xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />
+        <x:String x:Key="arrow-left">&#xf060;</x:String>
+    </ContentPage.Resources>
+    
+    <ScrollView>
+        <Grid
+            RowDefinitions="55, Auto"
+            ColumnDefinitions="Auto, *"
+            Padding="20"
+            RowSpacing="20">
+            
+            <ImageButton
+                HeightRequest="30"
+                Command="{Binding GoBackCommand}">
+                <ImageButton.Source>
+                    <FontImageSource
+                FontFamily="FAS"
+                Glyph="{StaticResource arrow-left}"
+                Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
+                </ImageButton.Source>
+            </ImageButton>
+
+            <Label 
+                WidthRequest="200"
+                Grid.ColumnSpan="2"
+                Text="{Binding Title}"
+                Style="{StaticResource Headline}"/>
+
+            <ActivityIndicator
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                IsRunning="{Binding IsLoading}"
+                IsVisible="{Binding IsLoading}"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                HeightRequest="200"
+                Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}"
+                Margin="0, 20, 0, 20" />
+
+            <VerticalStackLayout
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolToVisibilityConverter}}">
+                <templates:ErrorItem
+                    IsVisible="{Binding IsErrorVisible}"
+                    ButtonCommand="{Binding RefreshData}"
+                    ErrorException="{Binding Exception}"
+                    Margin="0, 0, 0, 20" />
+                <templates:EmptyItem
+                    IsVisible="{Binding IsEmpty}" />
+                <CollectionView
+                     ItemsSource="{Binding AnnouncementList}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="{x:Type models:AnnouncementInfo}">
+                            <templates:AnnouncementItem
+                                IsOwnerView="{Binding Source={x:Reference ShowFinalAnn}, Path=BindingContext.IsOwnerView}"
+                                Announcement="{Binding .}"/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </Grid>
+        
+    </ScrollView>
+</ContentPage>

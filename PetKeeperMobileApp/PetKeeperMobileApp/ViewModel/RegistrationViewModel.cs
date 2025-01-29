@@ -132,7 +132,7 @@ public partial class RegistrationViewModel(IGrpcClient grpcClient) : ObservableO
             {
                 Email = this.Email,
                 Username = this.Username,
-                HashPassword = Security.HashMD5(this.Password),
+                Password = this.Password,
                 FirstName = this.FirstName,
                 LastName = this.LastName,
                 PrimaryAddress = address,

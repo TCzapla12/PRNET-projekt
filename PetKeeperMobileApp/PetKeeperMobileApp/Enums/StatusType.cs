@@ -4,7 +4,7 @@ public enum StatusType
 {
     Created,
     Pending,
-    Accepted,
+    Accepted, //NIE UŻYWANE (nie ma negocjacji)
     Ongoing,
     Finished,
     Canceled

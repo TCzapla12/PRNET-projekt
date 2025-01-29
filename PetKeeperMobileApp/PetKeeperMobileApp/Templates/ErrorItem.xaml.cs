@@ -1,6 +1,5 @@
 using CommunityToolkit.Mvvm.Input;
 using Grpc.Core;
-using PetKeeperMobileApp.Models;
 using PetKeeperMobileApp.Utils;
 
 namespace PetKeeperMobileApp.Templates;
@@ -32,22 +31,22 @@ public partial class ErrorItem : ContentView
 
     public void BindData(Exception exception)
     {
+        TitleLabel.Text = Wordings.ERROR;
         if (exception is RpcException rpcException)
         {
             if (rpcException.StatusCode == StatusCode.Unauthenticated)
             {
-                TitleLabel.Text = Wordings.LOGOUT;
                 DescriptionLabel.Text = Wordings.LOGOUT_DESCRIPTION;
+                RefreshButton.Text = Wordings.LOGOUT;
+                ButtonCommand = new RelayCommand(async () => await Helpers.Logout());
             }
             else
             {
-                TitleLabel.Text = Wordings.ERROR;
                 DescriptionLabel.Text = rpcException.Status.Detail;
             }
         }
         else
         {
-            TitleLabel.Text = Wordings.ERROR;
             DescriptionLabel.Text = exception.Message;
         }
     }

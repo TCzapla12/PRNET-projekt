@@ -3,12 +3,161 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PetKeeperMobileApp.View.SearchPage"
              xmlns:viewmodel="clr-namespace:PetKeeperMobileApp.ViewModel"
+             xmlns:models="clr-namespace:PetKeeperMobileApp.Models"
+             xmlns:templates="clr-namespace:PetKeeperMobileApp.Templates"
              x:DataType="viewmodel:SearchViewModel"
              Title="SearchPage">
-    <VerticalStackLayout>
+
+    <ContentPage.Resources>
+        <converters:InvertedBoolToVisibilityConverter 
+            x:Key="InvertedBoolToVisibilityConverter"
+            xmlns:converters="clr-namespace:PetKeeperMobileApp.Converters" />
+        <x:String x:Key="arrow-left">&#xf060;</x:String>
+        <x:String x:Key="pen">&#xf304;</x:String>
+        <x:String x:Key="trash">&#xf1f8;</x:String>
+        <x:String x:Key="search">&#xf002;</x:String>
+        <x:String x:Key="location">&#xf3c5;</x:String>
+    </ContentPage.Resources>
+
+    <Grid
+        RowDefinitions="40, 44, Auto, *"
+        ColumnDefinitions="Auto, *, 64, 44"
+        Padding="20"
+        RowSpacing="20">
+        <ImageButton
+                HeightRequest="30"
+                Command="{Binding GoBackCommand}">
+            <ImageButton.Source>
+                <FontImageSource
+                        FontFamily="FAS"
+                        Glyph="{StaticResource arrow-left}"
+                        Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
+            </ImageButton.Source>
+        </ImageButton>
         <Label 
-            Text="Wyszukiwanie..."
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+            Grid.ColumnSpan="4"
+            Text="OGŁOSZENIA"
+            Style="{StaticResource Headline}" />
+
+        <Frame
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
+            CornerRadius="8"
+            Padding="10, 0, 10, -10">
+            <Entry
+                Placeholder="Wyszukaj miejscowość..."
+                IsSpellCheckEnabled="False"
+                Text="{Binding SearchText}" />
+        </Frame>
+        <Frame
+            Grid.Row="1"
+            Grid.Column="2"
+            CornerRadius="8"
+            Margin="10, 0, 10, 0"
+            Padding="0">
+                <ImageButton
+                    HeightRequest="20"
+                    Command="{Binding GetLocationCommand}">
+                    <ImageButton.Source>
+                        <FontImageSource
+                            FontFamily="FAS"
+                            Glyph="{StaticResource location}"
+                            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </Frame>
+
+        <Frame
+            Grid.Row="1"
+            Grid.Column="3"
+            CornerRadius="8"
+            Padding="0">
+            <ImageButton
+                    HeightRequest="20"
+                    Command="{Binding SearchAnnouncementsCommand}">
+                <ImageButton.Source>
+                    <FontImageSource
+                            FontFamily="FAS"
+                            Glyph="{StaticResource search}"
+                            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}" />
+                </ImageButton.Source>
+            </ImageButton>
+        </Frame>
+        <ScrollView 
+                Orientation="Horizontal" 
+                HorizontalScrollBarVisibility="Never"
+                Grid.Row="2"
+                Grid.ColumnSpan="4">
+            <HorizontalStackLayout Spacing="10">
+                <Label
+                    Style="{StaticResource SubHeadline}"
+                    VerticalTextAlignment="Center"
+                    Text="Profit:" />
+                <Frame
+                        WidthRequest="100"
+                        HeightRequest="44"
+                        CornerRadius="8"
+                        Padding="5, 0, 5, -10">
+                    <Entry
+                            Placeholder="Min."
+                            IsSpellCheckEnabled="False"
+                            Keyboard="Numeric"
+                            Text="{Binding MinValue}" />
+                </Frame>
+                <Frame
+                        WidthRequest="100"
+                        CornerRadius="8"
+                        Padding="5, 0, 5, -10">
+                    <Entry
+                            Placeholder="Maks."
+                            IsSpellCheckEnabled="False"
+                            Keyboard="Numeric"
+                            Text="{Binding MaxValue}" />
+                </Frame>
+                <Label
+                    Style="{StaticResource SubHeadline}"
+                    VerticalTextAlignment="Center"
+                    Text="Data:" />
+                <Frame
+                        WidthRequest="100"
+                        CornerRadius="8"
+                        Padding="5, 0, 5, -10">
+                    <DatePicker
+                            Date="{Binding StartTerm}"
+                            MinimumDate="{Binding MinimumDate}"/>
+                </Frame>
+                <Frame
+                        WidthRequest="100"
+                        CornerRadius="8"
+                        Padding="5, 0, 5, -10">
+                    <DatePicker
+                            Date="{Binding EndTerm}"
+                            MinimumDate="{Binding StartTerm}"/>
+                </Frame>
+            </HorizontalStackLayout>
+        </ScrollView>
+
+        <ActivityIndicator
+            Grid.Row="3"
+            Grid.ColumnSpan="4"
+            IsRunning="{Binding IsLoading}"
+            IsVisible="{Binding IsLoading}"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            HeightRequest="50"
+            Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}"
+            Margin="0, 20, 0, 20" />
+
+        <CollectionView
+            Grid.Row="3"
+            Grid.ColumnSpan="4"
+            IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolToVisibilityConverter}}"
+            ItemsSource="{Binding AnnouncementList}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="{x:Type models:AnnouncementInfo}">
+                    <templates:AnnouncementItem Announcement="{Binding .}"/>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
 </ContentPage>

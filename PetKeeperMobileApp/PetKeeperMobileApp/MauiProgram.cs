@@ -44,6 +44,12 @@ namespace PetKeeperMobileApp
             builder.Services.AddTransient<MyAddressesViewModel>();
             builder.Services.AddTransient<SearchPage>();
             builder.Services.AddTransient<SearchViewModel>();
+            builder.Services.AddTransient<ShowFinalAnnouncementsPage>();
+            builder.Services.AddTransient<ShowFinalAnnouncementsViewModel>();
+            builder.Services.AddTransient<ShowOpinionsPage>();
+            builder.Services.AddTransient<ShowOpinionsViewModel>();
+            builder.Services.AddTransient<SettingsPage>();
+            builder.Services.AddTransient<SettingsViewModel>();
 
             builder.Services.AddTransient<ForgotPasswordPage>();
             builder.Services.AddTransient<ForgotPasswordViewModel>();
